@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+	<!-- 	<link rel="shortcut icon" type="image/icon" href="img/favicon.ico" /> -->
+	<!-- <h:outputStylesheet name="project.css" target="head" /> --> 
+
+	<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+<!-- <h:outputStylesheet name="project.css" target="head" /> -->
+
+
+	<script
+	src='https://unpkg.com/mapillary-js@2.11.1/dist/mapillary.min.js'></script>
+<link href='https://unpkg.com/leaflet@1.0.1/dist/leaflet.css'
+	rel='stylesheet' />
+
+<h:outputScript name="/js/leaflet.js" target="head"/> 
+<h:outputScript name="/js/gis.js" target="head" />
+
+	
+</h:head>
+<style>
+
+body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+}
+
+#mly {
+	position: absolute;
+	left: 30px;
+	height: 100%;
+	width: 66%;
+}
+
+#map {
+	position: absolute;
+	left: 0px;
+	width: 100%;
+	top: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.up-div {
+	height:32px;
+	position: relative;
+}
+
+.up-links {
+	position: absolute;
+	right: 0px;
+	display: inline-block;
+}
+
+.up-menu {
+	padding: 0 !important;
+	border: none;
+}
+
+
+
+.banner{
+	background-image: url("#{resource['images/banner.png']}");
+    background-size: 100%;
+    background-repeat: no-repeat; 
+    background-attachment:fixed;
+    width:100%
+}
+
+/**
+Ovverriding Primefaces CSS
+**/
+.ui-layout-unit .ui-layout-unit-content {
+   padding: .0em 0;    
+   overflow: hidden ;
+}
+
+
+
+.ui-corner-all {
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    border-radius: 0px;
+}
+
+.ui-widget-header {
+    border: 1px solid #a8a8a8;
+    background-image: url("#{resource['images/banner.png']}");
+    background-size: 100%;
+    background-attachment:fixed;
+}
+
+</style>
+
+<h:body style="margin:0px 0px 0px 0px; font-size:12px;margin:0px;padding:0px" id="bodypage">
+	<p:layout id="fullPage" fullPage="true" stateful="false"
+		widgetVar="fullPage" >
+
+		<p:layoutUnit position="north" resizable="false" size="36" id="north_pane"
+			minSize="34" maxSize="34" style="margin:0px;padding:0px" >
+			<ui:include src="north.xhtml">
+				<ui:param name="pagename" value="home" />
+			</ui:include>
+		</p:layoutUnit>
+
+		
+		<p:layoutUnit position="center" id="centerPane">
+			<ui:include src="gis_center.xhtml" /> 
+		</p:layoutUnit>
+
+	</p:layout>
+	<p:growl id="msgs" showDetail="true" sticky="true" />
+
+
+
+</h:body>
+</html>
