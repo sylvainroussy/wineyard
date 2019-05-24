@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<f:view>
+	
+	<h:body>
+	<ui:composition>
+		
+    <h:form>
+      <p:remoteCommand autoRun="true" actionListener="#{meteoView.loadMeteo()}" update="meteoList"/>
+      
+      <p:dataGrid var="meteo" value="#{meteoView.meteo}" columns="1" layout="tabular"
+        id="meteoList" style="width:100%">
+         
+        <f:facet name="header">
+            Météo
+        </f:facet>
+ 
+        <p:panel  style="text-align:center">
+            <h:panelGrid columns="1" >
+                <p:graphicImage url="#{meteo.icon}"/> 
+ 
+                <h:outputText value="#{meteo.dayLong}" />
+                 <h:outputText value="#{meteo.condition}" />
+                  <h:outputText value="#{meteo.tMin}°C/#{meteo.tMax}°C" />
+  
+            
+                
+            </h:panelGrid>
+        </p:panel>
+ 
+    </p:dataGrid> 
+    <!-- <p:dataList id="meteoList" value="#{meteoView.meteo}" var="meteo" type="definition">
+        <f:facet name="header">
+           Météo
+        </f:facet>
+        
+        
+        
+       
+        <f:facet name="description">
+         #{meteo.dayLong}
+            <p:graphicImage url="#{meteo.icon}"/> 
+            
+        </f:facet>
+        
+    </p:dataList> -->
+    </h:form>
+		</ui:composition>
+	</h:body>
+</f:view>
+</html>

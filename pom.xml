@@ -23,6 +23,7 @@
 		<!-- lucene version must be kept in sync with elqsticsearch's version -->
 		<lib.lucene.version>7.3.1</lib.lucene.version>
 		<lib.neo4j.ogm.version>${neo4j-ogm.version}</lib.neo4j.ogm.version>
+		<jsf.version>2.2.19</jsf.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -51,7 +52,7 @@
 			<artifactId>primefaces</artifactId>
 			<version>7.0</version>
 		</dependency>
-<dependency>
+<!-- <dependency>
     <groupId>org.apache.myfaces.core</groupId>
     <artifactId>myfaces-impl</artifactId>
     <version>2.2.12</version>
@@ -60,7 +61,18 @@
     <groupId>org.apache.myfaces.core</groupId>
     <artifactId>myfaces-api</artifactId>
     <version>2.2.12</version>
-</dependency>
+</dependency> -->
+<dependency>
+            <groupId>com.sun.faces</groupId>
+            <artifactId>jsf-impl</artifactId>
+            <version>${jsf.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.faces</groupId>
+            <artifactId>jsf-api</artifactId>
+            <version>${jsf.version}</version>
+        </dependency>
 <dependency>
     <groupId>org.apache.tomcat.embed</groupId>
     <artifactId>tomcat-embed-jasper</artifactId>

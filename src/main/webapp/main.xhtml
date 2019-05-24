@@ -1,30 +1,85 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
 <f:view>
-    <h:head>
-        <meta charset="utf-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Product</title>
-    </h:head>
-    <h:body>
-        <div class="ui-g">
-            <div class="ui-g-12">
-                <p:toolbar>
-                    <f:facet name="left">
-                        <p:button href="/" value="List of Products" />
-                        <p:button href="/product" value="New Product" />
-                    </f:facet>
-                </p:toolbar>
-            </div>
-            <div class="ui-g-12">
-                <ui:insert name="content" />
-            </div>
-        </div>
-    </h:body>
+	<h:head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Wineyard</title>
+		<style>
+.banner {
+	background-image: url("resources/images/banner.png");
+	background-repeat: no-repeat;
+	background-color: #cccccc;
+	background-size: cover;
+	padding: 0px;
+	margin: 0px;
+	border: none;
+	overflow: hidden;
+}
+
+#north_menu {
+	padding: 0px;
+	margin: 0px;
+	border: none;
+	overflow: hidden;
+}
+
+.ui-panel, div.ui-state-hover {
+	margin: 0px;
+	width: 200px;
+}
+
+.ui-dashboard-column {
+	width: 220px;
+}
+
+.ui-widget {
+	font-size: 90% !important;
+}
+
+.ui-widget-header{
+background-image: url("resources/images/banner.png");
+	background-repeat: no-repeat;
+	background-color: #cccccc;
+	background-size: cover;
+}
+
+.ui-layout-unit-content .ui-widget-content {
+	
+}
+
+
+
+.ui-layout-unit .ui-layout-unit-content {
+	padding: 0em;
+	overflow: hidden;
+}
+</style>
+	</h:head>
+	<h:body>
+		<p:layout style="min-width:400px;min-height:200px;" fullPage="true">
+			<p:layoutUnit position="north" styleClass="banner">
+				<ui:include src="north.xhtml"></ui:include>
+			</p:layoutUnit>
+			<p:layoutUnit position="west" resizable="true" size="100"
+				minSize="40" maxSize="200">
+		       <ui:include src="main_west.xhtml"></ui:include>
+		    </p:layoutUnit>
+			<p:layoutUnit position="east" resizable="true"  size="300">
+				<ui:include src="main_east.xhtml"></ui:include>
+			</p:layoutUnit>
+			<p:layoutUnit position="center">
+				<ui:include src="main_center.xhtml"></ui:include>
+			</p:layoutUnit>
+			<p:layoutUnit position="south" resizable="true"  size="200">
+		       <ui:include src="main_south.xhtml"></ui:include>
+		    </p:layoutUnit>
+		</p:layout>
+	</h:body>
 </f:view>
 </html>
