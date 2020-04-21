@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<f:view>
+
+	<h:body>
+		<ui:composition>
+
+			<h:form id="westForm">
+
+				<p:remoteCommand id="applyOnMap" name="applyOnMap"
+					oncomplete='showDatum("#{gisView.currentFeature.id}",#{gisView.currentFeature.data});'></p:remoteCommand>
+				<p:remoteCommand id="removeOnMap" name="removeOnMap"
+					oncomplete='removeDatum("#{gisView.currentFeature.id}");'></p:remoteCommand>
+				<p:tabView>
+					<p:tab title="AOC">
+						<p:tree id="aocTree" value="#{gisView.aocTree}" var="node"
+							dynamic="false" styleClass="treeClass" highlight="false"
+							selectionMode="checkbox" propagateSelectionDown="false" propagateSelectionUp="false">
+							<p:ajax event="select" listener="#{gisView.onNodeSelect}"
+								update=":westForm:applyOnMap" oncomplete="applyOnMap()"
+								async="false" />
+							<p:ajax event="unselect" listener="#{gisView.onNodeUnselect}"
+								update=":westForm:removeOnMap" oncomplete="removeOnMap()"
+								async="false" />
+
+							<p:treeNode icon="ui-icon ui-icon-folder-collapsed" type="region" >
+								<h:outputText value="#{node}" />
+							</p:treeNode>
+
+							<p:treeNode icon="ui-icon ui-icon-folder-collapsed"
+								type="sousRegion">
+								<h:outputText value="#{node}" />
+							</p:treeNode>
+
+							<p:treeNode icon="ui-icon ui-icon-tag" type="aoc">
+								<h:outputText value="#{node}" />
+							</p:treeNode>
+						</p:tree>
+
+					</p:tab>
+					<p:tab title="Communes">
+					<p:tree id="citiesTree" value="#{gisView.citiesTree}" var="node"
+							dynamic="false" styleClass="treeClass" highlight="true"
+							cache="false" 
+							filterBy="#{node.newNomCom}" 
+							
+							selectionMode="checkbox" propagateSelectionDown="false">
+							<p:ajax event="select" listener="#{gisView.onNodeSelect}"
+								update=":westForm:applyOnMap" oncomplete="applyOnMap()"
+								async="false" />
+							<p:ajax event="unselect" listener="#{gisView.onNodeUnselect}"
+								update=":westForm:removeOnMap" oncomplete="removeOnMap()"
+								async="false" />
+
+							<p:treeNode icon="ui-icon ui-icon-folder-collapsed" type="ville">
+								<h:outputText value="#{node.newNomCom} (#{node.newInsee})" />
+							</p:treeNode>
+							<p:treeNode icon="ui-icon ui-icon-tag" type="ville_aoc">
+								<h:outputText value="#{node.denomination}" />
+							</p:treeNode>
+							
+						</p:tree>
+					</p:tab>
+				</p:tabView>
+			</h:form>
+		</ui:composition>
+	</h:body>
+</f:view>
+</html>
