@@ -20,8 +20,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<lib.elasticsearch.version>6.3.0</lib.elasticsearch.version>
-		<!-- lucene version must be kept in sync with elqsticsearch's version -->
-		<lib.lucene.version>7.3.1</lib.lucene.version>
+
 		<lib.neo4j.ogm.version>${neo4j-ogm.version}</lib.neo4j.ogm.version>
 		<jsf.version>2.2.19</jsf.version>
 	</properties>
@@ -52,41 +51,41 @@
 			<artifactId>primefaces</artifactId>
 			<version>7.0</version>
 		</dependency>
-<!-- <dependency>
-    <groupId>org.apache.myfaces.core</groupId>
-    <artifactId>myfaces-impl</artifactId>
-    <version>2.2.12</version>
-</dependency>
-<dependency>
-    <groupId>org.apache.myfaces.core</groupId>
-    <artifactId>myfaces-api</artifactId>
-    <version>2.2.12</version>
-</dependency> -->
-<dependency>
-            <groupId>com.sun.faces</groupId>
-            <artifactId>jsf-impl</artifactId>
-            <version>${jsf.version}</version>
-        </dependency>
+		<!-- <dependency> <groupId>org.apache.myfaces.core</groupId> <artifactId>myfaces-impl</artifactId> 
+			<version>2.2.12</version> </dependency> <dependency> <groupId>org.apache.myfaces.core</groupId> 
+			<artifactId>myfaces-api</artifactId> <version>2.2.12</version> </dependency> -->
+		<dependency>
+			<groupId>com.sun.faces</groupId>
+			<artifactId>jsf-impl</artifactId>
+			<version>${jsf.version}</version>
+		</dependency>
 
-        <dependency>
-            <groupId>com.sun.faces</groupId>
-            <artifactId>jsf-api</artifactId>
-            <version>${jsf.version}</version>
-        </dependency>
-<dependency>
-    <groupId>org.apache.tomcat.embed</groupId>
-    <artifactId>tomcat-embed-jasper</artifactId>
-</dependency>
+		<dependency>
+			<groupId>com.sun.faces</groupId>
+			<artifactId>jsf-api</artifactId>
+			<version>${jsf.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-jasper</artifactId>
+		</dependency>
 
 
 		<!-- Persistence -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-neo4j</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-ogm-bolt-driver</artifactId>
+		</dependency> -->
+		<!-- https://mvnrepository.com/artifact/org.neo4j.driver/neo4j-java-driver -->
+		<dependency>
+			<groupId>org.neo4j.driver</groupId>
+			<artifactId>neo4j-java-driver</artifactId>
+			<version>4.0.0</version>
 		</dependency>
+
 	</dependencies>
 </project>

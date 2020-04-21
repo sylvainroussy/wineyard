@@ -20,7 +20,7 @@ public class MeteoView {
 	@Resource
 	private RestTemplate restTemplate;
 	
-	public void loadMeteo() {
+	public void loadMeteo(String latLng) {
 		meteo.clear();
 		
 		final Map<String,Object> json = restTemplate.getForObject("https://www.prevision-meteo.ch/services/json/lat=46.259lng=5.235", Map.class);

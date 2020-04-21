@@ -9,9 +9,29 @@
 	<h:body>
 	<ui:composition>
 	<h:form id="north_menu" styleClass="banner">
-	<p:menubar styleClass="banner">
-		<p:menuitem>qsdqsd</p:menuitem>
+	<p:remoteCommand id="onFocusInit" name="onFocusInit" oncomplete="switchFocus(#{gisView.focusEnabled})" autoRun="true" />
+	<p:remoteCommand id="onFocusChange" name="onFocusChange"  oncomplete="switchFocus(!#{gisView.focusEnabled})" update="@this"></p:remoteCommand>
+	<p:menubar styleClass="banner" >
+		<p:menuitem oncomplete="PF('sidebar2').show()">WINEYARD</p:menuitem>
+		<p:menuitem onclick="manualPrint ()" icon="ui-icon-print">Print Map</p:menuitem>
+		
+		<p:menuitem onclick="setLayer ('osm')" icon="ui-icon-image">OSM layer</p:menuitem>
+		<p:menuitem onclick="setLayer ('topoMap')" icon="ui-icon-image">Topo Map layer</p:menuitem>
+		
+		<p:menuitem onclick="map.zoomIn()" icon="ui-icon-zoomin">Zoom in</p:menuitem>
+		<p:menuitem onclick="map.zoomOut()" icon="ui-icon-zoomout">Zoom out</p:menuitem>
+		<p:menuitem icon="ui-icon-zoomout" update="focus">
+		 Focus
+		 <p:inputSwitch id="focus" value="#{gisView.focusEnabled}" onchange="onFocusChange();" />
+		</p:menuitem>
+		
 	</p:menubar>		
+	<p:sidebar widgetVar="sidebar2" position="left" baseZIndex="20000" appendTo="@(Body)" styleClass="sidebar">
+    	<h1 style="font-weight:normal">WINEYARD</h1>
+    	<h2 style="font-weight:normal">by SRO SOFT 	(c)2020</h2>
+    	<p:commandButton value="Cancel" oncomplete="PF('sidebar2').hide()"/>
+	</p:sidebar>
+	
 	</h:form>
 	</ui:composition>
 	</h:body>

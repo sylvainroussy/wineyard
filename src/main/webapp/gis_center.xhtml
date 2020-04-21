@@ -9,7 +9,7 @@
 	<!-- 		<h:outputStylesheet name="project.css" target="head" /> -->
 
 	<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
-	
+
 </h:head>
 
 
@@ -17,16 +17,15 @@
 	<ui:composition>
 		<f:facet name="header"></f:facet>
 
-<h:form>
-<p:remoteCommand name="rc" onsuccess="initGIS()"
-				autoRun="true" />
-				
-</h:form>
- 
-	<div id='mly'></div>
-	<div id='map'></div>
+		<h:form>
+			<p:remoteCommand name="rc" onsuccess="initGIS()" autoRun="true" />
+			
+		</h:form>
 		
-
+		
+		<div id='map'></div>
+		
+		
 	</ui:composition>
 
 </h:body>

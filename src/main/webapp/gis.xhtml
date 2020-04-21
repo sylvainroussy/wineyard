@@ -12,12 +12,18 @@
 <!-- <h:outputStylesheet name="project.css" target="head" /> -->
 
 
-	<script
-	src='https://unpkg.com/mapillary-js@2.11.1/dist/mapillary.min.js'></script>
-<link href='https://unpkg.com/leaflet@1.0.1/dist/leaflet.css'
-	rel='stylesheet' />
-
-<h:outputScript name="/js/leaflet.js" target="head"/> 
+	<!-- <script
+	src='https://unpkg.com/mapillary-js@2.11.1/dist/mapillary.min.js'></script> -->
+<!-- <link href='https://unpkg.com/leaflet@1.0.1/dist/leaflet.css'
+	rel='stylesheet' /> -->
+	<!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet"></link> -->
+	<!--<link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet"></link>-->
+<h:outputStylesheet  name="/css/leaflet.css" target="head" rel="stylesheet"/> 
+<h:outputStylesheet  name="/css/font_awesome.css" target="head" rel="stylesheet"/> 
+<h:outputScript name="/js/leaflet.js" target="head"/>
+<h:outputScript name="/js/browser_print.js" target="head"/>
+<h:outputScript name="/js/leaflet_image.js" target="head"/>
+<h:outputScript name="/js/dom_to_image.js" target="head"/>
 <h:outputScript name="/js/gis.js" target="head" />
 
 	
@@ -62,25 +68,84 @@ body {
 	border: none;
 }
 
+.treeClass{
+	border:none;
+	width:100%;
+	overflow:hidden;
+}
 
+ .ui-widget-content {
+    border: none !important;
+    background: #fff;
+    color: #4f4f4f;
+}
+
+.ui-tabs{
+	padding: 0em; 
+}
+
+
+.ui-tabs .ui-state-hover{
+	background : #CCCCCC !important;
+	moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.ui-tabs .ui-state-default{
+	background : #EEEEEE !important;
+}
+
+.ui-tabs .ui-state-active{
+	background : #FFF !important;
+}
+
+.ui-layout-unit {
+    
+    padding: 0em; 
+}
+
+.ui-layout-unit .ui-layout-unit-content {
+	padding: 0em; 
+}
+
+
+.ui-chkbox-box {
+	border:none !important;
+}
+
+.ui-tabs-header .ui-state-default .ui-corner-top .ui-state-over{
+}
 
 .banner{
 	background-image: url("#{resource['images/banner.png']}");
     background-size: 100%;
     background-repeat: no-repeat; 
     background-attachment:fixed;
-    width:100%
+    width:100%;
+}
+
+.sidebar{
+	background-image: url("#{resource['images/banner.png']}");
+    background-size: 100%;
+    background-repeat: no-repeat; 
+    background-attachment:fixed;
+    width:30%; 
 }
 
 /**
 Ovverriding Primefaces CSS
 **/
-.ui-layout-unit .ui-layout-unit-content {
+#north_pane .ui-layout-unit-content {
    padding: .0em 0;    
    overflow: hidden ;
 }
 
 
+.ui-tabs .ui-tabs-nav {
+	background-image: url("#{resource['images/banner.png']}");
+	border:none;
+}
 
 .ui-corner-all {
     -moz-border-radius: 0px;
@@ -88,11 +153,31 @@ Ovverriding Primefaces CSS
     border-radius: 0px;
 }
 
+.ui-widget .ui-widget {
+    font-size: 0.9em;
+}
+
 .ui-widget-header {
     border: 1px solid #a8a8a8;
     background-image: url("#{resource['images/banner.png']}");
     background-size: 100%;
     background-attachment:fixed;
+}
+
+.meteoDayTable{
+	border: 1px;
+	border-style: solid;
+	border-color:#a8a8a8;
+	margin-bottom:5px;
+}
+
+.mapContextMenu{
+	border: 1px;
+	border-style: solid;
+	border-color:#a8a8a8;
+	background:none;
+	background-color:#a8a8a8;
+	
 }
 
 </style>
@@ -112,11 +197,20 @@ Ovverriding Primefaces CSS
 		<p:layoutUnit position="center" id="centerPane">
 			<ui:include src="gis_center.xhtml" /> 
 		</p:layoutUnit>
+		
+		<p:layoutUnit position="west" resizable="true"  size="300" style="margin:0px;padding:0px;overflow:auto">
+				<ui:include src="gis_west.xhtml"></ui:include>
+			</p:layoutUnit>
 
 	</p:layout>
 	<p:growl id="msgs" showDetail="true" sticky="true" />
 
-
+<p:sidebar widgetVar="meteoPanel" position="right" baseZIndex="20000" appendTo="@(Body)" styleClass="sidebar" >
+    	<h1 style="font-weight:normal">Bulletin météo</h1>
+    	
+    	<div id="meteoInfo">dd</div>
+    	<p:commandButton value="Cancel" oncomplete="PF('meteoPanel').hide()"/>
+	</p:sidebar>
 
 </h:body>
 </html>
