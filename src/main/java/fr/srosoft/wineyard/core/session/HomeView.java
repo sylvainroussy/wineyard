@@ -1,4 +1,4 @@
-package fr.srosoft.wineyard.core.parcel.jsf.views;
+package fr.srosoft.wineyard.core.session;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Scope("session")
-public class CenterParcelView {
+public class HomeView {
 
 	private DashboardModel model;
     
@@ -33,7 +33,8 @@ public class CenterParcelView {
         column2.addWidget("lifestyle");
         column2.addWidget("weather");
          
-        column3.addWidget("politics");
+        column3.addWidget("politics"); 
+        column3.addWidget("domains");
  
         model.addColumn(column1);
         model.addColumn(column2);
@@ -50,7 +51,7 @@ public class CenterParcelView {
     }
      
     public void handleClose(CloseEvent event) {
-       
+        
     }
      
     public void handleToggle(ToggleEvent event) {

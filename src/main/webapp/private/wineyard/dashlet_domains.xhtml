@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<f:view>
+	
+	
+	<ui:composition>
+	<p:panel  header="Domaines gérés par #{userSession.currentUser.displayName}" >
+	
+	<p:dataTable value="#{userSession.getModule('DomainModule').getManagedDomains()}" var="domain">
+		<p:column headerText="Domaine">#{domain.domainName}</p:column>
+		<p:column headerText="Contact">#{domain.contact}</p:column>
+		<p:column headerText="Téléphone(s)">#{domain.phones}</p:column>
+		<p:column headerText="Commune">#{domain.city}</p:column>
+	</p:dataTable>
+	
+	</p:panel>
+	<!-- <p:draggable for="domains" /> -->
+	
+    
+		</ui:composition>
+	
+</f:view>
+</html>

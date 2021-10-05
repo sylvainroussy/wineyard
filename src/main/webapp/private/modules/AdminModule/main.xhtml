@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+	
+
+
+</h:head>
+
+<ui:composition>
+	<div class="card">
+
+		<div class="grid sample-layout ">
+		<div class="grid">
+			<div class="col-12 md:col-2">
+				<p:accordionPanel>
+					<p:tab title="Utilisateurs">
+					
+					</p:tab>
+					<p:tab title="Données sources">
+					
+					</p:tab>
+				</p:accordionPanel>
+
+			</div>
+			<div class="col-12 md:col-10">
+				<ui:include src="dashlet_domains.xhtml"></ui:include>
+
+			</div>
+			</div>
+
+		</div>
+	</div>
+
+		
+
+		<p:sidebar widgetVar="meteoPanel" position="right" baseZIndex="20000"
+			appendTo="@(Body)" styleClass="sidebar">
+			<h1 style="font-weight: normal">Bulletin météo</h1>
+
+			<div id="meteoInfo">dd</div>
+			<p:commandButton value="Cancel" oncomplete="PF('meteoPanel').hide()" />
+		</p:sidebar>
+</ui:composition>
+</html>

@@ -15,16 +15,16 @@
 					oncomplete='showDatum("#{gisView.currentFeature.id}",#{gisView.currentFeature.data});'></p:remoteCommand>
 				<p:remoteCommand id="removeOnMap" name="removeOnMap"
 					oncomplete='removeDatum("#{gisView.currentFeature.id}");'></p:remoteCommand>
-				<p:tabView >
-					<p:tab title="AOC">
-						<p:tree id="aocTree" value="#{gisView.aocTree}" var="node"
-							dynamic="false" styleClass="treeClass" highlight="false" 
+				<p:tabView scrollable="true" >
+					<p:tab title="AOC" >
+						<p:tree id="aocTree" value="#{gisView.aocTree}" var="node" 
+							dynamic="false" styleClass="treeClass min-h-full" highlight="false" 
 							selectionMode="checkbox" propagateSelectionDown="false" propagateSelectionUp="false">
 							<p:ajax event="select" listener="#{gisView.onNodeSelect}"
-								update=":westForm:applyOnMap" oncomplete="applyOnMap()"
+								update=":centerPanel:westForm:applyOnMap" oncomplete="applyOnMap()"
 								async="false" />
 							<p:ajax event="unselect" listener="#{gisView.onNodeUnselect}"
-								update=":westForm:removeOnMap" oncomplete="removeOnMap()"
+								update=":centerPanel:westForm:removeOnMap" oncomplete="removeOnMap()"
 								async="false" />
 
 							<p:treeNode icon="ui-icon ui-icon-folder-collapsed" type="region" >
@@ -44,16 +44,16 @@
 					</p:tab>
 					<p:tab title="Communes">
 					<p:tree id="citiesTree" value="#{gisView.citiesTree}" var="node"
-							dynamic="false" styleClass="treeClass" highlight="true"
+							dynamic="false" styleClass="treeClass  min-h-full" highlight="true"
 							cache="false" 
 							filterBy="#{node.newNomCom}" 
 							
 							selectionMode="checkbox" propagateSelectionDown="false">
 							<p:ajax event="select" listener="#{gisView.onNodeSelect}"
-								update=":westForm:applyOnMap" oncomplete="applyOnMap()"
+								update=":centerPanel:westForm:applyOnMap" oncomplete="applyOnMap()"
 								async="false" />
 							<p:ajax event="unselect" listener="#{gisView.onNodeUnselect}"
-								update=":westForm:removeOnMap" oncomplete="removeOnMap()"
+								update=":centerPanel:westForm:removeOnMap" oncomplete="removeOnMap()"
 								async="false" />
 
 							<p:treeNode icon="ui-icon ui-icon-folder-collapsed" type="ville">

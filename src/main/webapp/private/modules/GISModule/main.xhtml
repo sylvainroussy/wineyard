@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+</h:head>
+<h:body>
+<ui:composition>
+	<div class="card">
+
+		<div class="grid sample-layout ">
+			<div class="col-12 no-gutter">
+
+				<ui:include src="gis_north.xhtml">
+					<ui:param name="pagename" value="home" />
+				</ui:include>
+
+			</div>
+
+
+			<div class="col-12 md:col-2 min-h-full">
+				<ui:include src="gis_west_flex.xhtml"></ui:include>
+			</div>
+			<div class="col-12 md:col-10">
+				<div class="p-grid">
+
+					<div class="col-12 min-h-full">
+						<ui:include src="gis_center_flex.xhtml" />
+					</div>
+				</div>
+			</div>
+			
+
+		</div>
+	</div>
+
+	
+
+	<p:sidebar widgetVar="meteoPanel" position="right" baseZIndex="20000" appendTo="@(Body)" styleClass="sidebar" >
+    	<h1 style="font-weight:normal">Bulletin météo</h1>
+    	
+    	<div id="meteoInfo">dd</div>
+    	<p:commandButton value="Cancel" oncomplete="PF('meteoPanel').hide()"/>
+	</p:sidebar> 
+	</ui:composition>
+</h:body>
+</html>

@@ -7,7 +7,7 @@ import org.springframework.boot.web.servlet.ServletContextInitializer;
 
 public class ServletInitializer implements ServletContextInitializer {
 
-    @Override
+    //@Override
     public void onStartup(ServletContext jsfServlet) throws ServletException {
    jsfServlet.setInitParameter("com.sun.faces.forceLoadConfiguration", Boolean.TRUE.toString());
     jsfServlet.setInitParameter("javax.faces.PARTIAL_STATE_SAVING_METHOD", "true");

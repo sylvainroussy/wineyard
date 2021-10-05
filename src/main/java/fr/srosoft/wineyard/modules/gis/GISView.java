@@ -1,4 +1,4 @@
-package fr.srosoft.wineyard.core.gis.jsf.views;
+package fr.srosoft.wineyard.modules.gis;
 
 import java.io.Serializable;
 import java.util.List;
@@ -181,6 +181,8 @@ public class GISView {
 
 	public void setFocusEnabled(Boolean focusEnabled) {
 		this.focusEnabled = focusEnabled;
+		LOGGER.info ("setFocusEnabled() set to "+focusEnabled);
+		System.out.println("setFocusEnabled() set to "+focusEnabled);
 	}
 
 	@SuppressWarnings("serial")

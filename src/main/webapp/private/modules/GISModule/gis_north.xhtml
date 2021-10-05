@@ -12,9 +12,6 @@
 	<p:remoteCommand id="onFocusInit" name="onFocusInit" oncomplete="switchFocus(#{gisView.focusEnabled})" autoRun="true" />
 	<p:remoteCommand id="onFocusChange" name="onFocusChange"  oncomplete="switchFocus(#{gisView.focusEnabled});console.log('focus returned #{gisView.focusEnabled}')" update=":north_menu"></p:remoteCommand>
 	<p:menubar id="northBar" styleClass="banner" >
-		<p:menuitem oncomplete="PF('sidebar2').show()">WINEYARD</p:menuitem>
-		
-		
 		<p:menuitem onclick="manualPrint ()" icon="ui-icon-print">Print Map</p:menuitem>
 		
 		<p:menuitem onclick="setLayer ('osm')" icon="ui-icon-image">OSM layer</p:menuitem>

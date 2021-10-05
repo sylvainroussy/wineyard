@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<f:view>
+
+	<h:body>
+		<ui:composition>
+			<style>
+#centerPanel {
+	flex-direction: column;
+}
+</style>
+
+			<h:form id="centerPanel">
+				<p:outputPanel rendered="#{userSession.currentPage=='home'}">
+					<p:growl id="msgs" showDetail="true" />
+
+					<div class="grid nested-grid">
+						<div class="col-8">
+							<div class="grid">
+								<div class="col-12"><ui:include src="dashlet_domains.xhtml"></ui:include></div>
+								<div class="col-12"><ui:include src="dashlet_scheduler.xhtml"></ui:include></div>
+								
+							</div>
+						</div>
+						<div class="col-4"><ui:include src="dashlet_gis.xhtml"></ui:include></div>
+					</div>
+
+					<div class="grid">
+
+						
+						
+						
+
+					</div>
+					<div style="clear: both" />
+				</p:outputPanel>
+
+				<c:forEach var="module" items="#{userSession.moduleBeans}">
+					<p:outputPanel
+						rendered="#{userSession.currentPage==module.moduleName}">
+						<ui:include src="../modules/#{module.moduleName}/main.xhtml" />
+					</p:outputPanel>
+				</c:forEach>
+			</h:form>
+		</ui:composition>
+	</h:body>
+</f:view>
+</html>

@@ -62,7 +62,7 @@ public class TestImportDataFull {
 		driver.close();
 	}
 	
-	private void loadWriteParcel (String fileName) {
+	/*private void loadWriteParcel (String fileName) {
 		 try ( Session session = driver.session() )
 	        {
 	           session.writeTransaction( new TransactionWork<Void>()
@@ -73,6 +73,50 @@ public class TestImportDataFull {
 	                	String query ="CALL apoc.load.json($file) YIELD value " + 
 	                			"WITH value as feature " + 
 	                			"MATCH (geo:GIS:GEOMETRY {id:\"geo_\"+feature.properties.id}) " + 
+	                			"WITH  geo, feature, feature.geometry.coordinates AS level1 " + 
+	                			" " + 
+	                			"FOREACH(l1n IN range (0, size(level1)-1) | " + 
+	                			"	MERGE (l1:GIS:LEVEL1 {id:feature.properties.id+\"_\"+l1n, level:1}) " + 
+	                			"	MERGE (geo)-[:HAS_LEVEL1]->(l1) " + 
+	                			" " + 
+	                			"	FOREACH(l2n IN range (0, size(level1[l1n])-1) | " + 
+	                			"		MERGE (l2:GIS:LEVEL2 {id:feature.properties.id+\"_\"+l1n+\"_\"+l2n, level:2}) " + 
+	                			"		MERGE (l1)-[:HAS_LEVEL2]->(l2) " + 
+	                			" " + 
+	                			"		FOREACH(l3n IN range (0, size(level1[l1n][l2n])-1) |	 " + 
+	                			" " + 
+	                			"				MERGE (l3:GIS:LEVEL3 {id:feature.properties.id+\"_\"+l1n+\"_\"+l2n+\"_\"+l3n, level:3}) " + 
+	                			"					SET l3.coords=level1[l1n][l2n][l3n], l3.l1=l1n, l3.l2=l2n, l3.l3=l3n " + 
+	                			"				MERGE (l2)-[:HAS_LEVEL3]->(l3) " + 
+	                			" " + 
+	                			")))";
+	                	
+	                	final Map<String,Object> parameters = new HashMap<>();
+	                	parameters.put( "file", fileName);
+	                	tx.run(query, parameters);
+	                   
+	                   return null;
+	                }
+	            } );
+	           
+	        }
+	}*/
+	
+	private void loadWriteParcel (String fileName) {
+		 try ( Session session = driver.session() )
+	        {
+	           session.writeTransaction( new TransactionWork<Void>()
+	            {
+	                @Override
+	                public Void execute( Transaction tx )
+	                {
+	                	String query ="CALL apoc.load.json($file) YIELD value " + 
+	                			"WITH value as feature " + 
+	                			"MERGE (g:GIS:PROPS {id:feature.properties.id}) ON CREATE SET g+=feature.properties "+ 
+	                			"MERGE (geo:GIS:GEOMETRY {id:'geo_'+feature.properties.id}) "+ 
+	                			"ON CREATE SET geo.type=feature.geometry.type "+
+	                			"MERGE (g)-[:HAS_GEOMETRY]->(geo) "+
+	                			
 	                			"WITH  geo, feature, feature.geometry.coordinates AS level1 " + 
 	                			" " + 
 	                			"FOREACH(l1n IN range (0, size(level1)-1) | " + 

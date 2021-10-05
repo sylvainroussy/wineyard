@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<f:view>
+
+	<h:body>
+		<ui:composition>			
+			<h:form id="north_menu">
+				<p:toolbar id="homeMenu">
+					<f:facet name="left">
+						<ui:param name="menuClass" value="#{module.moduleName==userSession.currentPage ? 'wineyard-menu-active':'wineyard-menu-inactive'}"/>
+						<p:commandButton value="WINEYARD" icon="grape_white"
+							actionListener="#{userSession.changePage('home')}" 
+							update="centerPanel" style=" text-shadow: 1px 1px;" styleClass="#{'home'==userSession.currentPage ? 'wineyard-menu-active':'wineyard-menu-inactive'}"/>
+
+						<c:forEach var="module" items="#{userSession.moduleBeans}">
+							<p:commandButton
+								actionListener="#{userSession.changePage(module.moduleName)}"
+								update="centerPanel, homeMenu" value="#{module.label}" 
+								styleClass="#{menuClass}"/>
+
+						</c:forEach>
+
+						
+						
+						
+					</f:facet>
+
+					<f:facet name="right">
+						<!--  <p:avatar icon="pi pi-user" 
+        	styleClass="p-mr-2" 
+        	size="xlarge" 
+        	shape="circle" 
+        	label="${userSession.currentUser.displayName}" 
+        	style="background-color:#9c27b0; color: #ffffff" dynamicColor="true"/> -->
+        	
+        	<p:commandButton
+								actionListener="#{userSession.changePage('DomainModule')}"
+								update="centerPanel" value="#{userSession.getModule('DomainModule').getCurrentDomain().getDomainName()}" />
+        	<span class="ui-separator"> <span
+							class="ui-icon pi pi-ellipsis-v" />
+						</span>
+						<p:menuButton value="${userSession.currentUser.displayName}" icon="pi pi-user">
+							<p:menuitem value="Save" action="#{toolbarView.save}"
+								icon="pi pi-save" />
+							<p:menuitem value="Update" action="#{toolbarView.update}"
+								icon="pi pi-refresh" />
+							<p:menuitem value="Delete" action="#{toolbarView.delete}"
+								ajax="false" icon="pi pi-times" />
+							<p:menuitem value="Homepage" url="http://www.primefaces.org"
+								icon="pi pi-home" />
+						</p:menuButton>
+					</f:facet>
+
+				</p:toolbar>
+			</h:form>
+		</ui:composition>
+	</h:body>
+</f:view>
+</html>

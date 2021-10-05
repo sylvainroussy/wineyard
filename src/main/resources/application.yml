@@ -1,5 +1,8 @@
- data:
+data:
     neo4j:
       uri: 'bolt://localhost'
       username: 'neo4j'
       password: 'root'
+      
+server:
+  port: 80

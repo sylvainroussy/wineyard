@@ -1,7 +1,5 @@
 package fr.srosoft.wineyard.core.planification.jsf.views;
 
-import java.util.Calendar;
-
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -31,7 +29,7 @@ public class TimelineView  {
     protected void initialize() {  
         model = new TimelineModel();  
    
-        Calendar cal = Calendar.getInstance();                   
+       /* Calendar cal = Calendar.getInstance();                   
         cal.set(2014, Calendar.JUNE, 12, 0, 0, 0);  
         model.add(new TimelineEvent("PrimeUI 1.1", cal.getTime()));  
            
@@ -75,7 +73,7 @@ public class TimelineView  {
         model.add(new TimelineEvent("Primefaces 5.3.8", cal.getTime()));  
    
         cal.set(2016, Calendar.FEBRUARY, 29, 0, 0, 0);  
-        model.add(new TimelineEvent("PrimeNG 0.5", cal.getTime()));  
+        model.add(new TimelineEvent("PrimeNG 0.5", cal.getTime()));  */
     }  
    
     public void onSelect(TimelineSelectEvent e) {  

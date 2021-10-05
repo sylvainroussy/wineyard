@@ -55,7 +55,7 @@ function initGIS() {
 	};
 
 
-	map = L.map('map',{center:[ mazenayLat, mazenayLong], zoom:6, zoomControl: false });	
+	map = L.map('map',{center:[ nolayLat, nolayLong], zoom:10, zoomControl: false });	
 	
 	 
 	
@@ -67,11 +67,7 @@ function initGIS() {
 		  .openOn(map);
 		});
 	
-	/*map.on("contextmenu", function(event){
-		//getMeteo(event.latlng);
-		contextMenuPopup.openOn(baseMaps.osm);
-	});*/
-	
+		
 	map.on("click", function(event){
 		getMeteo(event.latlng);
 	});
@@ -97,6 +93,22 @@ function initGIS() {
 	};
 	legend.addTo(map);*/
   
+}
+
+function addDomain(lat,long,domain){
+	L.marker([lat, long]).addTo(map)
+    .bindPopup(domain.domainName)
+    .openPopup();
+}
+
+function addDomains(arrayOfDomain){
+	if (arrayOfDomain){
+		console.log(arrayOfDomain);
+		for (i=0 ; i < arrayOfDomain.length ; i++){		
+			var coords = arrayOfDomain[i].coords;
+			addDomain(coords[0],coords[1],{domainName:arrayOfDomain[i].domainName});
+		}
+	}
 }
 
 function switchFocus(focus){
@@ -320,20 +332,6 @@ function addPoint(data, map) {
 	// .openPopup();
 }
 
-function addLocations() {
-	/*
-	 * $.ajax({ type:"GET", url: serverURL+graphMapName+"/_tag",
-	 * contentType:"application/json", success: function(data, textStatus,
-	 * jqXHR){ console.log ('success');
-	 * //this.window.location="location/index.html?id="+graphMapName;
-	 * location.reload();
-	 *  }, complete: function(data, textStatus, jqXHR){ console.log
-	 * ('complete');
-	 * 
-	 *  }, error: function(jqXHR, textStatus, errorThrown){ console.log("Error
-	 * on addLocations()"); console.log(textStatus); } });
-	 */// end of ajax
-} // e
 
 
 
