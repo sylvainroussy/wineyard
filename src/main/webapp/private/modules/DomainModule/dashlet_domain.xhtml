@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<f:view>
+
+
+	<ui:composition>
+		<ui:param name="module"
+				value="#{userSession.getModule('DomainModule')}" />
+		<ui:param name="currentDomain" value="#{module.currentDomain}" />
+		
+		<ui:param name="dashletMode" value="#{module.dashletDomain.mode}" />
+		
+		<p:panel header="Informations sur le domaine" toggleable="true" id="domainDashlet"
+			toggleOrientation="vertical">
+			<f:facet name="header">
+				<p:graphicImage class="pi pi-home" />
+				Informations sur le domaine				
+			</f:facet>
+			 <f:facet name="options">
+			  <p:menu>
+	          <p:submenu label="Options">
+                    <p:menuitem value="Modifier" icon="pi pi-pencil" actionListener="#{module.dashletDomain.changeMode('edit')}" update="domainDashlet" process="@this"/>
+                  
+                </p:submenu>
+                </p:menu>
+	        </f:facet>
+			<f:facet name="footer">Identifiant en base : #{currentDomain.id}</f:facet>
+			
+
+			<div class="ui-fluid formgrid grid">
+			
+				<div class="field col-12 md:col-12">
+					<p:graphicImage value="#{module.domainLogo}" stream="false" width="100px"/>
+				</div>
+				<div class="field col-12 md:col-6">
+					<label for="domainName" >Nom du domaine : </label>
+					<p:spacer width="2px"/>
+					<p:outputLabel value="#{currentDomain.domainName}" rendered="#{dashletMode == 'read'}" styleClass="font-medium" />
+					
+					<p:inputText id="domainName" type="text"
+						value="#{currentDomain.domainName}" required="true" rendered="#{dashletMode == 'edit'}"/>
+				</div>
+				<div class="field col-12 md:col-6">
+					<label for="contact">Contact : </label>
+					<p:spacer width="2px"/>
+					<p:outputLabel value="#{currentDomain.contact}" rendered="#{dashletMode == 'read'}" styleClass="font-medium"/>
+					<p:inputText id="contact" type="text"
+						value="#{currentDomain.contact}" required="false" rendered="#{dashletMode == 'edit'}"/>
+						
+					
+				</div>
+				
+				<div class="field col-12 md:col-6">
+					<label for="info">Info : </label>
+					<p:spacer width="2px"/>
+					<p:outputLabel value="#{currentDomain.info}" rendered="#{dashletMode == 'read'}" styleClass="font-medium"/>
+					<p:inputText id="info" type="text"
+						value="#{currentDomain.info}" required="false" rendered="#{dashletMode == 'edit'}"/>
+						
+					
+				</div>
+				
+				<div class="field col-12 md:col-6">
+					<label for="website">Site Web : </label>
+					<p:spacer width="2px"/>
+					<p:outputLabel value="#{currentDomain.website}" rendered="#{dashletMode == 'read'}" styleClass="font-medium"/>
+					<p:inputText id="website" type="text"
+						value="#{currentDomain.website}" required="false" rendered="#{dashletMode == 'edit'}"/>
+						
+					
+				</div>
+				
+				<p:commandButton icon="pi pi-file" actionListener="#{module.dashletDomain.changeMode('read')}" update="domainDashlet" title="Enregistrer" rendered="#{dashletMode == 'edit'}"/>
+			<p:commandButton icon="pi pi-times" actionListener="#{module.dashletDomain.changeMode('read')}" update="domainDashlet" title="Annuler" immediate="true" rendered="#{dashletMode == 'edit'}"/>
+			
+				
+
+			</div>
+
+		</p:panel>
+
+
+
+	</ui:composition>
+
+</f:view>
+</html>
