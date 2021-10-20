@@ -8,8 +8,9 @@
 </h:head>
 <h:body>
 <ui:composition>
+	<p:remoteCommand name="addToDomain2" action="#{userSession.getModule('DomainModule').addToCurrentDomain()}" oncomplete="console.log('[main.xhtml] Ok added to domain')" process="@form" />
 	<div class="card">
-
+			
 		<div class="grid sample-layout ">
 			<div class="col-12 no-gutter">
 

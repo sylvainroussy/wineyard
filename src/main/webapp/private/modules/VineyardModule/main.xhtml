@@ -8,12 +8,152 @@
 
 
 <h:body>
+<ui:composition>
+	<ui:param name="module" value="#{userSession.getModule('VineyardModule')}"></ui:param>
+	
+	<p:tabView styleClass="col-12">
+		<p:tab title="Parcelles">
+        <p:commandButton value="Grid" icon="pi pi-th-large" update="@form" actionListener="#{module.setCurrentParcelsView('grid')}" process="@this"  rendered="#{module.currentParcelsView=='table'}"/>
+    	<p:commandButton value="Table" icon="pi pi-bars" update="@form" actionListener="#{module.setCurrentParcelsView('table')}" process="@this"  rendered="#{module.currentParcelsView=='grid'}"/>
+       
+       <div class="grid">
+      
+       		<ui:repeat var="parcel" value="#{module.parcels}">
+       		<div class="col-12 md:col-6">
+       			
+       			<p:card >
+       			<f:facet name="header">
+       			<div class="text-center font-medium">Appellation : #{parcel.getAppellation()} </div>
+       			<div class="text-center">Dénomination : #{parcel.getDenomination()}</div>
+       			</f:facet>
+       			
+       			
+       			
+       			<div class="grid">
+	       			<div class="col-12 md:col-6">
+	       				<p:graphicImage name="images/parcelle.jpg" width="100%" height="150px"/>
+	       			</div>
+	       			<div class="col-12 md:col-6" >
+	       			<div id="map_parcel_#{parcel.wineyardId}" style="height:150px"/>
+	       				<script>
+	       				var parcel = #{module.getJsonParcel(parcel.wineyardId)};
+	       				initGISParcel('map_parcel_#{parcel.wineyardId}').showParcelData ([#{module.getJsonParcel(parcel.wineyardId)}]);
+	       				
+	       				var area = turf.area(parcel.geometry);
+	       				console.log(area/10000);
+	       				</script>
+	       				
+						
+	       			</div>
+	       			<div class="col-12 md:col-6" >
+	       			</div>
+       			</div>
+       				<div class="text-center">Commune : #{parcel.getNew_nomcom()}</div>
+       			</p:card>
+       		
+       		</div>
+       		</ui:repeat>
+       
+       </div>
+		<!-- <p:dataTable id="parcelTable" var="parcel" value="#{tanks}" rows="12" paginator="true" rendered="#{module.currentParcelsView=='table'}"
+				rowsPerPageTemplate="6,12,16" paginatorAlwaysVisible="true" paginatorPosition="bottom" scrollable="true"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+				
+				
+		<ui:param name="wineColor"
+										value="#{tank.contents.color =='white' ? '#EFEBE9':'#78081e'}"></ui:param>
+									<ui:param name="wineText"
+										value="#{tank.contents.color =='white' ? '#78081e':'#EFEBE9'}"></ui:param>
+									<ui:param name="wineClass"
+										value="#{tank.contents.color =='white' ? 'grape':'grape_white'}"></ui:param>
+		<p:column headerText="Cuve">#{tank.id}</p:column>
+		<p:column headerText="Appellation">#{tank.contents.appelation}</p:column>			
+		<p:column><canvas id="#{tank.id}"> </canvas>
+								<script>drawTank ("#{tank.id}", #{tank.volume}, #{tank.contents.volume},"#{tank.contents.color}")</script></p:column>
+		
+		<p:column headerText="Cépages(s)"> 
+		<ui:repeat var="contentGrape" value="#{tank.contents.grapes}">
+		
+									<p:tag icon="#{wineClass}" value="#{contentGrape}"
+										style="background-color:#{wineColor};color:#{wineText}" />
+		</ui:repeat>
+		 </p:column>
+		 <p:column headerText="Millésime">
+		 
+		 <p:tag icon="pi pi-calendar" value="#{tank.contents.year}"
+									severity="success" styleClass="product-badge status-instock" />
+		 </p:column>
+		 		
+		</p:dataTable >
+		<p:dataView id="parcelGrid" var="tank" value="#{tanks}" rows="12" paginator="true" rendered="#{module.currentParcelsView=='grid'}"
+				rowsPerPageTemplate="6,12,16" paginatorAlwaysVisible="true" paginatorPosition="bottom"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				 layout="grid" style="background-color:#78081e !important"
+				>
 
-	<div class="card">
+				<p:dataViewGridItem columns="4" >
+					<p:card>
+					
+						<div class="grid">
+							<div class="col-12 md:col-6">
+								<ui:repeat var="contentGrape" value="#{tank.contents.grapes}">
+									<ui:param name="wineColor"
+										value="#{tank.contents.color =='white' ? '#EFEBE9':'#78081e'}"></ui:param>
+									<ui:param name="wineText"
+										value="#{tank.contents.color =='white' ? '#78081e':'#EFEBE9'}"></ui:param>
+									<ui:param name="wineClass"
+										value="#{tank.contents.color =='white' ? 'grape':'grape_white'}"></ui:param>
+									<p:tag icon="#{wineClass}" value="#{contentGrape}"
+										style="background-color:#{wineColor};color:#{wineText}" />
+								</ui:repeat>
+							</div>
+							<div class="col-12 md:col-6 p-as-md-end">
+								<p:tag icon="pi pi-calendar" value="#{tank.contents.year}"
+									severity="success" styleClass="product-badge status-instock" />
+							</div>
 
-		<div class="grid sample-layout ">
-			<div class="grid"></div>
-		</div>
-	</div>
+						</div>
+						<div class="grid">
+							<div class="col-12 md:col-6">
+								<canvas id="#{tank.id}"> </canvas>
+								<script>drawTank ("#{tank.id}", #{tank.volume}, #{tank.contents.volume},"#{tank.contents.color}")</script>
+								
+							</div>
+							<div class="col-12 md:col-6">
+								<p:commandButton value="Actions" icon="pi pi-ellipsis-v"
+									actionListener="#{module.setCurrentTank(tank)}"
+									process="@parent" update=":centerPanel:actionsForTanks"
+									oncomplete="PF('actionsForTanks').show();" />
+									
+								<p:commandButton value="Détails" icon="pi pi-ellipsis-v"
+								actionListener="#{module.setCurrentTank(tank)}"
+								process="@parent" update=":centerPanel:detailsForTanks"
+								oncomplete="PF('detailsForTanks').show();" />
+							</div>
+							<div class="col-12 center">#{tank.contents.appelation}</div>
+						</div>			
+					</p:card>
+				</p:dataViewGridItem>
+
+
+				<p:dataViewListItem >
+					<div class="grid">
+
+						
+							<div class="col-12 md:col-2">#{tank.id}</div>
+							<div class="col-12 md:col-6">#{tank.contents.appelation}</div>
+
+							<div class="col-12 md:col-2">#{tank.contents.year}</div>
+							<div class="col-12 md:col-2">#{tank.contents.grapes}</div>
+						
+
+					</div>
+					
+				</p:dataViewListItem>
+
+			</p:dataView> -->
+		</p:tab>
+		</p:tabView>
+	</ui:composition>
 </h:body>
 </html>

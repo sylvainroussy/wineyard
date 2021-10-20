@@ -9,19 +9,23 @@
 
 	<h:body>
 		<ui:composition>			
+		<style type="text/css">
+   
+</style>
 			<h:form id="north_menu">
-				<p:toolbar id="homeMenu">
+					
+				<p:toolbar id="homeMenu" class="col-12 md:col-12">
 					<f:facet name="left">
-						<ui:param name="menuClass" value="#{module.moduleName==userSession.currentPage ? 'wineyard-menu-active':'wineyard-menu-inactive'}"/>
+						
 						<p:commandButton value="WINEYARD" icon="grape_white"
 							actionListener="#{userSession.changePage('home')}" 
-							update="centerPanel" style=" text-shadow: 1px 1px;" styleClass="#{'home'==userSession.currentPage ? 'wineyard-menu-active':'wineyard-menu-inactive'}"/>
+							update="centerPanel, homeMenu" style=" text-shadow: 1px 1px;" styleClass="#{'home'==userSession.currentPage ? 'wineyard-menu-active':'wineyard-menu-inactive'}"/>
 
 						<c:forEach var="module" items="#{userSession.moduleBeans}">
 							<p:commandButton
 								actionListener="#{userSession.changePage(module.moduleName)}"
 								update="centerPanel, homeMenu" value="#{module.label}" 
-								styleClass="#{menuClass}"/>
+								styleClass="#{module.moduleName==userSession.currentPage ? 'wineyard-menu-active':'wineyard-menu-inactive'}"/>
 
 						</c:forEach>
 
@@ -31,33 +35,36 @@
 					</f:facet>
 
 					<f:facet name="right">
-						<!--  <p:avatar icon="pi pi-user" 
-        	styleClass="p-mr-2" 
-        	size="xlarge" 
-        	shape="circle" 
-        	label="${userSession.currentUser.displayName}" 
-        	style="background-color:#9c27b0; color: #ffffff" dynamicColor="true"/> -->
-        	
-        	<p:commandButton
-								actionListener="#{userSession.changePage('DomainModule')}"
-								update="centerPanel" value="#{userSession.getModule('DomainModule').getCurrentDomain().getDomainName()}" />
+						
+        	<p:remoteCommand name="updateCenterPanel" process="@form" update=":centerPanel"/>
+        	<p:commandButton	actionListener="#{userSession.changePage('DomainModule')}"
+								update="centerPanel, homeMenu" value="#{userSession.getModule('DomainModule').getCurrentDomain().getDomainName()}" 
+								styleClass="#{'DomainModule'==userSession.currentPage ? 'wineyard-menu-active':'wineyard-menu-inactive'}" rendered="#{userSession.getModule('DomainModule').getManagedDomains().size()==1}"/>
+								
+			<p:selectOneMenu id="city" value="#{userSession.getModule('DomainModule').getCurrentDomain().id}" 
+			effect="fold" dynamic="true"			
+			rendered="#{userSession.getModule('DomainModule').getManagedDomains().size()&gt;1}"
+			valueChangeListener="#{userSession.getModule('DomainModule').changeDomainContext}" onchange="updateCenterPanel()" 
+			styleClass="#{'DomainModule'==userSession.currentPage ? 'wineyard-menu-active':'wineyard-menu-inactive'}">
+           
+            	<f:selectItems value="#{userSession.getModule('DomainModule').getManagedDomains()}" 
+            	itemValue="#{domain.id}" var="domain" 
+            	itemLabel="#{domain.domainName}" />
+            		 
+        	</p:selectOneMenu>
         	<span class="ui-separator"> <span
 							class="ui-icon pi pi-ellipsis-v" />
 						</span>
 						<p:menuButton value="${userSession.currentUser.displayName}" icon="pi pi-user">
-							<p:menuitem value="Save" action="#{toolbarView.save}"
-								icon="pi pi-save" />
-							<p:menuitem value="Update" action="#{toolbarView.update}"
-								icon="pi pi-refresh" />
-							<p:menuitem value="Delete" action="#{toolbarView.delete}"
-								ajax="false" icon="pi pi-times" />
-							<p:menuitem value="Homepage" url="http://www.primefaces.org"
-								icon="pi pi-home" />
+							<p:menuitem value="Se déconnecter" url="/logout"
+								icon="pi pi-sign-out" />
+							
 						</p:menuButton>
 					</f:facet>
 
 				</p:toolbar>
 			</h:form>
+			<p:sticky target="north_menu"/>
 		</ui:composition>
 	</h:body>
 </f:view>

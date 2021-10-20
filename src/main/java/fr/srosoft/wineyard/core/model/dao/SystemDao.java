@@ -16,8 +16,7 @@ public class SystemDao extends AbstractDao {
 	private final String  QUERY_BUILD_USER = "MERGE (u:User{id:apoc.util.md5([$email])}) SET u+=$patch, u.password=apoc.util.md5([$password]) ";
 	private final String  QUERY_EXISTS_USER = "OPTIONAL MATCH (u:User{id:apoc.util.md5([$email])}) RETURN u IS NOT NULL AS exists";
 	private final String  QUERY_LOGIN_USER = "OPTIONAL MATCH (user:User{id:apoc.util.md5([$email]), password:apoc.util.md5([$password])}) RETURN user";
-	private final String  QUERY_USER_MANAGE = "MATCH (user:User{id:$userid)}) "
-			+ "MATCH (domain:Domain {id:$domainid} MERGE (domain)<-[MANAGED_BY]-(user) ";
+	
 	
 	public void createUser (final User user, final String password) {
 		final Map<String,Object> parameters = new HashMap<>();
@@ -46,12 +45,7 @@ public class SystemDao extends AbstractDao {
 		
 	}
 	
-	public void setDomainManagement (String userId, String domainId) {
-		final Map<String,Object> parameters = new HashMap<>();
-		parameters.put("userid", userId);
-		parameters.put("domainid", domainId);
-		this.writeQuery(QUERY_USER_MANAGE, parameters);
-	}
+	
 	
 	
 	

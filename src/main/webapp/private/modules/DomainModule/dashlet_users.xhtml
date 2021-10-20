@@ -8,13 +8,17 @@
 	
 	
 	<ui:composition>
-	<p:panel  header="Intervenants du domaine" styleClass="col-12 md:col-8">
-	
-	<p:dataTable value="#{userSession.getModule('DomainModule').usersOfDomains}" var="user">
-		<p:column headerText="Utilisateur">#{user.displayName}</p:column>
-		<p:column headerText="Email">#{user.email}</p:column>
-		<p:column headerText="Téléphone(s)"></p:column>
-		<p:column headerText="Commune"></p:column>
+	<p:panel  header="Intervenants du domaine" toggleable="true" toggleOrientation="vertical">
+	<f:facet name="header">
+	<p:graphicImage class="pi pi-users"/>
+	Intervenants du domaine
+	</f:facet>
+	<p:dataTable value="#{userSession.getModule('DomainModule').usersOfDomains}" var="user" resizableColumns="true">
+		<p:column headerText="Utilisateur" width="30%">#{user.user.displayName}</p:column>
+		<p:column headerText="Email" width="30%">#{user.user.email}</p:column>
+		<!-- <p:column headerText="Téléphone(s)"></p:column> -->
+		
+		<p:column headerText="Fonction" width="30%">#{user.office}</p:column>
 	</p:dataTable>
 	
 	</p:panel>

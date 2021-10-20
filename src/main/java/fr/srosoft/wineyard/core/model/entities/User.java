@@ -1,6 +1,8 @@
 package fr.srosoft.wineyard.core.model.entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -10,6 +12,9 @@ public class User implements Serializable {
 	private String id;
 	private String email;
 	private String displayName;
+	private List<String> phones;
+	private boolean enabled = true;
+	private List<LinkedDomain> linkedDomains;
 	
 	@JsonIgnore
 	private String password;
@@ -38,5 +43,28 @@ public class User implements Serializable {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+	public List<String> getPhones() {
+		return phones;
+	}
+	public void setPhones(List<String> phones) {
+		this.phones = phones;
+	}
+	public boolean isEnabled() {
+		return enabled;
+	}
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+	public List<LinkedDomain> getLinkedDomains() {
+		return linkedDomains;
+	}
+	public void setLinkedDomains(List<LinkedDomain> linkedDomains) {
+		this.linkedDomains = linkedDomains;
+	}
+	public void addLinkedDomain(LinkedDomain linkedDomain) {
+		if (this.linkedDomains == null) this.linkedDomains = new ArrayList<>();
+		this.linkedDomains.add(linkedDomain);
+	}
+	
 	
 }

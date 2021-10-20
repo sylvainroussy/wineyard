@@ -1,23 +1,17 @@
 package fr.srosoft.wineyard.core.model.entities;
 
-import java.io.Serializable;
 import java.util.Date;
 
 @SuppressWarnings("serial")
-public class Action implements Serializable{
+public class Action extends WineyardObject{
 
-	private String id;
+	
 	private String actionName;
 	private String comment;	
 	private Date date;
 	private User user;
 	
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
+	
 	public String getActionName() {
 		return actionName;
 	}

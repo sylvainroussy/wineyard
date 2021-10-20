@@ -39,6 +39,24 @@ public abstract class AbstractDao {
         }
 	}
 	
+	protected void writeQuery(final String query,final Map<String,Object> parameters,final String preQuery,final Map<String,Object> preParameters) {
+		try ( Session session = neo4jDriver.session() )
+        {
+            session.writeTransaction( new TransactionWork<Void>()
+            {
+                @Override
+                public Void execute( Transaction tx )
+                {	
+                	tx.run(preQuery, preParameters);
+                	tx.run(query, parameters);
+                	
+                	return null;
+                }
+            } );
+           
+        }
+	}
+	
 	protected <T> T readSingleQuery(final String query,final Map<String,Object> parameters, String columnName, Class<T> clazz) {
 		try ( Session session = neo4jDriver.session() )
         {
@@ -53,8 +71,10 @@ public abstract class AbstractDao {
                 	if (map instanceof Node) {
                 		final Node node = (Node) map;
                 		map = node.asMap();
+                		return MAPPER.convertValue(map,clazz);        
                 	}
-                	return MAPPER.convertValue(map,clazz);                	
+                	else return MAPPER.convertValue(map,clazz);
+                	        	
                 }
             } );
            
@@ -78,6 +98,7 @@ public abstract class AbstractDao {
                     		map = node.asMap();
                     		results.add(MAPPER.convertValue(map,clazz));
                     	}
+                    	else results.add(MAPPER.convertValue(map,clazz));
                 	});  
                 	return null;
                 }

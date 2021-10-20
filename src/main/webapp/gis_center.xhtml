@@ -5,9 +5,7 @@
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:ui="http://java.sun.com/jsf/facelets">
 <h:head>
-	<!-- 	<link rel="shortcut icon" type="image/icon" href="img/favicon.ico" /> -->
-	<!-- 		<h:outputStylesheet name="project.css" target="head" /> -->
-
+	
 	<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
 
 </h:head>
@@ -18,7 +16,7 @@
 		
 		<f:facet name="header"></f:facet>
 		<h:form>
-			<p:remoteCommand name="rc" onsuccess="initGIS()" autoRun="true" />
+			<p:remoteCommand name="rc" onsuccess="if (!gisInitialized) initGIS()" autoRun="true" />
 			
 		</h:form>
 		

@@ -15,8 +15,9 @@
 }
 </style>
 
-			<h:form id="centerPanel">
-				<p:outputPanel rendered="#{userSession.currentPage=='home'}">
+			<h:form id="centerPanel" >
+			
+				<p:outputPanel id="dashboardPanel" rendered="#{userSession.currentPage=='home'}" >
 					<p:growl id="msgs" showDetail="true" />
 
 					<div class="grid nested-grid">
@@ -30,23 +31,19 @@
 						<div class="col-4"><ui:include src="dashlet_gis.xhtml"></ui:include></div>
 					</div>
 
-					<div class="grid">
-
-						
-						
-						
-
-					</div>
-					<div style="clear: both" />
+					
 				</p:outputPanel>
 
 				<c:forEach var="module" items="#{userSession.moduleBeans}">
-					<p:outputPanel
+					<p:outputPanel id="modulePanel_#{module.moduleName}"
 						rendered="#{userSession.currentPage==module.moduleName}">
 						<ui:include src="../modules/#{module.moduleName}/main.xhtml" />
 					</p:outputPanel>
 				</c:forEach>
 			</h:form>
+		
+			
+		
 		</ui:composition>
 	</h:body>
 </f:view>

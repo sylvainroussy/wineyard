@@ -3,8 +3,8 @@ package fr.srosoft.wineyard.core.model.entities;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Container {
-	private String id;
+public class Container  extends WineyardObject{
+	
 	private String number;
 	private Integer volume = 0;
 	private String year;
@@ -12,13 +12,7 @@ public class Container {
 	private Contents contents;
 	private List<Action> actions;
 
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
+	
 
 	public String getNumber() {
 		return number;
@@ -64,4 +58,6 @@ public class Container {
 		if (this.actions == null) this.actions = new ArrayList<>();
 		this.actions.add(action);
 	}
+
+	
 }

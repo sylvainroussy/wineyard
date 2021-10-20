@@ -27,8 +27,14 @@
 	<h:outputScript name="/js/leaflet_image.js" target="head" />
 	<h:outputScript name="/js/dom_to_image.js" target="head" />
 	<h:outputScript name="/js/gis.js" target="head" />
+	<h:outputScript name="/js/gis_parcel.js" target="head" />
 	<h:outputScript name="/js/drawings.js" target="head" />
-
+	<h:outputScript name="/js/turf_6_5_0.js" target="head" />
+	<h:outputScript name="/js/cytoscape_3_19_1.js" target="head" />
+	<h:outputScript name="/js/loadash.js" target="head" />
+	 
+	<h:outputScript name="/js/cytoscape-edgehandles.js" target="head" />
+	<h:outputScript name="/js/contents.js" target="head" />
 
 </h:head>
 
@@ -109,6 +115,7 @@ body {
 	top: 0;
 	right: 0;
 	bottom: 0;
+	
 }
 
 body .ui-toolbar {
@@ -142,12 +149,13 @@ body .ui-button {
     transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 
-.ui-button.ui-state-focus {
+.ui-state-focus {
 	   box-shadow: 0px 0px 1px 0px black !important;
 }
 
-.ui-button.ui-state-hover {
+body .ui-button.ui-state-hover {
 	background: #B60505 !important;
+	color:white !important;
 	border: 0px solid #B60505 !important;
 }
 
@@ -156,12 +164,25 @@ body .ui-button {
 	border: 0px solid #B60505 !important;
 }
 
+body .fc-button.fc-state-hover {
+	background: #B60505 !important;
+	color:white !important;
+	border: 0px solid #B60505 !important;
+}
+
+.fc-button.fc-state-active {
+	background: #B60505 !important;
+	border: 0px solid #B60505 !important;
+}
+
 .wineyard-menu-active{
 	background: #B60505 !important;
+	color:white !important;
 }
 
 .wineyard-menu-inactive{
 	background: #560505 !important;
+	color:white !important;
 }
 
 body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
@@ -174,7 +195,8 @@ body .ui-dataview .ui-dataview-header {
     color: #495057;
     padding: 0px !important;
     font-weight: 600;
-    border: none !important;;
+    border: none !important;
+    display:none !important;
    
 }
 
@@ -189,6 +211,37 @@ body .ui-tabs.ui-tabs-top > .ui-tabs-nav li.ui-tabs-header.ui-state-active {
 
 body .ui-tabs .ui-tabs-nav li.ui-tabs-header.ui-state-active a {
      color:#B60505 !important;
+}
+
+.ui-selectonemenu{
+border:none !important;
+}
+.ui-state-highlight{
+	background-color:lightgrey !important;
+}
+
+.ui-selectonemenu label.ui-selectonemenu-label {
+    cursor: pointer;
+    color:white;
+    
+}
+
+.ui-selectonemenu label.ui-selectonemenu-label .ui-state-hover {
+	background: #B60505 !important;
+	border: 0px solid #B60505 !important;
+	color:white !important;
+}
+
+/*.ui-panelmenu .ui-panelmenu-content {
+	overflow: visible !important;
+}*/
+
+.active-drop{
+	background-color:#FF0000;
+}
+
+.scheduler{
+
 }
 
 .grape {
@@ -236,9 +289,11 @@ body .ui-tabs .ui-tabs-nav li.ui-tabs-header.ui-state-active a {
 	<p:sidebar widgetVar="meteoPanel" position="right" baseZIndex="20000"
 		appendTo="@(Body)" styleClass="sidebar">
 		<h1 style="font-weight: normal">Bulletin météo</h1>
+		<h:form>
 
 		<div id="meteoInfo">dd</div>
 		<p:commandButton value="Cancel" oncomplete="PF('meteoPanel').hide()" />
+		</h:form>
 	</p:sidebar>
 </h:body>
 </html>

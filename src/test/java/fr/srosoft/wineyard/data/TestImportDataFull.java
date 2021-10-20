@@ -15,6 +15,11 @@ import org.neo4j.driver.TransactionWork;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Import INAO parcels
+ * @author sroussy
+ *
+ */
 public class TestImportDataFull {
 
 	private static final ObjectMapper MAPPER = new ObjectMapper();

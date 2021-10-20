@@ -20,7 +20,7 @@ import fr.srosoft.wineyard.modules.commons.Module;
 @Module (name="GISModule", 
 			description="Goegraphic Information System", 
 			label="GIS",
-			order=2)
+			order=50)
 public class GISModule extends AbstractModule{
 	
 	@Resource

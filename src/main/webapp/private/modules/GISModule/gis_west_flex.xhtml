@@ -18,8 +18,8 @@
 				<p:tabView scrollable="true" >
 					<p:tab title="AOC" >
 						<p:tree id="aocTree" value="#{gisView.aocTree}" var="node" 
-							dynamic="false" styleClass="treeClass min-h-full" highlight="false" 
-							selectionMode="checkbox" propagateSelectionDown="false" propagateSelectionUp="false">
+							dynamic="false" styleClass="treeClass min-h-full" highlight="false" filterBy="#{node}" 
+							selectionMode="checkbox" propagateSelectionDown="false" propagateSelectionUp="false" >
 							<p:ajax event="select" listener="#{gisView.onNodeSelect}"
 								update=":centerPanel:westForm:applyOnMap" oncomplete="applyOnMap()"
 								async="false" />
@@ -28,16 +28,16 @@
 								async="false" />
 
 							<p:treeNode icon="ui-icon ui-icon-folder-collapsed" type="region" >
-								<h:outputText value="#{node}" />
+								<h:outputText value="#{node}" title="#{node}"/>
 							</p:treeNode>
 
 							<p:treeNode icon="ui-icon ui-icon-folder-collapsed"
 								type="sousRegion">
-								<h:outputText value="#{node}" />
+								<h:outputText value="#{node}" title="#{node}"/>
 							</p:treeNode>
 
 							<p:treeNode icon="ui-icon ui-icon-tag" type="aoc">
-								<h:outputText value="#{node}" />
+								<h:outputText value="#{node}" title="#{node}"/>
 							</p:treeNode>
 						</p:tree>
 

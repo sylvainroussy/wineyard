@@ -9,9 +9,17 @@ var legend ;
 var meteoResult;
 var focusEnabled = true;
 
+var gisInitialized = false;
+
 function initGIS() {
 	
+	console.log ('Initialized gis ? '+gisInitialized);
 	
+	var highlight = {
+		    'color': '#333333',
+		    'weight': 2,
+		    'opacity': 1
+		};
 	
 	var mazenayLat = 46.9033543;
 	var mazenayLong = 4.5959406;
@@ -40,6 +48,73 @@ function initGIS() {
 		attribution : osmAttrib
 	});
 	
+	var OrthoIGN = L.tileLayer('https://wxs.ign.fr/{ignApiKey}/geoportail/wmts?'+
+            '&REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&TILEMATRIXSET=PM'+
+            '&LAYER={ignLayer}&STYLE={style}&FORMAT={format}'+
+            '&TILECOL={x}&TILEROW={y}&TILEMATRIX={z}',
+            {
+	            ignApiKey: 'pratique',
+	            ignLayer: 'ORTHOIMAGERY.ORTHOPHOTOS',
+	            style: 'normal',
+	            format: 'image/jpeg',
+	            service: 'WMTS'
+        });
+	
+	  var PlanIGN = L.tileLayer('https://wxs.ign.fr/{ignApiKey}/geoportail/wmts?'+
+	            '&REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&TILEMATRIXSET=PM'+
+	            '&LAYER={ignLayer}&STYLE={style}&FORMAT={format}'+
+	            '&TILECOL={x}&TILEROW={y}&TILEMATRIX={z}',
+	            {
+		            ignApiKey: 'pratique',
+		            ignLayer: 'GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2',
+		            style: 'normal',
+		            format: 'image/png',
+		            service: 'WMTS',
+					opacity: 0.5
+	        });
+	  
+	  var topoIGN = L.tileLayer('https://wxs.ign.fr/{ignApiKey}/geoportail/wmts?'+
+	            '&REQUEST=GetTile&SERVICE=WMS&VERSION=1.0.0&TILEMATRIXSET=PM'+
+	            '&LAYER={ignLayer}&STYLE={style}&FORMAT={format}'+
+	            '&TILECOL={x}&TILEROW={y}&TILEMATRIX={z}',
+	            {
+		            ignApiKey: 'uda8kuir6tuikdpmn9gnvjev',
+		            ignLayer: 'SCAN25TOUR_PYR-JPEG_WLD_WM',
+		            style: 'normal',
+		            format: 'image/png',
+		            service: 'WMS',
+					opacity: 0.5
+	        });
+	  
+	  
+	  var cadastreIGN = L.tileLayer('https://wxs.ign.fr/{ignApiKey}/geoportail/wmts?'+
+	            '&REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&TILEMATRIXSET=PM'+
+	            '&LAYER={ignLayer}&STYLE={style}&FORMAT={format}'+
+	            '&TILECOL={x}&TILEROW={y}&TILEMATRIX={z}',
+	            {
+		            ignApiKey: 'essentiels',
+		            ignLayer: 'CADASTRALPARCELS.PARCELLAIRE_EXPRESS',
+		            style: 'normal',
+		            format: 'image/png',
+		            service: 'WMTS',
+					opacity: 0.5
+	        });
+	  
+	  var aireIGN = L.tileLayer('https://wxs.ign.fr/{ignApiKey}/geoportail/wmts?'+
+	            '&REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&TILEMATRIXSET=PM'+
+	            '&LAYER={ignLayer}&STYLE={style}&FORMAT={format}'+
+	            '&TILECOL={x}&TILEROW={y}&TILEMATRIX={z}',
+	            {
+		            ignApiKey: 'essentiels',
+		            ignLayer: 'CADASTRALPARCELS.PARCELLAIRE_EXPRESS',
+		            style: 'normal',
+		            format: 'image/png',
+		            service: 'WMTS',
+					opacity: 0.5
+	        });
+	
+	 
+	  
 	var landUrl = 'http://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}.png';
 	var thunAttrib = '&copy; '+osmUrl+' Contributors & '+landUrl;
 	var landMap = new L.TileLayer(landUrl, {
@@ -48,13 +123,18 @@ function initGIS() {
 	});
 	
 	baseMaps = {
-		    "osm": osm,
-		    //"relief": reliefLayer,
-		    "topoMap":topoMap,
-		    //"landMap":landMap
+		   // "osm": osm,
+		    // "relief": reliefLayer,
+		    //"topoMap":topoMap,
+		    //"ign":OrthoIGN,
+		    "plan":PlanIGN,
+		    "cadastre":cadastreIGN
+		    //"topo":topoIGN
+		    
+		    // "landMap":landMap
 	};
 
-
+	
 	map = L.map('map',{center:[ nolayLat, nolayLong], zoom:10, zoomControl: false });	
 	
 	 
@@ -76,22 +156,22 @@ function initGIS() {
 		baseMaps[key].addTo(map);  
 	}
 	
-	  /*legend = L.control({position: 'bottomright'});
-	legend.onAdd = function (map) {
-
-	  var div = L.DomUtil.create('div', 'info legend'),
-	        grades = ["Car", "ball"],
-	        labels = ["http://datentaeter.de/wp-content/uploads/2016/06/flag_de.png","http://datentaeter.de/wp-content/uploads/2016/06/flag_de.png"];
-
-	    // loop through our density intervals and generate a label with a colored square for each interval
-	    for (var i = 0; i < grades.length; i++) {
-	        div.innerHTML +=
-	            grades[i] + (" <img src="+ labels[i] +" height='50' width='50'>") +'<br>';
-	    }
-
-	    return div;
-	};
-	legend.addTo(map);*/
+	console.log(cadastreIGN);
+	gisInitialized = true;
+	  /*
+		 * legend = L.control({position: 'bottomright'}); legend.onAdd =
+		 * function (map) {
+		 * 
+		 * var div = L.DomUtil.create('div', 'info legend'), grades = ["Car",
+		 * "ball"], labels =
+		 * ["http://datentaeter.de/wp-content/uploads/2016/06/flag_de.png","http://datentaeter.de/wp-content/uploads/2016/06/flag_de.png"];
+		 *  // loop through our density intervals and generate a label with a
+		 * colored square for each interval for (var i = 0; i < grades.length;
+		 * i++) { div.innerHTML += grades[i] + (" <img src="+ labels[i] +"
+		 * height='50' width='50'>") +'<br>'; }
+		 * 
+		 * return div; }; legend.addTo(map);
+		 */
   
 }
 
@@ -103,16 +183,18 @@ function addDomain(lat,long,domain){
 
 function addDomains(arrayOfDomain){
 	if (arrayOfDomain){
-		console.log(arrayOfDomain);
+		
 		for (i=0 ; i < arrayOfDomain.length ; i++){		
 			var coords = arrayOfDomain[i].coords;
-			addDomain(coords[0],coords[1],{domainName:arrayOfDomain[i].domainName});
+			if (coords){
+				addDomain(coords[0],coords[1],{domainName:arrayOfDomain[i].domainName});
+			}
 		}
 	}
 }
 
 function switchFocus(focus){
-	focusEnabled = focus;//!focusEnabled;
+	focusEnabled = focus;// !focusEnabled;
 }
 
 function getMeteoByCoords(lat,lng){
@@ -189,101 +271,165 @@ function showDatum (region, inData){
 		console.log ("Loading region: "+region);
 		
 		data =inData;
-		//data.push(inData);
-		//console.log (data);
+		// data.push(inData);
+		// console.log (data);
 		showData (region);
 	}
 	
 }
 
 function removeDatum(region){
-	 console.log (overlayMaps);
-	 overlayMaps[getCode(region)].remove();
-	 console.log ("Removed "+getCode(region));
+	 //console.log (overlayMaps);
+	 var values = overlayMaps[getCode(region)];
+	 for (var key in values){
+		 if(values[key]){
+			 values[key].remove();
+			 values[key] = null;
+		 }
+	 }
+	 
+	 //console.log ("Removed "+getCode(region));
 }
 
 function showData (region){
 	var originalData = data;	
+	//console.log('data=>',data);
+	
+	
 	if (originalData){
 		var preparedData =  {};	
-		var denomination;
-		if (region == "sols"){
-			// {""properties": perimeter": 157782.0, "soil_id": 15403, "area":
-			//{"326742000.0, "soil": 618, "smu": 337242, "geo_point_2d":
-			//	{"[48.92016172972839, 3.533430469265583]}},type": "Feature",
-			
-			originalData = data[0].features;
-			//console.log (originalData);
-			
+		var denomination;		
+		
+		for (i = 0 ; i < originalData.length ; i++){
+			denomination = originalData[i].properties.denomination;
+				
+			var pData =  preparedData[denomination];
+			if (!pData){
+				preparedData[denomination] = [];
+			}
+			preparedData[denomination].push ( originalData[i]);
+				// console.log (preparedData[denomination]);
 		}
 		
-			for (i = 0 ; i < originalData.length ; i++){
+		var lat;
+		var lng;
+		var localized;
+		// key is the selected denomination added to the map
+		for (var key in preparedData){
 				
+			var color = getRandomColor();
+			var mapKey = "<span style='background-color:"+color+"'>"+key+"</span>";
 				
-				
-				if (region == "sols"){
-				
-					denomination = originalData[i].properties.smu;
-					//console.log (denomination);
-				}
-				else denomination = originalData[i].properties.denomination;
-				
-				var pData =  preparedData[denomination];
-				if (!pData){
-					preparedData[denomination] = [];
-				}
-				preparedData[denomination].push ( originalData[i]);
-				//console.log (preparedData[denomination]);
-			}
-			//var overlayMaps[region] = {};
-			var lat;
-			var lng;
-			var localized;
-			for (var key in preparedData){
-				
-				  var color = getRandomColor();
-				  var mapKey = "<span style='background-color:"+color+"'>"+key+"</span>";
-				  console.log (preparedData[key][0]);
-				 if (!localized){
-					 lng  = preparedData[key][0].properties.longitude;
-					 if (lng){
-						 lat = preparedData[key][0].properties.latitude;
-						 localized = true;
-					 }
+			if (!localized){
+				lng  = preparedData[key][0].properties.longitude;
+				if (lng){
+					 lat = preparedData[key][0].properties.latitude;
+					 localized = true;
 				 }
-				  var cities = L.layerGroup([ L.geoJSON(preparedData[key], {
-					    style: function (feature) {			         	
-					    		return {color: color,stroke:true,fillRule:"nonzero"};			    	
-					    }
-					}).bindPopup(function (layer) {
-					    return "Appellation : "+layer.feature.properties.appellation
-					    +"<br/> Dénomination : "+layer.feature.properties.denomination
-					    +"<br/> ID Dénomination : "+layer.feature.properties.id_denom
-					    +"<br/> ID App : "+layer.feature.properties.id_app
-					    +"<br/> ID : "+layer.feature.properties.id
-					    +"<br/> Type : "+layer.feature.properties.type_ig
-					    +"<br/> Insee (new) : "+layer.feature.properties.new_insee
-					    +"<br/> Commune (new) : "+layer.feature.properties.new_nomcom
-					    +"<br/> Insee (old) : "+layer.feature.properties.old_insee
-					    +"<br/> Commune (old) : "+layer.feature.properties.old_nomcom
-					    +"<br/> Crinao : "+layer.feature.properties.crinao;
-					    +"<br/> Description : "+layer.feature.properties.description;
-					})]);
-				
+			}
+			
+			 var features = preparedData[key];
+			 
+			 	//console.log('Geometry => ',features[0].geometry);
+				var center = turf.center(features[0].geometry);
+				//console.log('center =>',center.geometry.coordinates);
+				map.panTo(new L.LatLng(center.geometry.coordinates[1], center.geometry.coordinates[0]));
 				 
-				  overlayMaps[getCode(region)] = cities;
-				  cities.addTo(map); 
-				  if (localized  && focusEnabled) map.setView(new L.LatLng(lat, lng), 8);
-				  localized = false;
-			}	
-		
+			//console.log ("preparedData[key]",preparedData[key]);
+			// split geometry in many
+			
+			 for (j = 0 ; j < preparedData[key].length;j++){	
+				 var layerData = preparedData[key][j];
+				
+				 var i = 0;
+				 for (coo in layerData.geometry.coordinates){	
+					 var datone = {
+					 	type:"Feature",		 
+						properties : Object.assign({},layerData.properties),
+						geometry:{
+							type:layerData.geometry.type, 
+							coordinates:[layerData.geometry.coordinates[coo]]
+						}
+						
+					 };
+					 datone.properties.levelId=datone.properties.id+"_"+i;
+					
+					 //console.log("datone",datone);		
+					 
+					 var jsonLayer = buildJsonLayer(datone,color);
+					 if (overlayMaps[getCode(region)]){
+						 overlayMaps[getCode(region)].push(jsonLayer);
+					 }
+					 else overlayMaps[getCode(region)]=[jsonLayer];
+				
+				
+				
+					 jsonLayer.addTo(map);
+					 if (localized  && focusEnabled) map.setView(new L.LatLng(lat, lng), 8);
+					 localized = false;
+					 
+					 
+					 
+					 i++;
+				 
+				 }
+				 
+				 
+			 }
+			 
+			
+			  
+		}
 			
 	}
 	
 }
 
+
+function buildJsonLayer(datone, color){	
+
+	 var jsonLayer =  L.geoJSON(datone,{
+		 onEachFeature: function (feature, layer) {
+			 
+			  layer.on('mouseover', function () {
+				  this.setStyle({
+			        'fillColor': '#0000ff'
+			      });
+			    });
+			  layer.on('mouseout', function () {
+			      this.setStyle({
+			        'fillColor': color
+			      });
+			    });
+			   layer.on('click', function () {
+				 			  
+			      this.openPopup();
+			    });
+			},
+	    style: function (feature) {			         	
+	    		return {color: color,stroke:true,fillRule:"nonzero"};			    	
+	    }
+	
+	}).bindPopup(function (layer) { return "Appellation :"+layer.feature.properties.appellation 
+		+"<br/>Dénomination : "+layer.feature.properties.denomination 
+		+"<br/>ID Dénomination : "+layer.feature.properties.id_denom 
+		+"<br/>ID App : "+layer.feature.properties.id_app 
+		+"<br/> ID :"+layer.feature.properties.id 
+		+"<br/> ID Wineyard :"+layer.feature.properties.levelId 
+		+"<br/> Type :"+layer.feature.properties.type_ig 
+		+"<br/> Insee (new) :"+layer.feature.properties.new_insee 
+		+"<br/> Commune (new) : "+layer.feature.properties.new_nomcom 
+		+"<br/> Insee (old) : "+layer.feature.properties.old_insee 
+		+"<br/> Commune (old) : "+layer.feature.properties.old_nomcom 
+		+"<br/> Crinao : "+layer.feature.properties.crinao 
+		+"<br/> Description : "+layer.feature.properties.description 
+		+"<br/> <input type='button' onClick='addToDomain2([{name:\"featureId\",value:\""+layer.feature.properties.levelId+"\"}])' value='ajouter au domaine' />" 
+		; } );
+	return jsonLayer;
+}
+
+
 function getCode (region){
-	console.log (region);
 	if (region.id) return region.id;
 	else return region;
 }
@@ -304,7 +450,7 @@ function loadFile (fileName, isClearData){
 	    data.push(JSON.parse(this.responseText));
 	    console.log ("Ready!");
 	   
-	    //document.getElementById("demo").innerHTML = myObj.name;
+	    // document.getElementById("demo").innerHTML = myObj.name;
 	  }
 	  
 	};

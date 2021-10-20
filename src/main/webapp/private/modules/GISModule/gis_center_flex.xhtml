@@ -18,9 +18,17 @@
 		</h:form>
 		
 		<div id='map' class="col-12">
-		MAP HERE
+		gis_center_flex
 		</div>
 		
+		<script>
+			var mappy = document.getElementById('map');
+			mappy.style. height = window.innerHeight -150+"px";
+			console.log ('heigth: ', mappy.height);
+			window.onresize = function () {
+				mappy.style. height = window.innerHeight -150+"px";
+			}
+		</script>
 		
 		
 	</ui:composition>

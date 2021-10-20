@@ -25,6 +25,8 @@ public class WineyardApplication extends SpringBootServletInitializer{
 	@Bean
     public ServletRegistrationBean<Servlet> servletRegistrationBean() {
         Servlet servlet = new FacesServlet();
-        return new ServletRegistrationBean<Servlet>(servlet, "*.jsf");
+        ServletRegistrationBean<Servlet> bean = new ServletRegistrationBean<Servlet>(servlet, "*.jsf");
+        //bean.addInitParameter("javax.faces.FACELETS_SKIP_COMMENTS", "true");
+        return bean;
     }
 }

@@ -3,33 +3,27 @@ package fr.srosoft.wineyard.core.model.entities;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Contents {
+@SuppressWarnings("serial")
+public class Contents  extends WineyardObject{
 
-	private String id;
+	private String step;
 	private String year;
-	private String appelation;
+	private Appellation appellation;
 	private List<String> grapes;
 	private Integer volume;
 	private String color;
 	
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
+	private TraceLine traceLine = new TraceLine();
+	private List<Contents> parents;
+	
+	
 	public String getYear() {
 		return year;
 	}
 	public void setYear(String year) {
 		this.year = year;
 	}
-	public String getAppelation() {
-		return appelation;
-	}
-	public void setAppelation(String appelation) {
-		this.appelation = appelation;
-	}
+	
 	
 	public Integer getVolume() {
 		return volume;
@@ -53,5 +47,29 @@ public class Contents {
 	}
 	public void setColor(String color) {
 		this.color = color;
+	}
+	public Appellation getAppellation() {
+		return appellation;
+	}
+	public void setAppellation(Appellation appellation) {
+		this.appellation = appellation;
+	}
+	public TraceLine getTraceLine() {
+		return traceLine;
+	}
+	public void setTraceLine(TraceLine traceLine) {
+		this.traceLine = traceLine;
+	}
+	public String getStep() {
+		return step;
+	}
+	public void setStep(String step) {
+		this.step = step;
+	}
+	public List<Contents> getParents() {
+		return parents;
+	}
+	public void setParents(List<Contents> parents) {
+		this.parents = parents;
 	}
 }

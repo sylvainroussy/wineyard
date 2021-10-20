@@ -1,6 +1,9 @@
 package fr.srosoft.wineyard.data;
 
 import java.io.IOException;
+/**
+ * Import domains from one page
+ */
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -20,6 +23,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import fr.srosoft.wineyard.core.main.WineyardApplication;
 import fr.srosoft.wineyard.core.model.dao.DomainDao;
+import fr.srosoft.wineyard.core.model.entities.Appellation;
 import fr.srosoft.wineyard.core.model.entities.Domain;
 
 @SpringBootTest(classes= {WineyardApplication.class})
@@ -109,12 +113,12 @@ public class TestImportViti2 {
 	}
 	
 	protected Domain buildViti(String startUrl) throws IOException{
-		final Domain info = new Domain();
+		final Domain domain = new Domain();
 		
 		final Document doc = Jsoup.connect(startUrl).get();
 		
 		
-		info.setDomainName(doc.getElementsByAttributeValue("class","domain-name").text().trim());
+		domain.setDomainName(doc.getElementsByAttributeValue("class","domain-name").text().trim());
 		
 		final Element contactElement = doc.select("#row1 > div > div:nth-child(2) > div.col-md-4 > div:nth-child(2) > div > ul").first();
 		
@@ -123,18 +127,18 @@ public class TestImportViti2 {
 		for (Element element : elements) {
 			if (first) {
 				first=false;
-				info.setInfo(element.text().trim());
+				domain.setInfo(element.text().trim());
 			}
 			else {
 				final Element child = element.getElementsByTag("img").first();
 				if (child != null) {
 					final String source  = child.attr("src");
 					switch (source) {
-					case "/theme_front/theme_front_16/image/domaine/icon-name.svg" : info.setContact(element.text().trim());break;
-					case "/theme_front/theme_front_16/image/domaine/icon-phone.svg" : info.getPhones().add(element.text().trim());break;
-					case "/theme_front/theme_front_16/image/domaine/icon-link.svg" : info.setWebsite(element.text().trim());break;
-					case "/theme_front/theme_front_16/image/domaine/icon-address.svg" : child.remove();this.setAddress(element.html().trim(), info);break;
-					case "/theme_front/theme_front_16/image/domaine/icon-print.svg" : info.setFax(element.text().trim());break;
+					case "/theme_front/theme_front_16/image/domaine/icon-name.svg" : domain.setContact(element.text().trim());break;
+					case "/theme_front/theme_front_16/image/domaine/icon-phone.svg" : domain.getPhones().add(element.text().trim());break;
+					case "/theme_front/theme_front_16/image/domaine/icon-link.svg" : domain.setWebsite(element.text().trim());break;
+					case "/theme_front/theme_front_16/image/domaine/icon-address.svg" : child.remove();this.setAddress(element.html().trim(), domain);break;
+					case "/theme_front/theme_front_16/image/domaine/icon-print.svg" : domain.setFax(element.text().trim());break;
 					}
 				}
 			}
@@ -144,15 +148,29 @@ public class TestImportViti2 {
 		String scoords = doc.select("#row1 > div > div:nth-child(2) > div.col-md-4 > div:nth-child(4) > div > div:nth-child(2) > span").text();
 		String [] acoords = scoords.trim().split(",");
 		try {
-			double [] coords = {Double.parseDouble(acoords[0]),Double.parseDouble(acoords[1])};
-			info.setCoords(coords);
+			if (acoords.length== 2 && !acoords[1].isBlank()) {
+				double [] coords = {Double.parseDouble(acoords[0]),Double.parseDouble(acoords[1])};
+				domain.setCoords(coords);
+			}
+			
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		final String id = info.getDomainName().toLowerCase().replaceAll(" ", "_")+":"+info.getZipCode();
-		info.setId(id);
+		final String id = domain.getDomainName().toLowerCase().replaceAll(" ", "_")+":"+domain.getZipCode();
+		domain.setId(id);
+		
+		final Elements apps = doc.select("#appellations > ul > li > a");
+		for (Element element : apps) {
+			Appellation appellation = new Appellation();
+			appellation.setId(element.text());
+			appellation.setAppellation(element.text());
+			System.out.println(element.text());
+			domain.addAppellation(appellation);
+			
+		}
+		//doc.select("#appellations");
 		
 		// find urls to add in frontier
 		 final Elements neighbors = doc.select("#neighbors > ul > li > a");
@@ -165,7 +183,7 @@ public class TestImportViti2 {
 		}
 		
 		
-		return info;
+		return domain;
 	}
 	
 	private void setAddress (String text, Domain info) {

@@ -12,14 +12,19 @@
     background-image: url(https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png);
 }
 </style>
-	<p:card styleClass="col-12 md:col-4">
-		<h:form>
-			<h:inputHidden  id="managedDomains" value="#{userSession.getModule('DomainModule').getJsonManagedDomains()}"/>
-			<p:remoteCommand name="rc2" onsuccess="initGIS();addDomains(#{userSession.getModule('DomainModule').getJsonManagedDomains()});" autoRun="true" />
+	<ui:param name="module" value="#{userSession.getModule('DomainModule')}"></ui:param>
+	<p:panel toggleable="true" toggleOrientation="vertical" >
+	<f:facet name="header">
+	<p:graphicImage class="pi pi-map-marker"/>
+	Situation géographique
+	</f:facet>
+		
+			
+			<p:remoteCommand name="rc2" onsuccess="initGIS();addDomains([#{module.getJsonCurrentDomain()}]);" autoRun="true" />
 				
-		</h:form>
+		
 		<div id='map' >MAP HERE</div>
-</p:card>
+</p:panel>
 	</ui:composition>
 
 </f:view>

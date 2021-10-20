@@ -8,8 +8,13 @@
 	
 	
 	<ui:composition>
-	<p:panel  header="Domaines gérés par #{userSession.currentUser.displayName}" >
+	<p:panel  header="Domaines gérés par #{userSession.currentUser.displayName}" toggleable="true" toggleOrientation="vertical">
+	<f:facet name="header">
 	
+	<p:graphicImage class="pi pi-globe"/>
+	Domaines sur lesquels intervient #{userSession.currentUser.displayName}
+	
+	</f:facet>
 	<p:dataTable value="#{userSession.getModule('DomainModule').getManagedDomains()}" var="domain">
 		<p:column headerText="Domaine">#{domain.domainName}</p:column>
 		<p:column headerText="Contact">#{domain.contact}</p:column>

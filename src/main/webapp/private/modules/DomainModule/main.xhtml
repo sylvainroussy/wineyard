@@ -6,14 +6,23 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets">
 
 <h:body>
-
-	<div class="card">
+	<div class="grid nested-grid">
+						<div class="col-8">
+							<div class="grid">
+								<div class="col-12"><ui:include src="dashlet_users.xhtml"></ui:include></div>
+								<div class="col-12"><ui:include src="dashlet_domain.xhtml"></ui:include></div>
+								
+							</div>
+						</div>
+						<div class="col-4"><ui:include src="dashlet_gis.xhtml"></ui:include></div>
+					</div>
+	<!-- <div class="card">
 
 		<div class="grid sample-layout ">
 			
 			<div class="grid">
 
-				<!-- <ui:include src="dashlet_domains.xhtml"></ui:include> -->
+				
 				<ui:include src="dashlet_users.xhtml"></ui:include>
 				<ui:include src="dashlet_gis.xhtml"></ui:include>
 				
@@ -21,8 +30,8 @@
 			</div>
 			
 
-		</div>
-	</div>
+		</div> 
+	</div>-->
 
 	
 

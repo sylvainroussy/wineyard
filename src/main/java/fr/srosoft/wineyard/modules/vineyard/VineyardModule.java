@@ -11,30 +11,29 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import fr.srosoft.wineyard.core.model.dao.DomainDao;
-import fr.srosoft.wineyard.core.model.entities.Domain;
-import fr.srosoft.wineyard.core.model.entities.User;
+import fr.srosoft.wineyard.core.model.entities.Parcel;
+import fr.srosoft.wineyard.core.services.GISService;
 import fr.srosoft.wineyard.core.session.UserSession;
 import fr.srosoft.wineyard.modules.commons.AbstractModule;
 import fr.srosoft.wineyard.modules.commons.Module;
+import fr.srosoft.wineyard.modules.domain.DomainModule;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Module (name="VineyardModule", 
 			description="Global Domain Management", 
 			label="Vigne",
-			order=6)
+			order=1)
 public class VineyardModule extends AbstractModule{
 	
 	private static final ObjectMapper MAPPER = new ObjectMapper();
 	
-	@Resource
-	private DomainDao domainDao;
+	private String currentParcelsView ="grid";
 	
-	private List<Domain> managedDomains;
-	private List<User> usersOfDomains;
-	private Domain currentDomain;
-
+	private DomainModule domainModule;
+	
+	@Resource
+	private GISService gisService;
 	
 	@PostConstruct
 	public void init () {
@@ -44,12 +43,7 @@ public class VineyardModule extends AbstractModule{
 
 	@Override
 	public void loadData(UserSession context) {
-		managedDomains = domainDao.findManagedDomains(context.getCurrentUser().getId());
-		if (managedDomains.size() == 1) {
-			this.currentDomain = managedDomains.get(0);
-		}
-		
-		usersOfDomains = domainDao.findDomainUsers(this.currentDomain.getId());
+		domainModule = (DomainModule)context.getModule("DomainModule");
 	}
 
 
@@ -60,40 +54,33 @@ public class VineyardModule extends AbstractModule{
 	}
 
 
-	public String getJsonManagedDomains() throws Exception {
-		
-		return MAPPER.writeValueAsString(managedDomains);
+	public String getCurrentParcelsView() {
+		return currentParcelsView;
+	}
+
+
+	public void setCurrentParcelsView(String currentParcelsView) {
+		this.currentParcelsView = currentParcelsView;
+	}
+	
+	public void changeCurrentParcelsView(String currentParcelsView) {
+		this.currentParcelsView = currentParcelsView;
+	}
+	
+	
+	public List<Parcel> getParcels (){
+		final String domainId = domainModule.getCurrentDomain().getId();
+		return gisService.getParcels(domainId);
 		
 	}
 	
-	public List<Domain> getManagedDomains() {
-		return managedDomains;
+	public String getJsonParcel(String parcelId) throws Exception {
+		List<Parcel> parcels = getParcels ();
+		Parcel parcel = parcels.stream().filter(e -> e.getWineyardId().equals(parcelId)).findFirst().get();
+		return MAPPER.writeValueAsString(parcel.getGeometry());
+		
 	}
 
-
-	public void setManagedDomains(List<Domain> managedDomains) {
-		this.managedDomains = managedDomains;
-	}
-
-
-	public Domain getCurrentDomain() {
-		return currentDomain;
-	}
-
-
-	public void setCurrentDomain(Domain currentDomain) {
-		this.currentDomain = currentDomain;
-	}
-
-
-	public List<User> getUsersOfDomains() {
-		return usersOfDomains;
-	}
-
-
-	public void setUsersOfDomains(List<User> usersOfDomains) {
-		this.usersOfDomains = usersOfDomains;
-	}
 	
 	
 }

@@ -20,6 +20,7 @@ public class Domain implements Serializable{
 	private String address;
 	private double[] coords;
 	private String dataSource;
+	private List<Appellation> appellations;
 	
 	
 	public String getDomainName() {
@@ -94,6 +95,17 @@ public class Domain implements Serializable{
 	public void setDataSource(String dataSource) {
 		this.dataSource = dataSource;
 	}
+	public List<Appellation> getAppellations() {
+		return appellations;
+	}
+	public void setAppellations(List<Appellation> appellations) {
+		this.appellations = appellations;
+	}
+	public void addAppellation(Appellation appellation) {
+		if (this.appellations == null) this.appellations = new ArrayList<>();
+		this.appellations.add(appellation);
+	}
+	
 	@Override
 	public String toString() {
 		return "VitiInfo [domainName=" + domainName + ", info=" + info + ", phones=" + phones + ", fax=" + fax
