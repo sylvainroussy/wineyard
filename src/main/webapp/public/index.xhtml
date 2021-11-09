@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=0" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<!-- 	<link rel="shortcut icon" type="image/icon" href="img/favicon.ico" /> -->
+
+	<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+
+	<h:outputStylesheet name="/css/primeflex.min.css" />
+	<h:outputStylesheet name="/css/leaflet.css" target="head"
+		rel="stylesheet" />
+	<h:outputStylesheet name="/css/font_awesome.css" target="head"
+		rel="stylesheet" />
+	<h:outputStylesheet name="/css/components.css" target="head"
+		rel="stylesheet" />
+
+
+	
+	<h:outputScript name="/js/leaflet.js" target="head" />
+	<h:outputScript name="/js/browser_print.js" target="head" />
+	<h:outputScript name="/js/leaflet_image.js" target="head" />
+	<h:outputScript name="/js/dom_to_image.js" target="head" />
+	<h:outputScript name="/js/gis.js" target="head" />
+	<h:outputScript name="/js/gis_parcel.js" target="head" />
+	<h:outputScript name="/js/drawings.js" target="head" />
+	<h:outputScript name="/js/turf_6_5_0.js" target="head" />
+	<h:outputScript name="/js/cytoscape_3_19_1.js" target="head" />
+	<h:outputScript name="/js/loadash.js" target="head" />
+	 
+	<h:outputScript name="/js/cytoscape-edgehandles.js" target="head" />
+	<h:outputScript name="/js/contents.js" target="head" />
+
+</h:head>
+
+
+<style type="text/css">
+body {
+	margin: 0px;
+	padding: 0px;
+}
+
+.box, .sample-layout>div {
+	background-color: #78081e;
+	text-align: left;
+	padding-top: 1em;
+	padding-bottom: 1em;
+	border-radius: 4px;
+	color: #e9e7e9;
+	margin: 0px;
+	padding: 0px;
+}
+
+.box-stretched {
+	height: 100%;
+	box-sizing: border-box;
+	margin: 0px;
+	padding: 0px;
+}
+
+.sample-layout {
+	margin: 0;
+}
+
+.sample-layout>div {
+	border: 1px solid #ffffff;
+}
+
+.vertical-container {
+	margin: 0;
+	height: 200px;
+	background: #efefef;
+	border-radius: 4px;
+	text-align: left;
+}
+
+.nested-grid .p-col-4 {
+	padding-bottom: 1em;
+}
+
+.doc-table {
+	font-family: arial, sans-serif;
+	border-collapse: collapse;
+	width: 100%;
+}
+
+.doc-table th {
+	background-color: #78081e;
+}
+
+.doc-table td, .doc-table th {
+	border: 1px solid #e5ebf0;
+	text-align: left;
+	padding: 8px;
+}
+
+.doc-table tr:nth-child(odd) {
+	background-color: #f3f6f9;
+}
+
+
+/*
+	Wineyard customizations
+*/
+#map {
+	position: relative;
+	left: 0px;
+	width: 100%;
+	height: 600px;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	
+}
+
+body .ui-toolbar {
+    border: 1px solid #dee2e6;
+    background: #78081e;
+    color: #495057;
+    padding: 0px !important;
+    border-radius: 4px;
+}
+
+
+
+ .ui-toolbar .ui-button {
+    background: #560505;
+    color: #ffffff;
+   /* border: 1px solid #660505;*/
+    border: none !important;
+    margin: 0;
+    outline: 0 none;
+    border-radius: 0px !important;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+body .ui-button {
+    background: #B60505;
+    color: #ffffff;
+    border: none !important;
+    margin: 0;
+    outline: 0 none;
+    border-radius: 4px !important;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.ui-state-focus {
+	   box-shadow: 0px 0px 1px 0px black !important;
+}
+
+body .ui-button.ui-state-hover {
+	background: #B60505 !important;
+	color:white !important;
+	border: 0px solid #B60505 !important;
+}
+
+.ui-button.ui-state-active {
+	background: #B60505 !important;
+	border: 0px solid #B60505 !important;
+}
+
+body .fc-button.fc-state-hover {
+	background: #B60505 !important;
+	color:white !important;
+	border: 0px solid #B60505 !important;
+}
+
+.fc-button.fc-state-active {
+	background: #B60505 !important;
+	border: 0px solid #B60505 !important;
+}
+
+.wineyard-menu-active{
+	background: #B60505 !important;
+	color:white !important;
+}
+
+.wineyard-menu-inactive{
+	background: #560505 !important;
+	color:white !important;
+}
+
+body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+    background-color: #EFEBE9 !important;
+    color: #495057;
+}
+
+body .ui-dataview .ui-dataview-header {
+    background: white;
+    color: #495057;
+    padding: 0px !important;
+    font-weight: 600;
+    border: none !important;
+    display:none !important;
+   
+}
+
+body .ui-dataview  {
+    background: transparent !important;
+}
+
+body .ui-tabs.ui-tabs-top > .ui-tabs-nav li.ui-tabs-header.ui-state-active {
+    border-color: #B60505;
+   
+}
+
+body .ui-tabs .ui-tabs-nav li.ui-tabs-header.ui-state-active a {
+     color:#B60505 !important;
+}
+
+.ui-selectonemenu{
+border:none !important;
+}
+.ui-state-highlight{
+	background-color:lightgrey !important;
+}
+
+.ui-selectonemenu label.ui-selectonemenu-label {
+    cursor: pointer;
+    color:white;
+    
+}
+
+.ui-selectonemenu label.ui-selectonemenu-label .ui-state-hover {
+	background: #B60505 !important;
+	border: 0px solid #B60505 !important;
+	color:white !important;
+}
+
+/*.ui-panelmenu .ui-panelmenu-content {
+	overflow: visible !important;
+}*/
+
+.active-drop{
+	background-color:#FF0000;
+}
+
+.scheduler{
+
+}
+
+.grape {
+	width: 15px;
+	height: 15px;
+	display: block;
+	background: url("#{resource['images/grapes_15x15.png']}") no-repeat 0px
+		0px;
+}
+
+.grape_white {
+	width: 15px;
+	height: 15px;
+	display: block;
+	background: url("#{resource['images/grapes_white_15x15.png']}") no-repeat 0px
+		0px;
+}
+</style>
+
+
+
+<h:body>
+		<div class="grid  sample-layout ">
+			<div class="col-12 ">
+
+				<ui:include src="index_north.xhtml">
+					<ui:param name="pagename" value="home" />
+				</ui:include>
+
+			</div>
+			<div class="col-12 md:col-12">
+				<div class="col-12 ">
+					<ui:include src="index_center.xhtml" />
+				</div>
+
+			</div>
+			<div class="col-12">SRO SOFT (c)2020-2021</div>
+			
+
+		</div>
+	
+
+	
+</h:body>
+</html>

@@ -4,7 +4,22 @@ import fr.srosoft.wineyard.core.session.UserSession;
 
 public abstract class AbstractModule {
 
-	public abstract void loadData (UserSession context);
+	protected UserSession context;
 	
-	public abstract String getMainPage ();
+	public void loadData (UserSession context) {
+		this.context = context;
+	}	
+	
+	
+	public String getIcon() {
+		return null;
+	}
+
+	public UserSession getContext() {
+		return context;
+	}
+
+	public void setContext(UserSession context) {
+		this.context = context;
+	}
 }

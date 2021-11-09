@@ -2,6 +2,7 @@ package fr.srosoft.wineyard.core.services;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,9 @@ import fr.srosoft.wineyard.core.model.dao.DomainDao;
 import fr.srosoft.wineyard.core.model.dao.SystemDao;
 import fr.srosoft.wineyard.core.model.entities.Domain;
 import fr.srosoft.wineyard.core.model.entities.User;
+import fr.srosoft.wineyard.core.model.entities.WineyardObject;
+import fr.srosoft.wineyard.core.session.UserSession;
+import fr.srosoft.wineyard.utils.WineyardUtils;
 
 @Service
 public class DirectoryService {
@@ -56,6 +60,11 @@ public class DirectoryService {
 		return domainsOfUser.get(userId);
 	}
 	
+	public void saveDomain (Domain domain, UserSession context) {
+		this.stampObject(domain, "Domain", context);
+		domainDao.saveDomain(domain);
+	}
+	
 	public byte[] getDomainLogo(String domainId) throws Exception{
 		byte[] bytes = {};
 		try {
@@ -63,8 +72,9 @@ public class DirectoryService {
 			bytes =  stream.readAllBytes();
 			stream.close();
 		}
-		catch (Exception e) {
-			e.printStackTrace();
+		catch (IOException e) {
+			//e.printStackTrace();
+			// log nothing, Maybe logo is not uploaded 
 		}
 		return bytes;
 	}
@@ -91,5 +101,9 @@ public class DirectoryService {
 		}
 	}
 	
+	private void stampObject (WineyardObject object, String label, UserSession context) {
+		boolean exists = this.domainDao.exists(label, object.getId());
+		WineyardUtils.stamp(object, !exists, context.getCurrentUser().getDisplayName());
+	}	
 	
 }

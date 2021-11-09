@@ -11,3 +11,9 @@ server:
       timeout: 60m
       cookie:
         max-age: 60m
+        
+spring:
+  mvc:
+    view:
+      prefix: /jsp/
+      suffix: .jsp

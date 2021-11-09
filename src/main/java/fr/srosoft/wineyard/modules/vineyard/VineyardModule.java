@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.srosoft.wineyard.core.model.entities.Parcel;
-import fr.srosoft.wineyard.core.services.GISService;
+import fr.srosoft.wineyard.core.services.VineyardService;
 import fr.srosoft.wineyard.core.session.UserSession;
 import fr.srosoft.wineyard.modules.commons.AbstractModule;
 import fr.srosoft.wineyard.modules.commons.Module;
@@ -32,27 +32,29 @@ public class VineyardModule extends AbstractModule{
 	
 	private DomainModule domainModule;
 	
+		
 	@Resource
-	private GISService gisService;
+	private VineyardService vineyarService;
 	
 	@PostConstruct
 	public void init () {
 		
 	}
+	
+	@Override
+	public String getIcon() {
+		return "grape_white";
+	}
 
 
 	@Override
 	public void loadData(UserSession context) {
+		super.loadData(context);
 		domainModule = (DomainModule)context.getModule("DomainModule");
 	}
 
 
-	@Override
-	public String getMainPage() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 
 	public String getCurrentParcelsView() {
 		return currentParcelsView;
@@ -70,13 +72,13 @@ public class VineyardModule extends AbstractModule{
 	
 	public List<Parcel> getParcels (){
 		final String domainId = domainModule.getCurrentDomain().getId();
-		return gisService.getParcels(domainId);
+		return vineyarService.getParcels(domainId);
 		
 	}
 	
 	public String getJsonParcel(String parcelId) throws Exception {
-		List<Parcel> parcels = getParcels ();
-		Parcel parcel = parcels.stream().filter(e -> e.getWineyardId().equals(parcelId)).findFirst().get();
+		final List<Parcel> parcels = getParcels ();
+		final Parcel parcel = parcels.stream().filter(e -> e.getWineyardId().equals(parcelId)).findFirst().get();
 		return MAPPER.writeValueAsString(parcel.getGeometry());
 		
 	}

@@ -26,9 +26,14 @@ public class SecurityConfiguration  extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().authorizeRequests()
           .antMatchers("/public/**").permitAll()
+          .antMatchers("/login*").permitAll()
           .antMatchers("/javax.faces.resource/**").permitAll()
           .antMatchers("/private/**").authenticated()
           .and()
-          .formLogin().defaultSuccessUrl("/private/wineyard/home.jsf");
+          .formLogin()
+          .loginPage("/login").permitAll()
+          //.loginProcessingUrl("/perform_login")
+          .defaultSuccessUrl("/private/wineyard/home.jsf");
+          //.failureUrl("/login.html?error=true");
     }
 }

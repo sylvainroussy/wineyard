@@ -20,6 +20,7 @@ import fr.srosoft.wineyard.core.model.entities.Domain;
 import fr.srosoft.wineyard.core.model.entities.User;
 import fr.srosoft.wineyard.core.services.DirectoryService;
 import fr.srosoft.wineyard.core.services.GISService;
+import fr.srosoft.wineyard.core.services.VineyardService;
 import fr.srosoft.wineyard.core.session.UserSession;
 import fr.srosoft.wineyard.modules.commons.AbstractModule;
 import fr.srosoft.wineyard.modules.commons.Module;
@@ -40,16 +41,19 @@ public class DomainModule extends AbstractModule{
 	private DomainDao domainDao;
 	
 	@Resource
-	private DirectoryService directoryService;
+	protected DirectoryService directoryService;
 	
 	@Resource
 	private GISService gisService;
+	
+	@Resource
+	private VineyardService vineyardService;
 	
 	private Domain currentDomain;
 
 	private User currentUser;
 	
-	private UserSession context;
+	
 	
 	private DashletDomain dashletDomain;
 	
@@ -57,32 +61,32 @@ public class DomainModule extends AbstractModule{
 	public void init () {
 		
 	}
+	
+	@Override
+	public String getIcon() {
+		return "pi pi-home";
+	}
 
 
 	@Override
 	public void loadData(UserSession context) {
-		this.context = context;
+		super.loadData(context);
 		this.currentUser = context.getCurrentUser();
 		directoryService.getDomainsForUser(currentUser.getId());
 		currentDomain  = directoryService.getDefaultDomain(currentUser.getId());
 		
-		dashletDomain = new DashletDomain();
+		dashletDomain = new DashletDomain(this);
 		
 	}
 
 
-	@Override
-	public String getMainPage() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	/**
 	 * Adding ârcel to currentDomain
 	 */
 	public void addToCurrentDomain() {
 		 String featureId = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("featureId");
-		 gisService.registerParcelToDomain(featureId, this.currentDomain.getId());
+		 vineyardService.registerParcelToDomain(featureId, this.currentDomain.getId());
 		 
 	}
 
@@ -116,11 +120,14 @@ public class DomainModule extends AbstractModule{
 	
 	
 	
+	
+	
 	public void changeDomainContext (ValueChangeEvent event) {
 		final String domainId = (String)event.getNewValue();
 		this.currentDomain = directoryService.getDomainsForUser(currentUser.getId())
 				.stream().filter(e -> e.getId().equals(domainId)).findFirst().get();
-		dashletDomain = new DashletDomain();
+		dashletDomain = new DashletDomain(this);
+		this.context.onDomainChange();
 		
 	}
 	
@@ -137,6 +144,8 @@ public class DomainModule extends AbstractModule{
 		}
 		else return new ArrayList<>();
 	}
+	
+	
 
 
 	public DashletDomain getDashletDomain() {
@@ -148,6 +157,8 @@ public class DomainModule extends AbstractModule{
 		this.dashletDomain = dashletDomain;
 	}
 
+	
 
+	
 	
 }

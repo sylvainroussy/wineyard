@@ -232,6 +232,18 @@ border:none !important;
 	color:white !important;
 }
 
+body .ui-carousel .ui-carousel-header {
+	border:none;
+}
+
+body .ui-carousel .ui-carousel-viewport {
+	border:none;
+}
+
+body .ui-carousel .ui-carousel-viewport .ui-carousel-item {
+	border:none;
+}
+
 /*.ui-panelmenu .ui-panelmenu-content {
 	overflow: visible !important;
 }*/
@@ -259,8 +271,65 @@ border:none !important;
 	background: url("#{resource['images/grapes_white_15x15.png']}") no-repeat 0px
 		0px;
 }
-</style>
 
+.whiteGrape {
+	width: 15px;
+	height: 15px;
+	display: block;
+	background: url("#{resource['images/grapes_15x15.png']}") no-repeat 0px
+		0px;
+}
+
+.redGrape {
+	width: 15px;
+	height: 15px;
+	display: block;
+	background: url("#{resource['images/grapes_white_15x15.png']}") no-repeat 0px
+		0px;
+}
+
+.onWhiteBackground > label{
+	color: #495057 !important;
+	border:1px solid #ced4da !important;
+}
+
+
+
+.bottle-sticker{
+ 	#background: #B60505;
+ 	background: white;
+ 	display: block;
+ 	font-size:1em;
+ 	font: bold large serif;
+ 	 text-align: center;
+ 	 height:140px;
+	color:black;
+	margin: 5px;
+	border: thick double black;
+	border-radius:5px;
+	filter: sepia(60%);
+	
+	}
+	
+.redWine{
+	background-color:#78081e !important;
+	color:#EFEBE9 !important;
+	margin-left:5px;
+}
+
+.whiteWine{
+	background-color:#EFEBE9 !important;
+	color:#78081e !important;
+	margin-left:5px;
+}
+
+.roseWine{
+	background-color:#78081e !important;
+	color:#EFEBE9 !important;
+	margin-left:5px;
+
+}
+</style>
 
 
 <h:body>
@@ -278,8 +347,7 @@ border:none !important;
 				</div>
 
 			</div>
-			<div class="col-12">SRO SOFT (c)2020-2021 Logged User:
-				${userSession.currentUser.displayName}</div>
+			<div class="col-12" style="text-align:center">SRO SOFT (c)2020-2021 * Wineyard v0.0.1-SNAPSHOT * Logged User:<p:spacer width="2px"/>${userSession.currentUser.displayName}</div>
 
 		</div>
 	

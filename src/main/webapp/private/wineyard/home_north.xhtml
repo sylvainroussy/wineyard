@@ -25,6 +25,7 @@
 							<p:commandButton
 								actionListener="#{userSession.changePage(module.moduleName)}"
 								update="centerPanel, homeMenu" value="#{module.label}" 
+								icon="#{module.module.icon}"
 								styleClass="#{module.moduleName==userSession.currentPage ? 'wineyard-menu-active':'wineyard-menu-inactive'}"/>
 
 						</c:forEach>

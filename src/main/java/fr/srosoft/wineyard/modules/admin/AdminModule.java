@@ -52,6 +52,12 @@ public class AdminModule extends AbstractModule{
 		allUsers = directoryService.getAllUsers();
 	}
 	
+	@Override
+	public void loadData(UserSession context) {
+		super.loadData(context);
+		
+	}	
+	
 	public List<Domain> searchDomainContains(String query) {
         String queryLowerCase = query.toLowerCase();       
         return allDomains.stream().filter(t -> t.getDomainName().toLowerCase().contains(queryLowerCase)).collect(Collectors.toList());
@@ -114,19 +120,7 @@ public class AdminModule extends AbstractModule{
 	}
 	
 
-	@Override
-	public void loadData(UserSession context) {
-		
-		
-	}
-
-
-	@Override
-	public String getMainPage() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 
 	public List<Domain> getAllDomains() {
 		return allDomains;

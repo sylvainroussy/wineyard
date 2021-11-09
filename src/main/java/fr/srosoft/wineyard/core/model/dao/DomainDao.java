@@ -8,7 +8,6 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import fr.srosoft.wineyard.core.model.beans.UserDomain;
-import fr.srosoft.wineyard.core.model.entities.Appellation;
 import fr.srosoft.wineyard.core.model.entities.Domain;
 import fr.srosoft.wineyard.core.model.entities.User;
 
@@ -17,10 +16,21 @@ public class DomainDao extends AbstractDao {
 
 	private final String QUERY_BUILD_DOMAIN = "MERGE (domain:Domain{id:apoc.util.md5([$id])}) SET domain+=$patch "
 			+ "WITH domain "
+			+ "MERGE (domain)-[:HAS_MODULE{enabled:true}]->(cave:Module:CaveModule{id:domain.id}) "
+			+ "MERGE (domain)-[:HAS_MODULE{enabled:true}]->(d:Module:DomainModule{id:domain.id}) "
+			+ "MERGE (domain)-[:HAS_MODULE{enabled:true}]->(cuvee:Module:CuveeModule{id:domain.id}) "
+			+ "MERGE (domain)-[:HAS_MODULE{enabled:true}]->(gis:Module:GisModule{id:domain.id}) "
+			+ "MERGE (domain)-[:HAS_MODULE{enabled:true}]->(directory:Module:DirectoryModule{id:domain.id}) "
+			+ "MERGE (domain)-[:HAS_MODULE{enabled:true}]->(harvest:Module:HarvestModule{id:domain.id}) "
+			+ "MERGE (domain)-[:HAS_MODULE{enabled:true}]->(vineyard:Module:VineyardModule{id:domain.id}) "
+			+ "MERGE (domain)-[:HAS_MODULE{enabled:true}]->(admin:Module:AdminModule{id:domain.id}) "
 			+ "UNWIND $appellations AS appellation "
 			+ "MERGE (app:Appellation{id:domain.id+':'+apoc.util.md5([appellation.id])})  "
 			+ "SET app.appellation = appellation.appellation "
-			+ "MERGE (domain)-[:PROPOSES]->(app) ";
+			+ "MERGE (cuvee)-[:PROPOSES]->(app) ";
+	
+	// One level depth
+	private final String QUERY_SAVE_DOMAIN = "MERGE (domain:Domain{id:$id}) SET domain+=$patch ";
 	
 	private final String QUERY_FIND_DOMAIN_BY_ID = "MATCH (domain:Domain{id:$id}) RETURN domain ";
 	private final String QUERY_FIND_DOMAIN_BY_MANAGER = "MATCH (user:User{id:$userid}) "
@@ -51,8 +61,7 @@ public class DomainDao extends AbstractDao {
 			+ "SET l.office = linkedDomain.office "
 			+ "MERGE (u)-[:HAS_CONTEXT]->(l) ";
 	
-	private final String QUERY_APPELLATIONS = "MATCH (domain:Domain{id:$domainId})-[:PROPOSES]->(appellation:Appellation) RETURN appellation ORDER BY appellation.appellation ASC";
-	private final String QUERY_FIND_APPELLATION_BY_ID = "MATCH (appellation:Appellation{id:$id}) RETURN appellation";
+	
 			
 	
 	public void createDomain (final Domain domain) {
@@ -68,6 +77,17 @@ public class DomainDao extends AbstractDao {
     	this.writeQuery(QUERY_BUILD_DOMAIN, parameters);
 	}
 	
+	public void saveDomain (final Domain domain) {
+		final Map<String,Object> parameters = new HashMap<>();
+    	final Map<?,?> patch =  MAPPER.convertValue(domain, Map.class);   
+    	patch.values().removeAll(Collections.singleton(null));
+    	parameters.put("id",domain.getId());
+    	patch.remove("id");
+    	patch.remove("appellations");
+    	parameters.put("patch", patch);
+    	this.writeQuery(QUERY_SAVE_DOMAIN, parameters);
+	}
+	
 	public Domain findDomain (final String id) {
 		final Map<String,Object> parameters = new HashMap<>();    	    	
     	parameters.put("id",id);    		
@@ -80,17 +100,7 @@ public class DomainDao extends AbstractDao {
     	return this.readMultipleQuery(QUERY_FIND_DOMAIN_BY_MANAGER, parameters,"domain",Domain.class);
 	}
 	
-	public List<Appellation> findAppelationsForDomain (final String domainId) {
-		final Map<String,Object> parameters = new HashMap<>();    	    	
-    	parameters.put("domainId",domainId);    		
-    	return this.readMultipleQuery(QUERY_APPELLATIONS, parameters,"appellation",Appellation.class);
-	}
 	
-	public Appellation findAppellation (final String id) {
-		final Map<String,Object> parameters = new HashMap<>();    	    	
-    	parameters.put("id",id);    		
-    	return this.readSingleQuery(QUERY_FIND_APPELLATION_BY_ID, parameters,"appellation",Appellation.class);
-	}
 	
 	public List<Domain> findAllDomains () {
 		final Map<String,Object> parameters = new HashMap<>();    	    	
@@ -132,4 +142,8 @@ public class DomainDao extends AbstractDao {
     	parameters.put("password", password);
     	this.writeQuery(QUERY_SAVE_USER, parameters);
 	}
+	
+	
+	
+	
 }

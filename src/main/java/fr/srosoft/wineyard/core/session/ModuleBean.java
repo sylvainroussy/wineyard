@@ -10,7 +10,7 @@ public class ModuleBean implements Serializable, Comparable<ModuleBean>{
 	private String moduleName;
 	private AbstractModule module;
 	private String label;
-	private String description;
+	private String description;	
 	private Integer order;
 	
 	public AbstractModule getModule() {

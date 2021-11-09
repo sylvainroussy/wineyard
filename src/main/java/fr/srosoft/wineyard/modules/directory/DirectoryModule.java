@@ -32,21 +32,21 @@ public class DirectoryModule extends AbstractModule{
 	public void init () {
 		allDomains = domainDao.findAllDomains();
 	}
+	
+	@Override
+	public String getIcon() {
+		return "pi pi-phone";
+	}
 
 
 	@Override
 	public void loadData(UserSession context) {
-		
+		super.loadData(context);
 		
 	}
 
 
-	@Override
-	public String getMainPage() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 
 	public List<Domain> getAllDomains() {
 		return allDomains;

@@ -1,14 +1,13 @@
 package fr.srosoft.wineyard.core.model.entities;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings("serial")
-public class Domain implements Serializable{
+public class Domain extends WineyardObject{
 	
-	private String id;
+	
 	private String domainName;
 	private String info;
 	private List<String> phones = new ArrayList<String>();
@@ -20,7 +19,9 @@ public class Domain implements Serializable{
 	private String address;
 	private double[] coords;
 	private String dataSource;
+	@Deprecated
 	private List<Appellation> appellations;
+	private String surface;
 	
 	
 	public String getDomainName() {
@@ -83,12 +84,7 @@ public class Domain implements Serializable{
 	public void setFax(String fax) {
 		this.fax = fax;
 	}
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
+	
 	public String getDataSource() {
 		return dataSource;
 	}
@@ -106,6 +102,12 @@ public class Domain implements Serializable{
 		this.appellations.add(appellation);
 	}
 	
+	public String getSurface() {
+		return surface;
+	}
+	public void setSurface(String surface) {
+		this.surface = surface;
+	}
 	@Override
 	public String toString() {
 		return "VitiInfo [domainName=" + domainName + ", info=" + info + ", phones=" + phones + ", fax=" + fax

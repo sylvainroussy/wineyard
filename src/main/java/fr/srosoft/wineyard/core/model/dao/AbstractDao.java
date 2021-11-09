@@ -106,4 +106,24 @@ public abstract class AbstractDao {
         }
 		return results;
 	}
+	
+	public boolean exists (String label, String id) {
+		try ( Session session = neo4jDriver.session() )
+        {
+          return  session.readTransaction( new TransactionWork<Boolean>()
+            {                
+				@Override
+                public Boolean execute( Transaction tx )
+                {
+                	     	
+                	final Result result = tx.run("OPTIONAL MATCH (o:"+label+"{id:$id}) RETURN o IS NOT NULL as exists", Map.of("id", id));
+                	return result.single().get("exists").asBoolean();                	
+                	        	
+                }
+            } );
+           
+        }
+	}
+	
+	
 }

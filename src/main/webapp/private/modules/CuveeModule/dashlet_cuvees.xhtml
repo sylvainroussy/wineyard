@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+<f:view>
+
+
+	<ui:composition>
+
+		<style type="text/css">
+.product-item .product-item-content {
+	margin-top: .2rem;
+	margin-left: .2rem;
+	margin-right: .2rem;
+	margin-bottom: .2rem;
+	padding: 1rem 0;
+}
+
+
+</style>
+		<ui:param name="module"
+			value="#{userSession.getModule('CuveeModule')}" />
+
+		<p:carousel
+			id="cuvee_millesime" 
+			value="#{module.currentCuveesSummary}"
+			stateful="true" 
+			var="summary"
+			numVisible="3" numScroll="3" responsive="true" 
+			
+			rendered="#{module.currentMillesime != null}" styleClass="border-radius:5px">
+			<f:facet name="header">
+				<h5>Cuvées du millésime #{module.currentMillesime.year}</h5>
+			</f:facet>
+
+			<div class="product-item" style="box-shadow: 5px 5px 5px grey;">
+				<div class="product-item-content">
+					<div class="p-mb-3">
+					<ui:repeat var="blend" value="#{summary.cuvee.appellation.blends}">
+						<p:tag icon="#{blend.grape.color}Grape" value="#{blend.grape.commonName} (#{(blend.proportion * 100).intValue()}%)"
+										styleClass="#{blend.grape.color}Wine" />
+					</ui:repeat>
+					</div>
+					<div class="bottle-sticker" >
+						<h6 class="p-mb-1">#{module.context.currentDomain.domainName}</h6>
+						<div class="p-mb-1"/>
+						<div class="p-mb-1">#{summary.cuvee.appellation.appellation}<br/><span style="font-size:0.8em">#{summary.cuvee.appellation.label}</span></div>
+						
+						<div style="position:fixed;top: 80%; left:45%">#{summary.cuvee.millesime.year}</div>
+					</div>
+					<div class="p-mt-5" style="border: solid 1px black;margin:5px">					
+						<div class="grid" >
+							<ui:repeat var="stock" value="#{summary.stockSummary.stocks}">							
+								<div class="col-8" style="padding-left:15px">Stock #{stock.containerType} (#{stock.unit})</div>
+								<div class="col-4" > #{stock.quantity}</div>
+							</ui:repeat>
+						</div>
+					</div>
+					<div class="p-mt-5" style="margin:5px">
+						<p:commandButton value="Accéder au chai" 
+							icon="pi pi-sitemap"
+							actionListener="#{module.context.setCurrentPage('CaveModule')}"
+							update=":centerPanel"/>	
+					</div>
+				</div>
+			</div>
+		</p:carousel>
+		<p:panel id="panelCuvee" rendered="#{module.currentCuvee != null}">
+			#{module.currentCuvee.appellation.appellation}
+		</p:panel>
+
+	</ui:composition>
+
+</f:view>
+</html>

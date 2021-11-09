@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import fr.srosoft.wineyard.core.model.dao.FeatureDao;
+import fr.srosoft.wineyard.core.model.dao.GisDao;
 import fr.srosoft.wineyard.core.model.entities.City;
 import fr.srosoft.wineyard.core.model.entities.City.Denomination;
 
@@ -34,7 +34,7 @@ public class GISView {
 	private final static Logger LOGGER = LoggerFactory.getLogger(GISView.class);
 
 	@Resource
-	private FeatureDao featureDao;
+	private GisDao featureDao;
 
 	private List<City> allCities;
 	private Map<String, List<String>> allCrinaos;

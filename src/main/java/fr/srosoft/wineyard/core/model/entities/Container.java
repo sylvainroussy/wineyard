@@ -3,6 +3,7 @@ package fr.srosoft.wineyard.core.model.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("serial")
 public class Container  extends WineyardObject{
 	
 	private String number;

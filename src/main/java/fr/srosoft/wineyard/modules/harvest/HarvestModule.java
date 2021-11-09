@@ -35,20 +35,20 @@ public class HarvestModule extends AbstractModule{
 	public void init () {
 		
 	}
+	
+	@Override
+	public String getIcon() {
+		return "pi pi-replay";
+	}
 
 
 	@Override
 	public void loadData(UserSession context) {
-		
+		super.loadData(context);
 	}
 
 
-	@Override
-	public String getMainPage() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 
 		
 	

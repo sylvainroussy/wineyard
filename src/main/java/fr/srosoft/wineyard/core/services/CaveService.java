@@ -9,40 +9,91 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import fr.srosoft.wineyard.core.model.dao.DomainDao;
+import fr.srosoft.wineyard.core.model.dao.CuveeDao;
 import fr.srosoft.wineyard.core.model.entities.Appellation;
+import fr.srosoft.wineyard.core.model.entities.Cuvee;
+import fr.srosoft.wineyard.core.model.entities.Millesime;
 import fr.srosoft.wineyard.core.model.entities.Tank;
+import fr.srosoft.wineyard.core.model.entities.WineyardObject;
+import fr.srosoft.wineyard.core.session.UserSession;
+import fr.srosoft.wineyard.utils.WineyardUtils;
 
 @Service
 public class CaveService {
 	
 	@Resource
-	private DomainDao domainDao;
+	private CuveeDao cuveeDao;
+	
+	
 	
 	public static final String[] actionNames1= {  "FILTRATION","PIGEAGE","REMPLISSAGE"};
 	public static final String[] actionNames2= {"MISE EN BOUTEILLES",  "FILTRATION","PIGEAGE","REMPLISSAGE"};
 	
 	private Map<String,List<Tank>> tanks = new HashMap<>();
+	private Map<String,List<Appellation>> appellations = new HashMap<>();
 	
-	public List<Tank> getTanks(String domainId){
-		if(tanks.get(domainId) == null) {
-			this.loadTanks(domainId);
+	
+	public List<Appellation> findAppellations(String domainId){
+		if(appellations.get(domainId) == null) {
+			this.loadAppellations(domainId);
 		}		
-		return tanks.get(domainId);
+		return appellations.get(domainId);		
+	}
+	
+	
+	
+	public Appellation findAppellation(String appellationId){
+		return cuveeDao.findAppellation(appellationId);
+	}
+	
+	public int countAppellationsByAppellation(String appellation, String domainId){
+		
+		return cuveeDao.countAppellations(appellation, domainId);		
+	}
+	
+	public void saveAppellation(Appellation appellation, UserSession context) {
+		this.stampObject(appellation, "Appellation", context);
+		this.cuveeDao.saveAppellation(appellation, context.getCurrentDomain().getId());
+		this.appellations.remove(context.getCurrentDomain().getId());
+	}
+	
+	private void loadAppellations(String domainId) {
+		this.appellations.put(domainId, cuveeDao.findAppelationsForDomain(domainId));
 		
 	}
 	
-	public List<Appellation> findAppellations(String domainId){
-		return domainDao.findAppelationsForDomain(domainId);
+	public void saveAllCuvees (List<Cuvee> cuvees, UserSession context ) {		
+		cuvees.stream().forEach(e -> this.stampObject(e, "Cuvee", context));		
+		this.cuveeDao.saveAllCuvees (cuvees, context.getCurrentDomain().getId());
 	}
 	
-	public Appellation findAppellation(String appellationId){
-		return domainDao.findAppellation(appellationId);
+	public List<Cuvee> getCuvees(UserSession context){
+		return cuveeDao.findCuveesByDomain(context.getCurrentDomain().getId());
 	}
+	
+	public List<Cuvee> getCurrentCuvees(UserSession context){
+		return cuveeDao.findCuveesByDomainAndMillesime(context.getCurrentDomain().getId(), context.getCurrentMillesime().getYear());
+	}
+	
+	public List<Cuvee> getCuveesByDomainAndMillesime(UserSession context, int year){
+		return cuveeDao.findCuveesByDomainAndMillesime(context.getCurrentDomain().getId(), year);
+	}
+	
+	public List<Millesime> getMillesimes(UserSession context){
+		return cuveeDao.findMillesimesByDomain(context.getCurrentDomain().getId());
+	}
+	
+	
+	
+	private void stampObject (WineyardObject object, String label, UserSession context) {
+		boolean exists = this.cuveeDao.exists(label, object.getId());
+		WineyardUtils.stamp(object, !exists, context.getCurrentUser().getDisplayName());
+	}	
+
 	
 	private void loadTanks(String domainId) {
 		
-		List<Appellation> appellations = findAppellations(domainId);
+		
 		final List<Tank> tanks = new ArrayList<>();
 		
 		/*for (int i = 0; i < 4; i++) {

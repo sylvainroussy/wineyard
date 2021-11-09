@@ -1,28 +1,24 @@
 package fr.srosoft.wineyard.core.model.entities;
 
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Contents is a part of a container registered with Cuvee
+ * @author sroussy
+ *
+ */
 @SuppressWarnings("serial")
 public class Contents  extends WineyardObject{
 
-	private String step;
-	private String year;
-	private Appellation appellation;
-	private List<String> grapes;
-	private Integer volume;
-	private String color;
+	private Cuvee cuvee;	
+	private Integer volume;	
 	
 	private TraceLine traceLine = new TraceLine();
 	private List<Contents> parents;
+	private String currentState;
 	
 	
-	public String getYear() {
-		return year;
-	}
-	public void setYear(String year) {
-		this.year = year;
-	}
+	
 	
 	
 	public Integer getVolume() {
@@ -31,45 +27,31 @@ public class Contents  extends WineyardObject{
 	public void setVolume(Integer volume) {
 		this.volume = volume;
 	}
-	public List<String> getGrapes() {
-		return grapes;
-	}
-	public void setGrapes(List<String> grapes) {
-		this.grapes = grapes;
-	}
 	
-	public void addGrape(String grape) {
-		if (this.grapes == null) this.grapes  = new ArrayList<>();
-		this.grapes.add(grape);
-	}
-	public String getColor() {
-		return color;
-	}
-	public void setColor(String color) {
-		this.color = color;
-	}
-	public Appellation getAppellation() {
-		return appellation;
-	}
-	public void setAppellation(Appellation appellation) {
-		this.appellation = appellation;
-	}
 	public TraceLine getTraceLine() {
 		return traceLine;
 	}
 	public void setTraceLine(TraceLine traceLine) {
 		this.traceLine = traceLine;
 	}
-	public String getStep() {
-		return step;
-	}
-	public void setStep(String step) {
-		this.step = step;
-	}
+	
 	public List<Contents> getParents() {
 		return parents;
 	}
 	public void setParents(List<Contents> parents) {
 		this.parents = parents;
+	}
+	
+	public String getCurrentState() {
+		return currentState;
+	}
+	public void setCurrentState(String currentState) {
+		this.currentState = currentState;
+	}
+	public Cuvee getCuvee() {
+		return cuvee;
+	}
+	public void setCuvee(Cuvee cuvee) {
+		this.cuvee = cuvee;
 	}
 }

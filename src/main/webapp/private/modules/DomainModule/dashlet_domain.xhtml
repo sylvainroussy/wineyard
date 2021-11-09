@@ -74,7 +74,7 @@
 					
 				</div>
 				
-				<p:commandButton icon="pi pi-file" actionListener="#{module.dashletDomain.changeMode('read')}" update="domainDashlet" title="Enregistrer" rendered="#{dashletMode == 'edit'}"/>
+				<p:commandButton icon="pi pi-file" actionListener="#{module.dashletDomain.saveDomain}" update="domainDashlet" title="Enregistrer" rendered="#{dashletMode == 'edit'}"/>
 			<p:commandButton icon="pi pi-times" actionListener="#{module.dashletDomain.changeMode('read')}" update="domainDashlet" title="Annuler" immediate="true" rendered="#{dashletMode == 'edit'}"/>
 			
 				

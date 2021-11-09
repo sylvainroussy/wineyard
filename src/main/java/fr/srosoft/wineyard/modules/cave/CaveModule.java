@@ -1,6 +1,7 @@
 package fr.srosoft.wineyard.modules.cave;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -22,29 +23,40 @@ import org.springframework.stereotype.Component;
 import fr.srosoft.wineyard.core.model.entities.Action;
 import fr.srosoft.wineyard.core.model.entities.Appellation;
 import fr.srosoft.wineyard.core.model.entities.Barrel;
+import fr.srosoft.wineyard.core.model.entities.Container;
+import fr.srosoft.wineyard.core.model.entities.ContainerTemplate;
 import fr.srosoft.wineyard.core.model.entities.Contents;
+import fr.srosoft.wineyard.core.model.entities.Cuvee;
+import fr.srosoft.wineyard.core.model.entities.Millesime;
 import fr.srosoft.wineyard.core.model.entities.Tank;
 import fr.srosoft.wineyard.core.model.entities.Trace;
 import fr.srosoft.wineyard.core.services.CaveService;
+import fr.srosoft.wineyard.core.services.ContainerService;
 import fr.srosoft.wineyard.core.session.UserSession;
 import fr.srosoft.wineyard.modules.commons.AbstractModule;
 import fr.srosoft.wineyard.modules.commons.Module;
 import fr.srosoft.wineyard.modules.domain.DomainModule;
+import fr.srosoft.wineyard.utils.Constants;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Module (name="CaveModule", 
 description="Cave Management", 
-label="Cave",
+label="Chai",
 order=2)
 public class CaveModule extends AbstractModule{
 
 	@Resource
 	private CaveService caveService;
 	
+	@Resource
+	private ContainerService containerService;
+	
 	private List<Barrel> barrels;
 	private List<Event> events;
 	
 	private Tank currentTank;
+	private ContainerTemplate currentContainerTemplate;
+	private int containerTemplateQuantity;
 	
 	
 	private String currentTankView ="grid";
@@ -55,7 +67,9 @@ public class CaveModule extends AbstractModule{
 	
 	private boolean showCodes = false;
 	
-	private UserSession context;
+	
+	
+	
 	
 	private ContentsDashlet contentsDashlet;
 	
@@ -63,10 +77,15 @@ public class CaveModule extends AbstractModule{
 	
 	@Override
 	public void loadData(UserSession context) {
-		this.context = context;
+		super.loadData(context);		
 		contentsDashlet = new ContentsDashlet(this);
 		this.createCartesianLinerModel();
 		
+	}
+	
+	@Override
+	public String getIcon() {
+		return "pi pi-sitemap";
 	}
 	
 	public List<Event> getActions(){
@@ -90,6 +109,16 @@ public class CaveModule extends AbstractModule{
 		return caveService.findAppellations(currentDomainId);
 	}
 	
+	public List<Millesime> getMillesimes() {
+		return caveService.getMillesimes (context);
+	}
+	
+	public List<Cuvee> getCuveesByMillesime(int year){
+		return caveService.getCuveesByDomainAndMillesime(context, year);
+	}
+	
+	
+	
 	public void addTanks() {
 		for (int i = 0; i < addTanksNumber; i++) {
 			Tank t = new Tank ();
@@ -98,12 +127,10 @@ public class CaveModule extends AbstractModule{
 			t.setId(UUID.randomUUID().toString());
 			
 			Contents c= new Contents();
-			c.setVolume(0);
-			c.setYear("2021");
-			c.setAppellation(null);
+			c.setVolume(0);			
 			t.setContents(c);
-			String currentDomainId = ((DomainModule)context.getModule("DomainModule")).getCurrentDomain().getId();
-			caveService.addTank(currentDomainId,t);
+			
+			
 			
 			Trace trace = new Trace();
 			trace.setName("Mise en cuve");
@@ -117,50 +144,63 @@ public class CaveModule extends AbstractModule{
 		}
 	}
 	
-	public void addTank() {
-	
-			Tank t = new Tank ();
-			t.setVolume(20);
-			t.setYear("2015");
-			t.setId(UUID.randomUUID().toString());
+	public Container buildContainer(String containerTemplateId) {
+		
+			currentContainerTemplate =  this.getContainerTemplates().stream().filter(e -> e.getId().equals(containerTemplateId)).findFirst().get();
+			
+			final Container container = containerService.prepareContainer(currentContainerTemplate);
+			
+			container.setYear("2015");
+			container.setId(UUID.randomUUID().toString());
 			
 			Action action = new Action ();
 			action.setActionName("Remplissage");
 			action.setCreationDate(new Date());
 			action.setDate(new Date());
-			t.addAction(action);
+			container.addAction(action);
 			
-			Contents c= new Contents();
+			Contents c= new Contents();			
 			c.setVolume(0);
-			c.setYear("2021");
-			c.setAppellation(null);
-			t.setContents(c);
-			String currentDomainId = ((DomainModule)context.getModule("DomainModule")).getCurrentDomain().getId();
-			caveService.addTank(currentDomainId,t);
+			
+			container.setContents(c);
 			
 			
-			this.currentTank = t;
+			return container;
 	
 	}
 	
 	public void onItemDropped(DragDropEvent<?> event) {
 	      String item = (String) event.getData();
 	      System.out.println("Source: "+event.getSource());
-	      System.out.println("Source: "+event.getComponent());
-	      if (event.getDragId().equals("centerPanel:cuve")) {
-	    	  this.addTank();
+	      System.out.println("Source: "+event.getDragId());
+	      if (event.getDragId().contains("menu_containerTemplate_")) {
+	    	  final String parts[] =  event.getDragId().split("_");
+	    	  final String containerTemplateId =parts[parts.length-1];
+	    	  final Container container = this.buildContainer(containerTemplateId);
+	    	  this.containerService.saveContainers(Arrays.asList(container), context, currentContainerTemplate);
+	    	  currentContainerTemplate = null;
+	    	  
 	      }
 	      else {
 	    	  
 	    	  String [] parts = event.getDragId().split("_");
 	    	  System.out.println(parts[2]+":"+parts[3]);
 	    	  Appellation app = caveService.findAppellation(parts[2]+":"+parts[3]);
-	    	    	
+	    	  Cuvee cuvee = new Cuvee();
+	    	  final Millesime millesime = new Millesime ();
+	    	  millesime.setYear(Integer.parseInt("2021"));
+	    	  cuvee.setAppellation(app);
+	    	  cuvee.setMillesime(millesime);
+	    	  
 	    	  
 	    	 // centerPanel:j_idt152:tankGrid:8:card
 	    	  parts =  event.getDropId().split(":");
 	    	  Tank tank = this.getTanks().get(Integer.parseInt(parts[3]));
-	    	  tank.getContents().setAppellation(app);
+	    	  Contents c= new Contents();
+	    	  c.setVolume(0);		
+	    	  c.setCuvee(cuvee);
+	    	  tank.setContents(c);
+	    	
 	    	  
 	    	  Trace trace = new Trace();
 	    	  trace.setName("Mise en cuve");
@@ -170,14 +210,11 @@ public class CaveModule extends AbstractModule{
 			  trace.setLastUpdateDate(new Date());
 			  trace.setLastUpdateUser(context.getCurrentUser().getDisplayName());
 			  tank.getContents().getTraceLine().addTrace(trace);
-			  tank.getContents().setVolume(tank.getVolume());
-			  tank.getContents().setColor(app.getWineColor());
+			  tank.getContents().setVolume(tank.getVolume());			  
+			  tank.getContents().setCurrentState(Constants.STATE_WAITING_ALCOHOLIC_FERMENTATION);
 	    	  
 	      }
-	      //centerPanel:menu_appellation_7801d94608e5120d87ebea4a0b76d704_e5934671321aad7db7b4f077c5652a92
-	      System.out.println(event.getDragId());
-	      System.out.println(event.getDropId());
-	      System.out.println(item);
+	     
 	      
 	  }
 	
@@ -189,11 +226,11 @@ public class CaveModule extends AbstractModule{
         LineChartDataSet dataSet = new LineChartDataSet();
         List<Object> values = new ArrayList<>();
         values.add(1100);
-        values.add(1080);
-        values.add(1060);
+        values.add(1090);
+        values.add(1070);
         values.add(1040);
         values.add(1020);
-        values.add(1000);
+        values.add(980);
         dataSet.setData(values);
         dataSet.setLabel("Densité");
         dataSet.setYaxisID("left-y-axis");
@@ -251,16 +288,34 @@ public class CaveModule extends AbstractModule{
     }
 	
 	
-	
-	@Override
-	public String getMainPage() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<ContainerTemplate> getContainerTemplates(){
+		return containerService.getContainerTemplates(context);
 	}
-
+	
+	public void saveContainerTemplate(){
+		if (this.currentContainerTemplate.getId() == null) {
+			this.currentContainerTemplate.setId(UUID.randomUUID().toString());
+		}
+		this.containerService.saveContainerTemplate(this.currentContainerTemplate, context);
+		
+		final List<Container> containers = new ArrayList<>();
+		for (int i = 0; i < this.containerTemplateQuantity; i++) {
+			final Container container = this.buildContainer(currentContainerTemplate.getId());
+			containers.add(container);
+		}
+		if (this.containerTemplateQuantity > 0) this.containerService.saveContainers(containers, context, currentContainerTemplate);
+		
+		this.containerTemplateQuantity = 0;
+		this.currentContainerTemplate = null;
+	}
+	
+	public void prepareContainerTemplate() {
+		this.currentContainerTemplate = new ContainerTemplate();
+	}
+	
 	public List<Tank> getTanks() {
 		String currentDomainId = ((DomainModule)context.getModule("DomainModule")).getCurrentDomain().getId();
-		return caveService.getTanks(currentDomainId);	
+		return containerService.getTanks(currentDomainId);	
 	}
 
 	
@@ -370,6 +425,15 @@ public class CaveModule extends AbstractModule{
 		return addTanksVolume;
 	}
 
+
+	public ContainerTemplate getCurrentContainerTemplate() {
+		return currentContainerTemplate;
+	}
+
+	public void setCurrentContainerTemplate(ContainerTemplate currentContainerTemplate) {
+		this.currentContainerTemplate = currentContainerTemplate;
+	}
+
 	public void setAddTanksVolume(Integer addTanksVolume) {
 		this.addTanksVolume = addTanksVolume;
 	}
@@ -417,6 +481,14 @@ public class CaveModule extends AbstractModule{
 
 	public void setCartesianLinerModel(LineChartModel cartesianLinerModel) {
 		this.cartesianLinerModel = cartesianLinerModel;
+	}
+
+	public int getContainerTemplateQuantity() {
+		return containerTemplateQuantity;
+	}
+
+	public void setContainerTemplateQuantity(int containerTemplateQuantity) {
+		this.containerTemplateQuantity = containerTemplateQuantity;
 	}
 
 

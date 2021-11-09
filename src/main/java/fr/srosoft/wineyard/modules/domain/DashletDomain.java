@@ -1,11 +1,18 @@
 package fr.srosoft.wineyard.modules.domain;
 
-import fr.srosoft.wineyard.core.model.entities.Domain;
+import fr.srosoft.wineyard.core.session.Dashlet;
 
-public class DashletDomain {
+public class DashletDomain extends Dashlet<DomainModule>{
 	
 	public static final String MODE_READ="read";
 	public static final String MODE_EDIT="edit";
+	
+	public DashletDomain(DomainModule module) {
+		super(module);
+		
+	}
+
+	
 	
 	/**
 	 * Modes : "edit" or "read"
@@ -24,10 +31,13 @@ public class DashletDomain {
 		this.mode = mode;
 	}
 	
-	public void saveDomain(Domain domain) {
-		
+	public void saveDomain() {
+		module.directoryService.saveDomain(module.getCurrentDomain(), module.getContext());
 		this.mode = MODE_READ;
 	}
 	
+	
+	
+		
 	
 }

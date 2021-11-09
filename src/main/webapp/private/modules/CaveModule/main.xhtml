@@ -12,68 +12,138 @@
 
 <ui:param name="module" value="#{userSession.getModule('CaveModule')}" />
 
-<ui:param name="tanks" value="#{module.getTanks()}" />
+
 
 <div class="grid">
 	<div class="col-12 md:col-3">
-	 <p:draggable id="draggable" for="cuve" appendTo="@(Body)" zindex="200"  revert="true"  helper="clone" />
+	 <!-- <p:draggable id="draggable" for="cuve" appendTo="@(Body)" zindex="200"  revert="true"  helper="clone" /> -->
 	<p:panelMenu id="caveMenu" stateful="true"  >
-	
+		
         <p:submenu id="containerTemplates" label="Modèles de Conteneurs">
-            <p:menuitem id="cuve" value="Cuve Inox AISI 304 (15 hl)" url="https://www.vitvinif.com/wp-content/uploads/2019/01/20190120-Catalogue-VitVinif-Cuve-Web-1.pdf" icon="pi pi-book"  target="_blank"/>
-            <p:menuitem value="Cuve Inox AISI 316 (20 hl)"  url="https://www.vitvinif.com/wp-content/uploads/2019/01/20190120-Catalogue-VitVinif-Cuve-Web-1.pdf" icon="pi pi-book" target="_blank"/>
+         	<p:menuitem id="cuve" value="Créer un nouveau modèle..." 
+         		icon="pi pi-plus" style="font-size:1em; padding:5px"
+         		actionListener="#{module.prepareContainerTemplate}" 
+         		oncomplete="PF('containerTemplateForm').show()"
+         		update=":centerPanel:containerTemplateForm"/>
+        	<c:forEach var="template" items="#{module.getContainerTemplates()}">
+        		<ui:param name="containerIcon" value="#{template.type=='tank' ? 'pi pi-tablet':'pi circle-off'}"/>
+        		 <p:menuitem id="menu_containerTemplate_#{template.id}" 
+        		 	value="#{msg[template.type]} #{template.model} (#{msg[template.material]}) #{template.volume}#{template.unit}" 
+        		 	icon="#{containerIcon}"  style="font-size:0.8em; padding:5px"
+        		 	/>
+        	</c:forEach>
         </p:submenu>
         
-        <p:submenu id="appellationTemplates" label="Appellations" >
-        
-        <c:forEach var="appellation" items="#{module.getAppellations()}">
-          <p:menuitem id="menu_appellation_#{appellation.id.replace(':','_')}" value="#{appellation.appellation}"  ajax="true" icon="grape" />
-         
+        <c:forEach var="millesime" items="#{module.getMillesimes()}">
+	        <p:submenu id="cuvees" label="Cuvée #{millesime.year}" icon="pi pi-tag" >	        
+		        <c:forEach var="cuvee" items="#{module.getCuveesByMillesime(millesime.year)}">
+		          <p:menuitem id="menu_appellation_#{cuvee.appellation.id.replace(':','_')}" 
+		          	value="#{cuvee.appellation.appellation}"  ajax="true" 
+		          	icon="pi pi-tag"  style="font-size:0.8em; padding:5px"/>
+		         
+		        </c:forEach>
+	        </p:submenu>
+	      
         </c:forEach>
-          
-           
-            
-           
-        </p:submenu>
        
-        <p:separator />
-    
+        <p:separator />    
     </p:panelMenu>
-     <c:forEach var="appellation" items="#{module.getAppellations()}">
-          
-          <p:draggable id="draggable" for="menu_appellation_#{appellation.id.replace(':','_')}" appendTo="@(Body)" zindex="200"  revert="true"  helper="clone" />
-        </c:forEach>
+    
+    <!--  Draggables -->
+     <c:forEach var="millesime" items="#{module.getMillesimes()}">
+	     <c:forEach var="cuvee" items="#{module.getCuveesByMillesime(millesime.year)}">          
+	          <p:draggable id="draggable_appellation_#{cuvee.appellation.id.replace(':','_')}" for="menu_appellation_#{cuvee.appellation.id.replace(':','_')}" appendTo="@(Body)" zindex="200"  revert="true"  helper="clone" />
+	     </c:forEach>
+     </c:forEach>
+     <c:forEach var="template" items="#{module.getContainerTemplates()}">          
+          <p:draggable id="draggable_template_#{template.id}" for="menu_containerTemplate_#{template.id}" appendTo="@(Body)" zindex="200"  revert="true"  helper="clone" />
+     </c:forEach>
     
     <p:sticky target="caveMenu" margin="50"/>
-		<!-- <p:accordionPanel>
-			<p:tab title="Utilisateurs">
-			<p:commandButton id="dynaButton" value="Show" type="button" icon="pi pi-home"/>
-    <p:menu overlay="true" trigger="dynaButton" my="left top" at="left bottom" >
-        <p:submenu label="Ajax">
-            <p:menuitem value="Save"  icon="pi pi-save"/>
-            <p:menuitem value="Update"  icon="pi pi-refresh"/>
-        </p:submenu>
-        <p:submenu label="Non-Ajax">
-            <p:menuitem value="Delete" ajax="false" icon="pi pi-times"/>
-        </p:submenu>
-        <p:submenu label="Navigations">
-            <p:menuitem value="External" url="http://www.primefaces.org" icon="pi pi-home"/>
-            <p:menuitem value="Internal" icon="pi pi-star"/>
-        </p:submenu>
-    </p:menu>
-
-			</p:tab>
-			<p:tab title="Données sources">
-
-			</p:tab>
-		</p:accordionPanel> -->
-
+	
 	</div>
 	<div class="col-12 md:col-9">
 		<ui:include src="dashlet_containers.xhtml"></ui:include>
 
 	</div>
 </div>
+
+<!-- SIDE BARS -->
+
+<p:sidebar widgetVar="containerTemplateForm" id="containerTemplateForm"
+		position="right" baseZIndex="20000" appendTo="@(Body)" dynamic="true"
+		fullScreen="false" >
+		<h3 style="font-weight: normal">Modèle de container</h3>
+		<ui:param name="template" value="#{module.currentContainerTemplate}"></ui:param>
+	<h:form>
+		<div class="ui-fluid p-formgrid p-grid">
+			
+			<div class="p-field p-col">
+				<label for="model">Modèle</label>
+				<p:inputText id="model"  value="#{template.model}" />
+			</div>
+			<div class="p-field p-col">
+				<label for="type">Type</label>
+				<p:selectOneMenu id="type" value="#{template.type}" styleClass="onWhiteBackground" appendTo="@(this)" >
+                    <f:selectItem itemLabel="Choisir un type de contenant" />
+                    <f:selectItem itemLabel="Cuve" itemValue="tank"/>                   
+                    <f:selectItem itemLabel="Fût bourguignon" itemValue="burgundyBarrel"/>   
+                    <f:selectItem itemLabel="Amphore" itemValue="amphora"/>               
+                </p:selectOneMenu>
+				<!-- <p:inputText id="type"  value="#{template.type}" /> -->
+			</div>
+			<div class="p-field p-col">
+				<label for="material">Matière</label>
+				<p:selectOneMenu id="material" value="#{template.material}" effect="fold" editable="true" appendTo="@(this)" styleClass="onWhiteBackground">
+                    <f:selectItem itemLabel="Choisir une matière" itemValue=""/>
+                    <f:selectItem itemLabel="#{msg['inox']}" itemValue="inox"/>
+                    <f:selectItem itemLabel="#{msg['cement']}" itemValue="cement"/> 
+                    <f:selectItem itemLabel="Email" itemValue="enamel"/> 
+                    <f:selectItem itemLabel="Chêne" itemValue="oak"/>                  
+                </p:selectOneMenu>
+				<!-- <p:inputText id="material"  value="#{template.material}" /> -->
+			</div>
+			<div class="p-field p-col">
+				<label for="volume">Volume</label>
+				<p:inputText id="volume"  value="#{template.volume}" />
+			</div>
+			<div class="p-field p-col">
+				<label for="unit">Unité</label>
+				<p:inputText id="unit"  value="#{template.unit}" />
+			</div>
+			<div class="p-field p-col">
+				<label for="supplier">Fournisseur</label>
+				<p:inputText id="supplier"  value="#{template.supplier}" />
+			</div>
+			
+			<div class="p-field p-col">
+				<label for="label">Libellé</label>
+				<p:inputText id="label"  value="#{template.label}" />
+			</div>
+			<div class="p-field p-col">
+				<label for="description">Description</label>
+				<p:inputText id="description"  value="#{template.description}" />
+			</div>
+			<div class="p-field p-col">
+				<label for="quantity">Quantité</label>
+				<p:inputText id="quantity"  value="#{module.containerTemplateQuantity}" />
+			</div>
+			
+		
+		</div>		
+		<p:commandButton value="Annuler"
+			oncomplete="PF('containerTemplateForm').hide()" 
+			icon="pi pi-times" immediate="true"/>
+		<p:commandButton value="Enregister"
+			actionListener="#{module.saveContainerTemplate}"
+			update=":centerPanel"
+			icon="pi pi-disk" 
+			process="@form"
+			partialSubmit="false" type="submit"
+			oncomplete="PF('containerTemplateForm').hide()" 
+			immediate="false"/>
+	</h:form>
+</p:sidebar>
 
 </ui:composition>
 </html>
