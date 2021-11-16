@@ -11,7 +11,7 @@ public class Liter extends Unit{
 	public static final float CENTI_LITER = 0.1f;
 	
 	
-	public void getBottleValue (){
+	public void getBottleValueForHl (){
 		
 	}
 }

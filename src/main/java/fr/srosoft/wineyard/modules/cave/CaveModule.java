@@ -4,11 +4,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
 import org.primefaces.event.DragDropEvent;
+import org.primefaces.event.diagram.ConnectEvent;
+import org.primefaces.event.diagram.ConnectionChangeEvent;
+import org.primefaces.event.diagram.DisconnectEvent;
 import org.primefaces.model.charts.ChartData;
 import org.primefaces.model.charts.axes.cartesian.CartesianScales;
 import org.primefaces.model.charts.axes.cartesian.linear.CartesianLinearAxes;
@@ -16,6 +21,16 @@ import org.primefaces.model.charts.line.LineChartDataSet;
 import org.primefaces.model.charts.line.LineChartModel;
 import org.primefaces.model.charts.line.LineChartOptions;
 import org.primefaces.model.charts.optionconfig.title.Title;
+import org.primefaces.model.diagram.Connection;
+import org.primefaces.model.diagram.DefaultDiagramModel;
+import org.primefaces.model.diagram.Element;
+import org.primefaces.model.diagram.connector.StraightConnector;
+import org.primefaces.model.diagram.endpoint.DotEndPoint;
+import org.primefaces.model.diagram.endpoint.EndPoint;
+import org.primefaces.model.diagram.endpoint.EndPointAnchor;
+import org.primefaces.model.diagram.endpoint.RectangleEndPoint;
+import org.primefaces.model.diagram.overlay.ArrowOverlay;
+import org.primefaces.model.diagram.overlay.LabelOverlay;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -33,11 +48,13 @@ import fr.srosoft.wineyard.core.model.entities.Trace;
 import fr.srosoft.wineyard.core.services.CaveService;
 import fr.srosoft.wineyard.core.services.ContainerService;
 import fr.srosoft.wineyard.core.session.UserSession;
+import fr.srosoft.wineyard.modules.cave.TransferAction.TargetContainer;
 import fr.srosoft.wineyard.modules.commons.AbstractModule;
 import fr.srosoft.wineyard.modules.commons.Module;
 import fr.srosoft.wineyard.modules.domain.DomainModule;
 import fr.srosoft.wineyard.utils.Constants;
 @Component
+
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Module (name="CaveModule", 
 description="Cave Management", 
@@ -68,18 +85,32 @@ public class CaveModule extends AbstractModule{
 	private boolean showCodes = false;
 	
 	
+	private TransferAction transferAction;
 	
-	
-	
+	// Trying...
 	private ContentsDashlet contentsDashlet;
 	
 	 private LineChartModel cartesianLinerModel;
+	 
+	 
+	 private DefaultDiagramModel diagramModel; 
 	
 	@Override
 	public void loadData(UserSession context) {
 		super.loadData(context);		
 		contentsDashlet = new ContentsDashlet(this);
 		this.createCartesianLinerModel();
+		
+		diagramModel = new DefaultDiagramModel();
+        diagramModel.setMaxConnections(-1);
+        diagramModel.setConnectionsDetachable(true);
+        diagramModel.setContainment(false);
+       
+        diagramModel.getDefaultConnectionOverlays().add(new ArrowOverlay(20, 20, 1, 1));
+        StraightConnector connector = new StraightConnector();
+        connector.setPaintStyle("{stroke:'#98AFC7', strokeWidth:3}");
+        connector.setHoverPaintStyle("{stroke:'#5C738B'}");
+        diagramModel.setDefaultConnector(connector);
 		
 	}
 	
@@ -117,6 +148,123 @@ public class CaveModule extends AbstractModule{
 		return caveService.getCuveesByDomainAndMillesime(context, year);
 	}
 	
+	public void prepareTransferAction(Container container) {
+		this.transferAction = new TransferAction(container);
+		
+	}
+	
+	public void initDiagramModel () {
+		initTransferGraph(this.transferAction.getSourceContainer(),this.transferAction.getDestinationContainerType() );
+	}
+	
+	private void initTransferGraph(Container containerSource, String type) {
+		  
+			String styleSource = containerSource instanceof Tank ? "pi pi-tablet" :"barrel"; 
+		
+			this.diagramModel.clear();
+	        TargetContainer source = new TargetContainer();
+	        source.setContainer(containerSource);
+	        source.setVolume(containerSource.getContents().getVolume());
+	        final ElementWrapper ewSource = new ElementWrapper();
+	        ewSource.setContainers(Arrays.asList(source));
+	        ewSource.setLabel(source.getContainer().getNumber());
+	        ewSource.setVolume(source.getContainer().getContents().getVolume());
+	        ewSource.setStyle(styleSource);
+	        
+	        Element computerA = new Element(ewSource, "10em", "6em");
+	        computerA.setId(source.getContainer().getId());
+	        EndPoint endPointCA = createRectangleEndPoint(EndPointAnchor.BOTTOM);
+	        endPointCA.setSource(true);
+	        computerA.addEndPoint(endPointCA);
+
+	        
+	        int baseX = 2;// +15
+	        int baseY = 24;
+	        if (type.equals("Tank") ) {
+		        for(TargetContainer target : this.getReadyContainers()) {		        	
+		        	
+		        	
+		        	final ElementWrapper ewTarget = new ElementWrapper();
+		        	ewTarget.setContainers(Arrays.asList(target));
+		        	ewTarget.setLabel(target.getContainer().getNumber());
+		        	ewTarget.setVolume(target.getContainer().getVolume());
+		        	ewTarget.setStyle("pi pi-tablet");
+			        final Element serverA = new Element(ewTarget, baseX+"em", baseY+"em");
+			        final EndPoint endPointSA = createDotEndPoint(EndPointAnchor.AUTO_DEFAULT);
+			        serverA.setId(target.getContainer().getId());
+			        serverA.setDraggable(true);
+			        endPointSA.setTarget(true);
+			        serverA.addEndPoint(endPointSA);
+			        diagramModel.addElement(serverA);
+			        baseX = baseX+15;
+		        }
+		        	
+		    }
+	        else if (type.equals("Barrel") ) {
+	        	final Map<String, List<TargetContainer>> map=  this.getReadyContainers().stream().collect(Collectors.groupingBy( e -> e.getContainer().getYear()));
+	        	for (Map.Entry<String,List<TargetContainer>> targets : map.entrySet()) {
+	        		
+	        		final ElementWrapper ewTarget = new ElementWrapper();
+		        	ewTarget.setContainers(targets.getValue());
+		        	ewTarget.setLabel(targets.getKey()+" (Nb:"+targets.getValue().size()+")");
+		        	ewTarget.setVolume(targets.getValue().get(0).getContainer().getVolume());
+		        	ewTarget.setStyle("barrel");
+	        		Element serverA = new Element(ewTarget, baseX+"em", baseY+"em");
+			        EndPoint endPointSA = createDotEndPoint(EndPointAnchor.AUTO_DEFAULT);
+			        serverA.setId(targets.getKey());
+			        serverA.setDraggable(true);
+			        endPointSA.setTarget(true);
+			        serverA.addEndPoint(endPointSA);
+			        diagramModel.addElement(serverA);
+			        baseX = baseX+15;
+				}
+	        }
+			
+	        diagramModel.addElement(computerA);
+	        
+	      
+	   
+	}
+	
+	public void onConnectDiagram(ConnectEvent event) {
+		
+	   final ElementWrapper wrapper = (ElementWrapper)event.getTargetElement().getData();
+       this.transferAction.getTargetContainers().addAll(wrapper.getContainers());
+       
+       LabelOverlay lo = new LabelOverlay();
+       lo.setLabel("Volume");
+    }	
+	
+
+    public void onDisconnectDiagram(DisconnectEvent event) {
+    	 final ElementWrapper wrapper = (ElementWrapper)event.getTargetElement().getData();
+    	 this.transferAction.getTargetContainers().removeAll(wrapper.getContainers());
+    }
+    
+    public void onConnectionChange(ConnectionChangeEvent event) {
+      
+    }
+	
+	 private EndPoint createDotEndPoint(EndPointAnchor anchor) {
+	        DotEndPoint endPoint = new DotEndPoint(anchor);
+	        endPoint.setScope("network");
+	        endPoint.setTarget(true);
+	        endPoint.setStyle("{fill:'#98AFC7'}");
+	        endPoint.setHoverStyle("{fill:'#5C738B'}");
+
+	        return endPoint;
+	    }
+
+	    private EndPoint createRectangleEndPoint(EndPointAnchor anchor) {
+	        RectangleEndPoint endPoint = new RectangleEndPoint(anchor);
+	        endPoint.setScope("network");
+	        endPoint.setSource(true);
+	      
+	        endPoint.setStyle("{fill:'#98AFC7'}");
+	        endPoint.setHoverStyle("{fill:'#5C738B'}");
+
+	        return endPoint;
+	    }
 	
 	
 	public void addTanks() {
@@ -169,6 +317,43 @@ public class CaveModule extends AbstractModule{
 	
 	}
 	
+	public void saveContainer(Container container) {
+		
+		 this.containerService.updateContainer(container, context);
+	}
+	
+	public List<String> getReadyContainerTypes(){
+		return containerService.getReadyContainerTypes(this.context);	
+	}
+	
+	public List<TargetContainer> getReadyContainers(){		
+		final List<TargetContainer> targetContainers = new ArrayList<>();
+		final String type = this.transferAction.getDestinationContainerType();
+		if (type != null) {
+			switch (type) {
+				case "Barrel" : targetContainers.addAll(this.getReadyBarrels());break;
+				case "Tank" : targetContainers.addAll(this.getReadyTanks());break;
+			}
+		}
+		return targetContainers;
+	}
+	
+	private List<TargetContainer> getReadyTanks(){
+		return this.containerService.findReadyTanks(context).stream().map(e -> {
+			final TargetContainer targetContainer = new TargetContainer();
+			targetContainer.setContainer(e);
+			return targetContainer;
+		} ).collect(Collectors.toList());
+	}
+	
+	private List<TargetContainer> getReadyBarrels(){
+		return this.containerService.findReadyBarrels(context).stream().map(e -> {
+			final TargetContainer targetContainer = new TargetContainer();
+			targetContainer.setContainer(e);
+			return targetContainer;
+		} ).collect(Collectors.toList());
+	}
+	
 	public void onItemDropped(DragDropEvent<?> event) {
 	      String item = (String) event.getData();
 	      System.out.println("Source: "+event.getSource());
@@ -184,40 +369,64 @@ public class CaveModule extends AbstractModule{
 	      else {
 	    	  
 	    	  String [] parts = event.getDragId().split("_");
-	    	  System.out.println(parts[2]+":"+parts[3]);
-	    	  Appellation app = caveService.findAppellation(parts[2]+":"+parts[3]);
-	    	  Cuvee cuvee = new Cuvee();
-	    	  final Millesime millesime = new Millesime ();
-	    	  millesime.setYear(Integer.parseInt("2021"));
-	    	  cuvee.setAppellation(app);
-	    	  cuvee.setMillesime(millesime);
-	    	  
-	    	  
-	    	 // centerPanel:j_idt152:tankGrid:8:card
-	    	  parts =  event.getDropId().split(":");
-	    	  Tank tank = this.getTanks().get(Integer.parseInt(parts[3]));
-	    	  Contents c= new Contents();
-	    	  c.setVolume(0);		
-	    	  c.setCuvee(cuvee);
-	    	  tank.setContents(c);
-	    	
-	    	  
-	    	  Trace trace = new Trace();
-	    	  trace.setName("Mise en cuve");
-	    	  trace.setComment("Mise en cuve n°"+tank.getId());
-			  trace.setCreationDate(new Date());
-			  trace.setCreationUser(context.getCurrentUser().getDisplayName());
-			  trace.setLastUpdateDate(new Date());
-			  trace.setLastUpdateUser(context.getCurrentUser().getDisplayName());
-			  tank.getContents().getTraceLine().addTrace(trace);
-			  tank.getContents().setVolume(tank.getVolume());			  
-			  tank.getContents().setCurrentState(Constants.STATE_WAITING_ALCOHOLIC_FERMENTATION);
+	    	  if (parts.length > 4) {
+		    	  System.out.println(parts[2]+":"+parts[3]+"_"+parts[4]);
+		    	  final Cuvee cuvee = caveService.getCuveesById(parts[2]+":"+parts[3]+"_"+parts[4], context);    	  	    	  
+		    	  
+		    	 // centerPanel:j_idt152:tankGrid:8:card
+		    	  parts =  event.getDropId().split(":");
+		    	  Tank tank = this.getTanks().get(Integer.parseInt(parts[3]));
+		    	  Contents c= new Contents();
+		    	  c.setId(cuvee.getId()+"_"+tank.getId());
+		    	  c.setVolume(0);		
+		    	  c.setCuvee(cuvee);
+		    	  tank.setContents(c);
+		    	
+		    	  
+		    	  Trace trace = new Trace();
+		    	  trace.setName("Mise en cuve");
+		    	  trace.setComment("Mise en cuve n°"+tank.getNumber());
+				  trace.setCreationDate(new Date());
+				  trace.setCreationUser(context.getCurrentUser().getDisplayName());
+				  trace.setLastUpdateDate(new Date());
+				  trace.setLastUpdateUser(context.getCurrentUser().getDisplayName());
+				  tank.getContents().getTraceLine().addTrace(trace);
+				  tank.getContents().setVolume(tank.getVolume());			  
+				  tank.getContents().setCurrentState(Constants.STATE_WAITING_ALCOHOLIC_FERMENTATION);
+				  
+				  containerService.addContentToContainer(c, tank.getId(), context);
+	    	  }
+			  
 	    	  
 	      }
 	     
 	      
 	  }
 	
+	public void onTargetContainerDrop(DragDropEvent<TargetContainer> ddEvent) {
+		
+		final TargetContainer targetContainer = ddEvent.getData();
+		if (!this.transferAction.getTargetContainers().contains(ddEvent.getData())) {
+			this.transferAction.getTargetContainers().add(ddEvent.getData());
+			
+			final Element source = diagramModel.findElement(this.transferAction.getSourceContainer().getId());
+			final Element target = diagramModel.findElement(targetContainer.getContainer().getId());
+			
+			diagramModel.connect(this.createConnection(source.getEndPoints().get(0),target.getEndPoints().get(0) ,null));
+		}
+        
+    }
+	
+	private Connection createConnection(EndPoint from, EndPoint to, String label) {
+        Connection conn = new Connection(from, to);
+        conn.getOverlays().add(new ArrowOverlay(20, 20, 1, 1));
+
+        if (label != null) {
+            conn.getOverlays().add(new LabelOverlay(label, "flow-label", 0.5));
+        }
+
+        return conn;
+    }
 	
 	public void createCartesianLinerModel() {
         cartesianLinerModel = new LineChartModel();
@@ -313,15 +522,18 @@ public class CaveModule extends AbstractModule{
 		this.currentContainerTemplate = new ContainerTemplate();
 	}
 	
+	
+	
 	public List<Tank> getTanks() {
-		String currentDomainId = ((DomainModule)context.getModule("DomainModule")).getCurrentDomain().getId();
+		String currentDomainId = context.getCurrentDomain().getId();
 		return containerService.getTanks(currentDomainId);	
 	}
 
 	
 
 	public List<Barrel> getBarrels() {
-		return barrels;
+		String currentDomainId = context.getCurrentDomain().getId();
+		return containerService.getBarrels(currentDomainId);	
 	}
 
 	public void setBarrels(List<Barrel> barrels) {
@@ -467,6 +679,14 @@ public class CaveModule extends AbstractModule{
 		return contentsDashlet;
 	}
 
+	public TransferAction getTransferAction() {
+		return transferAction;
+	}
+
+	public void setTransferAction(TransferAction transferAction) {
+		this.transferAction = transferAction;
+	}
+
 	public void setContentsDashlet(ContentsDashlet contentsDashlet) {
 		this.contentsDashlet = contentsDashlet;
 	}
@@ -489,6 +709,58 @@ public class CaveModule extends AbstractModule{
 
 	public void setContainerTemplateQuantity(int containerTemplateQuantity) {
 		this.containerTemplateQuantity = containerTemplateQuantity;
+	}
+	
+	
+	public DefaultDiagramModel getDiagramModel() {
+		return diagramModel;
+	}
+
+	public void setDiagramModel(DefaultDiagramModel diagramModel) {
+		this.diagramModel = diagramModel;
+	}
+
+
+	public static class ElementWrapper {
+		private List<TargetContainer> containers;
+		private String label;
+		private int volume;
+		private String unit;
+		private String style;
+		
+		public List<TargetContainer> getContainers() {
+			return containers;
+		}
+		public void setContainers(List<TargetContainer> containers) {
+			this.containers = containers;
+		}
+		public String getLabel() {
+			return label;
+		}
+		public void setLabel(String label) {
+			this.label = label;
+		}
+		public int getVolume() {
+			return volume;
+		}
+		public void setVolume(int volume) {
+			this.volume = volume;
+		}
+		public String getUnit() {
+			return unit;
+		}
+		public void setUnit(String unit) {
+			this.unit = unit;
+		}
+		public String getStyle() {
+			return style;
+		}
+		public void setStyle(String style) {
+			this.style = style;
+		}
+		
+		
+		
 	}
 
 

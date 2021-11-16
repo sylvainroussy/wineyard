@@ -8,6 +8,9 @@ import javax.annotation.Resource;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.file.UploadedFile;
+import org.primefaces.model.file.UploadedFileWrapper;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -53,7 +56,7 @@ public class DomainModule extends AbstractModule{
 
 	private User currentUser;
 	
-	
+	 private UploadedFile file;
 	
 	private DashletDomain dashletDomain;
 	
@@ -135,6 +138,18 @@ public class DomainModule extends AbstractModule{
 		return directoryService.getDomainLogo(this.currentDomain.getId());
 	}
 	
+	public void uploadLogo() {
+        if (file != null) {
+         this.directoryService.saveDomainLogo(context.getCurrentDomain().getId(), file.getContent());
+        }
+    }
+	
+	
+	public void handleFileUpload(FileUploadEvent event) {
+		UploadedFileWrapper f = null;
+		 this.directoryService.saveDomainLogo(context.getCurrentDomain().getId(),  event.getFile().getContent());
+     
+    }
 
 
 	public List<UserDomain> getUsersOfDomains() {
@@ -155,6 +170,14 @@ public class DomainModule extends AbstractModule{
 
 	public void setDashletDomain(DashletDomain dashletDomain) {
 		this.dashletDomain = dashletDomain;
+	}
+
+	public UploadedFile getFile() {
+		return file;
+	}
+
+	public void setFile(UploadedFile file) {
+		this.file = file;
 	}
 
 	

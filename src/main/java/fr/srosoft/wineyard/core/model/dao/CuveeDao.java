@@ -82,6 +82,14 @@ public class CuveeDao extends AbstractDao{
 			+ "WITH millesime, cuvee, appellation, COLLECT (blend) AS blends "
 			+ "RETURN cuvee{.*, millesime:millesime{.*}, appellation:appellation{.*, blends:blends}} AS cuvee  ORDER BY appellation.appellation ASC ";
 	
+	private final String QUERY_FIND_CUVEE_BY_ID =  "MATCH (cuvee:Cuvee{id:$id})<-[:STAMPS]-(millesime) "
+			+ "MATCH (appellation:Appellation)-[:MARKS]->(cuvee) "
+			+ "OPTIONAL MATCH (appellation)-[:HAS_BLEND]->(blend) "
+			+ "OPTIONAL MATCH (blend)<-[:COMPOSES]-(grape:Grape) "
+			+ "WITH millesime, cuvee, appellation, CASE WHEN blend IS NULL THEN NULL ELSE {id:blend.id, proportion:blend.proportion, grape:grape{.*}} END AS blend "
+			+ "WITH millesime, cuvee, appellation, COLLECT (blend) AS blends "
+			+ "RETURN cuvee{.*, millesime:millesime{.*}, appellation:appellation{.*, blends:blends}} AS cuvee  ORDER BY appellation.appellation ASC ";
+	
 	private final String QUERY_FIND_MILLESIMES_BY_DOMAIN =  "MATCH (domain:Domain{id:$domainId}) "
 			+ "MATCH (domain)-[:HAS_MODULE]->(module:CuveeModule) "
 			+ "MATCH (module)-[:WORKS_ON]->(millesime:Millesime) "			
@@ -139,7 +147,21 @@ public class CuveeDao extends AbstractDao{
 		return this.readMultipleQuery(QUERY_FIND_CUVEES_BY_DOMAIN_AND_MILLESIME, Map.of("domainId", domainId,"year", year),"cuvee",Cuvee.class);
 	}
 	
+	public Cuvee findCuveeById(String cuveeId){
+		return this.readSingleQuery(QUERY_FIND_CUVEE_BY_ID, Map.of("id", cuveeId),"cuvee",Cuvee.class);
+	}
+	
+	
+	private final String QUERY_FIND_STOCKS_BY_CUVEE =  "MATCH (cuvee:Cuvee{id:$id}) "
+			+ "MATCH (cuvee)<-[:ATTACHED_TO]-(contents:Contents) "
+			+ "RETURN sum (contents.volume)  AS sum ";
+	public Long getStocksFromContainers(String cuveeId){
+		return this.readSingleQuery(QUERY_FIND_STOCKS_BY_CUVEE, Map.of("id",cuveeId), "sum", Long.class);
+	}
+	
 	public List<Millesime> findMillesimesByDomain(String domainId){
 		return this.readMultipleQuery(QUERY_FIND_MILLESIMES_BY_DOMAIN, Map.of("domainId", domainId),"millesime",Millesime.class);
 	}
+	
+	
 }

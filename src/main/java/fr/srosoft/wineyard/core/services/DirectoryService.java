@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
 
 import fr.srosoft.wineyard.core.model.beans.UserDomain;
@@ -77,6 +78,16 @@ public class DirectoryService {
 			// log nothing, Maybe logo is not uploaded 
 		}
 		return bytes;
+	}
+	
+	public void saveDomainLogo(String domainId, byte[] data) {
+		try {
+			
+			 FileUtils.writeByteArrayToFile(new File("C:\\z_data\\wineyard\\wineyard-fs\\"+domainId+"\\logo.png"), data); 
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void loadDomainsOfUser (String userId) {

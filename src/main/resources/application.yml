@@ -17,3 +17,8 @@ spring:
     view:
       prefix: /jsp/
       suffix: .jsp
+
+#logging:
+#  level:
+#    org:
+#      springframework: DEBUG

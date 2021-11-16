@@ -34,7 +34,24 @@
 			<div class="ui-fluid formgrid grid">
 			
 				<div class="field col-12 md:col-12">
-					<p:graphicImage value="#{module.domainLogo}" stream="false" width="100px"/>
+				<div class="grid">
+					<div class="col-12 md:col-3">
+					<p:graphicImage value="#{module.domainLogo}" stream="false" width="100px" rendered="#{module.domainLogo != null}"/>
+					</div>
+					<div class="col-12 md:col-9">
+				    <p:fileUpload 
+				    	mode="advanced" listener="#{module.handleFileUpload}"				     	
+				    	auto="false" process="@form" update=":centerPanel" onupload="console.log('starting upload')"
+				    	 accept=".jpg,.jpeg,.png"
+				    	 uploadButtonTitle="#{msg['upload.upload']}"
+				    	 uploadLabel="#{msg['upload.upload']}"
+				    	 chooseButtonTitle="#{msg['upload.choose']}"
+				    	 title="#{msg['upload.choose']}"
+				    	 cancelLabel="#{msg['cancel']}"
+				    	chooseIcon="pi pi-camera" onerror="console.log(e)"  multiple="false" 
+				    	 rendered="#{dashletMode == 'edit'}"/>
+				    </div>	
+				  </div>  	
 				</div>
 				<div class="field col-12 md:col-6">
 					<label for="domainName" >Nom du domaine : </label>
@@ -65,11 +82,66 @@
 				</div>
 				
 				<div class="field col-12 md:col-6">
-					<label for="website">Site Web : </label>
+					<label >Site Web : </label>
 					<p:spacer width="2px"/>
-					<p:outputLabel value="#{currentDomain.website}" rendered="#{dashletMode == 'read'}" styleClass="font-medium"/>
+					<a target="_blank" href="#{currentDomain.website}" >#{currentDomain.website}</a>
+					
 					<p:inputText id="website" type="text"
 						value="#{currentDomain.website}" required="false" rendered="#{dashletMode == 'edit'}"/>
+						
+					
+				</div>
+				<div class="field col-12 md:col-6">
+					<label >Taille du domaine : </label>
+					<p:spacer width="2px"/>
+					<p:outputLabel value="#{currentDomain.surface} ha" rendered="#{dashletMode == 'read'}" styleClass="font-medium"/>
+					
+					<p:inputText id="surface" type="text"
+						value="#{currentDomain.surface}" required="false" rendered="#{dashletMode == 'edit'}"/>
+						
+					
+				</div>
+				<div class="field col-12 md:col-6">
+					
+						<label >Coordonnées GPS : </label>
+					<p:spacer width="2px"/>
+					<p:outputLabel value="#{currentDomain.coords[0]},#{currentDomain.coords[1]}" rendered="#{dashletMode == 'read'}" styleClass="font-medium"/>
+					
+					<p:inputText id="long" type="text"
+						value="#{currentDomain.coords[0]}" required="false" rendered="#{dashletMode == 'edit'}">
+						 <f:converter converterId="javax.faces.Double" />
+					</p:inputText>
+					<p:inputText id="lat" type="text"
+						value="#{currentDomain.coords[1]}" required="false" rendered="#{dashletMode == 'edit'}">
+						 <f:converter converterId="javax.faces.Double" />
+					</p:inputText>
+					
+				</div>
+				<div class="field col-12 md:col-6">
+					<label >Adresse : </label>
+					<p:spacer width="2px"/>
+					<p:outputLabel value="#{currentDomain.address}" rendered="#{dashletMode == 'read'}" styleClass="font-medium"/>
+					
+					<p:inputText id="address" type="text"
+						value="#{currentDomain.address}" required="false" rendered="#{dashletMode == 'edit'}"/>
+				</div>
+				<div class="field col-12 md:col-2">
+					<label >Code postal : </label>
+					<p:spacer width="2px"/>
+					<p:outputLabel value="#{currentDomain.zipCode}" rendered="#{dashletMode == 'read'}" styleClass="font-medium"/>
+					
+					<p:inputText id="zipCode" type="text"
+						value="#{currentDomain.zipCode}" required="false" rendered="#{dashletMode == 'edit'}"/>
+						
+					
+				</div>
+				<div class="field col-12 md:col-4">
+					<label >Commune : </label>
+					<p:spacer width="2px"/>
+					<p:outputLabel value="#{currentDomain.city}" rendered="#{dashletMode == 'read'}" styleClass="font-medium"/>
+					
+					<p:inputText id="city" type="text"
+						value="#{currentDomain.city}" required="false" rendered="#{dashletMode == 'edit'}"/>
 						
 					
 				</div>

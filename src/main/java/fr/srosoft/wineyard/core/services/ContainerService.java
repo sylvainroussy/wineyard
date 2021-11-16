@@ -14,9 +14,11 @@ import fr.srosoft.wineyard.core.model.entities.Amphora;
 import fr.srosoft.wineyard.core.model.entities.Barrel;
 import fr.srosoft.wineyard.core.model.entities.Container;
 import fr.srosoft.wineyard.core.model.entities.ContainerTemplate;
+import fr.srosoft.wineyard.core.model.entities.Contents;
 import fr.srosoft.wineyard.core.model.entities.Tank;
 import fr.srosoft.wineyard.core.model.entities.WineyardObject;
 import fr.srosoft.wineyard.core.session.UserSession;
+import fr.srosoft.wineyard.utils.Constants.STATE_CONTAINER;
 import fr.srosoft.wineyard.utils.WineyardUtils;
 
 @Service
@@ -50,6 +52,19 @@ public class ContainerService {
 		tanksCache.remove(context.getCurrentDomain().getId());
 	}
 	
+	public void updateContainer (Container container,UserSession context) {
+		if (container.getId() == null) throw new IllegalArgumentException ("updateContainer() Container must already exist! ");
+		final String containerType =  container.getClass().getSimpleName();
+		this.stampObject(container,containerType, context);
+		if (container.getStatus().equals(STATE_CONTAINER.STATE_CONTAINER_NEEDS_NUMBER) 
+				&& container.getNumber() != null
+				&& !container.getNumber().isBlank()) {
+			container.setStatus(STATE_CONTAINER.STATE_CONTAINER_READY);			
+		}
+		containerDao.updateContainer(container, context.getCurrentDomain().getId(), containerType);
+		tanksCache.remove(context.getCurrentDomain().getId());
+	}
+	
 	public List<Tank> getTanks(String domainId){
 		if(tanksCache.get(domainId) == null) {
 			this.loadTanks(domainId);
@@ -58,9 +73,52 @@ public class ContainerService {
 		
 	}
 	
-	private void loadTanks(String domainId) {
-		tanksCache.put(domainId, containerDao.findContainersByDomainAndType(domainId, Tank.class));
+	public List<Barrel> getBarrels(String domainId){
+		if(barrelsCache.get(domainId) == null) {
+			this.loadBarrels(domainId);
+		}		
+		return barrelsCache.get(domainId);
+		
 	}
+	
+	public void addContentToContainer (Contents contents, String containerId,UserSession context) {
+		containerDao.addContentToContainer(contents, containerId, context.getCurrentDomain().getId());
+		tanksCache.remove(context.getCurrentDomain().getId());
+	}
+	
+	public Contents loadContentsFromContainer (Container container, UserSession context) {
+		
+		return containerDao.loadContentsFromContainer(container,context.getCurrentDomain().getId());
+	}
+	
+	public List<Tank> findReadyTanks(UserSession context){
+		return containerDao.findContainersByStatus(context.getCurrentDomain().getId(), Tank.class, STATE_CONTAINER.STATE_CONTAINER_READY);
+				
+	}
+	
+	public List<Barrel> findReadyBarrels(UserSession context){
+		return containerDao.findContainersByStatus(context.getCurrentDomain().getId(), Barrel.class, STATE_CONTAINER.STATE_CONTAINER_READY);
+				
+	}
+	
+	public List<String> getReadyContainerTypes(UserSession context){		
+		return containerDao.getContainerTypesByStatus(context.getCurrentDomain().getId(), STATE_CONTAINER.STATE_CONTAINER_READY);
+	}
+	
+	
+	private void loadTanks(String domainId) {
+		final List<Tank> tanks = containerDao.findContainersByDomainAndType(domainId, Tank.class);
+		tanks.stream().forEach(e -> containerDao.loadContentsFromContainer(e, domainId));		
+		tanksCache.put(domainId, tanks);
+	}
+	
+	private void loadBarrels(String domainId) {
+		final List<Barrel> barrels = containerDao.findContainersByDomainAndType(domainId, Barrel.class);
+		barrels.stream().forEach(e -> containerDao.loadContentsFromContainer(e, domainId));		
+		barrelsCache.put(domainId, barrels);
+	}
+	
+	
 	
 	private void stampObject (WineyardObject object, String label, UserSession context) {
 		boolean exists = this.containerDao.exists(label, object.getId());

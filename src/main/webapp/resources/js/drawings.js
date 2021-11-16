@@ -20,7 +20,7 @@ function drawTank (tankId, tankVolume, fillVolume, wineColor){
 	ctx.fillRect(CUVE_MARGIN+CUVE_PADDING, CUVE_MARGIN, CUVE_WIDTH-(CUVE_PADDING*2), CUVE_HEIGHT-CUVE_PADDING);
 	
 	
-	var filledPercent = (fillVolume *  100) /  tankVolume;
+	var filledPercent = ((fillVolume *  100) /  tankVolume);
 	
 	var startY =  CUVE_HEIGHT-CUVE_PADDING+CUVE_MARGIN;	
 	var minY = startY+CUVE_MARGIN - (startY * (filledPercent /100));	

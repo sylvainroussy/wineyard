@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import fr.srosoft.wineyard.core.model.beans.CuveeSummary;
-import fr.srosoft.wineyard.core.model.beans.Stock;
 import fr.srosoft.wineyard.core.model.entities.Appellation;
 import fr.srosoft.wineyard.core.model.entities.Blend;
 import fr.srosoft.wineyard.core.model.entities.Cuvee;
@@ -99,21 +98,7 @@ public class CuveeModule extends AbstractModule{
 			final CuveeSummary summary = new CuveeSummary();
 			summary.setCuvee(e);
 			
-			final Stock stockBottles = new Stock();
-			stockBottles.setContainerType("Bouteilles");
-			stockBottles.setQuantity(0);
-			stockBottles.setUnit("75cl");
-			
-			summary.getStockSummary().addStock(stockBottles);
-			
-			final Stock stockTank = new Stock();
-			stockTank.setContainerType("Cuves");
-			stockTank.setQuantity(0);
-			stockTank.setUnit("total en hl");
-			
-			summary.getStockSummary().addStock(stockTank);
-			
-			
+			summary.setStockSummary(caveService.getStockSummaryForCuvee(e.getId(), context));
 			
 			return summary;
 			

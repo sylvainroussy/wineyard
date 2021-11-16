@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,7 +23,7 @@ import fr.srosoft.wineyard.modules.commons.AbstractModule;
 import fr.srosoft.wineyard.modules.commons.ModuleLoader;
 import fr.srosoft.wineyard.modules.cuvee.CuveeModule;
 import fr.srosoft.wineyard.modules.domain.DomainModule;
-import jakarta.faces.event.ValueChangeEvent;
+
 
 @Component
 @Scope("session")
@@ -51,6 +52,8 @@ public class UserSession {
 
 	private Domain currentDomain;
 	private Millesime currentMillesime;
+	
+	
 
 	@PostConstruct
 	public void initCurrentUser() throws Exception {
@@ -59,15 +62,11 @@ public class UserSession {
 		modules = loader.loadAllModules();
 		modules.entrySet().forEach(e -> {
 			final ModuleBean bean = new ModuleBean();
-
-			String label = e.getValue().getClass().getAnnotation(fr.srosoft.wineyard.modules.commons.Module.class)
-					.label();
-			String desc = e.getValue().getClass().getAnnotation(fr.srosoft.wineyard.modules.commons.Module.class)
-					.description();
-			String name = e.getValue().getClass().getAnnotation(fr.srosoft.wineyard.modules.commons.Module.class)
-					.name();
-			Integer order = e.getValue().getClass().getAnnotation(fr.srosoft.wineyard.modules.commons.Module.class)
-					.order();
+			final fr.srosoft.wineyard.modules.commons.Module moduleAnnotation = e.getValue().getClass().getAnnotation(fr.srosoft.wineyard.modules.commons.Module.class);
+			String label = moduleAnnotation.label();
+			String desc = moduleAnnotation.description();
+			String name = moduleAnnotation.name();
+			Integer order = moduleAnnotation.order();
 			e.getValue().loadData(this);
 			bean.setModule(e.getValue());
 			bean.setLabel(label);

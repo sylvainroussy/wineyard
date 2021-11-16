@@ -3,6 +3,8 @@ package fr.srosoft.wineyard.core.model.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.srosoft.wineyard.utils.Constants.STATE_CONTAINER;
+
 @SuppressWarnings("serial")
 public class Container  extends WineyardObject{
 	
@@ -12,6 +14,8 @@ public class Container  extends WineyardObject{
 	
 	private Contents contents;
 	private List<Action> actions;
+	
+	private STATE_CONTAINER status = STATE_CONTAINER.STATE_CONTAINER_NEEDS_NUMBER;
 
 	
 
@@ -58,6 +62,14 @@ public class Container  extends WineyardObject{
 	public void addAction(Action action) {
 		if (this.actions == null) this.actions = new ArrayList<>();
 		this.actions.add(action);
+	}
+
+	public STATE_CONTAINER getStatus() {
+		return status;
+	}
+
+	public void setStatus(STATE_CONTAINER status) {
+		this.status = status;
 	}
 
 	

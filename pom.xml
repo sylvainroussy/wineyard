@@ -92,7 +92,7 @@
 		<!-- <dependency> <groupId>org.apache.myfaces.core</groupId> <artifactId>myfaces-impl</artifactId> 
 			<version>2.2.12</version> </dependency> <dependency> <groupId>org.apache.myfaces.core</groupId> 
 			<artifactId>myfaces-api</artifactId> <version>2.2.12</version> </dependency> -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.sun.faces</groupId>
 			<artifactId>jsf-impl</artifactId>
 			<version>${jsf.version}</version>
@@ -102,19 +102,32 @@
 			<groupId>com.sun.faces</groupId>
 			<artifactId>jsf-api</artifactId>
 			<version>${jsf.version}</version>
-		</dependency>
+		</dependency> -->
 		<!-- https://mvnrepository.com/artifact/jakarta.faces/jakarta.faces-api -->
-		<dependency>
-			<groupId>jakarta.faces</groupId>
-			<artifactId>jakarta.faces-api</artifactId>
-			<version>3.0.0</version>
-			<scope>provided</scope>
-		</dependency>
+		<!-- <dependency> <groupId>jakarta.faces</groupId> <artifactId>jakarta.faces-api</artifactId> 
+			<version>3.0.0</version> <scope>provided</scope> </dependency> -->
 
 		<dependency>
 			<groupId>org.apache.tomcat.embed</groupId>
 			<artifactId>tomcat-embed-jasper</artifactId>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.joinfaces/jsf-spring-boot-starter -->
+		<dependency>
+			<groupId>org.joinfaces</groupId>
+			<artifactId>jsf-spring-boot-starter</artifactId>
+			<version>4.4.12</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/commons-fileupload/commons-fileupload 
+			<dependency> <groupId>commons-fileupload</groupId> <artifactId>commons-fileupload</artifactId> 
+			<version>1.4</version> </dependency> -->
 
 
 		<!-- Persistence -->

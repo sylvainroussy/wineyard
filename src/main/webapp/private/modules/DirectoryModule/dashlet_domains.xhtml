@@ -28,6 +28,8 @@
 				<p:column headerText="Téléphone(s)">#{domain.phones}</p:column>
 				<p:column headerText="Commune" filterable="true" filterMatchMode="contains"
 					filterBy="#{domain.city}" sortable="true" sortBy="#{domain.city}">#{domain.city}</p:column>
+					<p:column headerText="Ha" 
+					 sortable="true" sortBy="#{domain.surface}">#{domain.surface}</p:column>
 			</p:dataTable>
 
 		</p:panel>

@@ -17,7 +17,7 @@ public class Domain extends WineyardObject{
 	private String zipCode;
 	private String city;
 	private String address;
-	private double[] coords;
+	private double[] coords = {0d,0d};
 	private String dataSource;
 	@Deprecated
 	private List<Appellation> appellations;

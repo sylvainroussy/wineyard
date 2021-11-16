@@ -54,8 +54,8 @@
 					<div class="p-mt-5" style="border: solid 1px black;margin:5px">					
 						<div class="grid" >
 							<ui:repeat var="stock" value="#{summary.stockSummary.stocks}">							
-								<div class="col-8" style="padding-left:15px">Stock #{stock.containerType} (#{stock.unit})</div>
-								<div class="col-4" > #{stock.quantity}</div>
+								<div class="col-8" style="padding-left:15px">#{stock.containerType} (#{stock.unit})</div>
+								<div class="col-4"  style="text-align:right;padding-right:15px"> #{stock.quantity}</div>
 							</ui:repeat>
 						</div>
 					</div>

@@ -244,6 +244,21 @@ body .ui-carousel .ui-carousel-viewport .ui-carousel-item {
 	border:none;
 }
 
+body .ui-progressbar {   
+    background: #efefef;
+    border-radius: 4px;
+    margin-left:0px !important;
+}
+body .ui-progressbar .ui-progressbar-label {
+    margin-top: 0;
+    color: #495057;
+    line-height: 20px;
+   }
+
+body .ui-progressbar .ui-progressbar-value {
+	background:none !important;
+}
+
 /*.ui-panelmenu .ui-panelmenu-content {
 	overflow: visible !important;
 }*/
@@ -288,6 +303,15 @@ body .ui-carousel .ui-carousel-viewport .ui-carousel-item {
 		0px;
 }
 
+.barrel{
+	width: 15px;
+	height: 15px;
+	border:none;
+	display: inline-block;
+	background: url("#{resource['images/barrel_15x15.png']}") no-repeat 0px
+		0px;
+}
+
 .onWhiteBackground > label{
 	color: #495057 !important;
 	border:1px solid #ced4da !important;
@@ -324,11 +348,31 @@ body .ui-carousel .ui-carousel-viewport .ui-carousel-item {
 }
 
 .roseWine{
-	background-color:#78081e !important;
-	color:#EFEBE9 !important;
+	background-color:#DB7093 !important;
+	color:white !important;
 	margin-left:5px;
 
 }
+
+.roseWine .ui-progressbar-label{
+	background-color:#DB7093 !important;
+	color:white !important;
+	margin-left:0px !important;
+	
+}
+
+.redWine .ui-progressbar-label{
+	background-color:#78081e !important;
+	color:#EFEBE9 !important;
+	margin-left:0px !important;
+}
+
+.whiteWine .ui-progressbar-label{
+	background-color:#EFEBE9 !important;
+	color:#78081e !important;
+	margin-left:0px !important;
+}
+
 </style>
 
 
@@ -350,7 +394,8 @@ body .ui-carousel .ui-carousel-viewport .ui-carousel-item {
 			<div class="col-12" style="text-align:center">SRO SOFT (c)2020-2021 * Wineyard v0.0.1-SNAPSHOT * Logged User:<p:spacer width="2px"/>${userSession.currentUser.displayName}</div>
 
 		</div>
-	
+	<!-- FORMS -->
+	<ui:include src="../modules/CaveModule/forms.xhtml" />
 
 	<p:growl id="msgs" showDetail="true" sticky="true" />
 

@@ -9,6 +9,8 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import fr.srosoft.wineyard.core.model.beans.Stock;
+import fr.srosoft.wineyard.core.model.beans.StockSummary;
 import fr.srosoft.wineyard.core.model.dao.CuveeDao;
 import fr.srosoft.wineyard.core.model.entities.Appellation;
 import fr.srosoft.wineyard.core.model.entities.Cuvee;
@@ -16,6 +18,7 @@ import fr.srosoft.wineyard.core.model.entities.Millesime;
 import fr.srosoft.wineyard.core.model.entities.Tank;
 import fr.srosoft.wineyard.core.model.entities.WineyardObject;
 import fr.srosoft.wineyard.core.session.UserSession;
+import fr.srosoft.wineyard.core.unit.Bottle;
 import fr.srosoft.wineyard.utils.WineyardUtils;
 
 @Service
@@ -62,6 +65,7 @@ public class CaveService {
 		
 	}
 	
+	// *** Cuvees
 	public void saveAllCuvees (List<Cuvee> cuvees, UserSession context ) {		
 		cuvees.stream().forEach(e -> this.stampObject(e, "Cuvee", context));		
 		this.cuveeDao.saveAllCuvees (cuvees, context.getCurrentDomain().getId());
@@ -79,6 +83,32 @@ public class CaveService {
 		return cuveeDao.findCuveesByDomainAndMillesime(context.getCurrentDomain().getId(), year);
 	}
 	
+	public Cuvee getCuveesById(String cuveeId, UserSession context){
+		return cuveeDao.findCuveeById(cuveeId);
+	}
+	
+	public StockSummary getStockSummaryForCuvee(String cuveeId, UserSession context) {
+		StockSummary stockSummary = new StockSummary();
+		final Long stockHl = cuveeDao.getStocksFromContainers(cuveeId);
+		
+		Stock stock1 = new Stock();
+		stock1.setContainerType("Stock cuves");
+		stock1.setQuantity(stockHl.intValue());
+		stock1.setUnit("hl");
+		
+		Stock stock2 = new Stock();
+		stock2.setContainerType("Equivalence en bouteilles");
+		stock2.setQuantity(Bottle.numberOfBottlesForHl(stockHl.intValue()));
+		stock2.setUnit("0,75cl");
+		
+		stockSummary.addStock(stock1);
+		stockSummary.addStock(stock2);
+		
+		return stockSummary;
+	}
+	
+	
+	// *** Millesime
 	public List<Millesime> getMillesimes(UserSession context){
 		return cuveeDao.findMillesimesByDomain(context.getCurrentDomain().getId());
 	}

@@ -25,6 +25,7 @@ public class ContentsDashlet extends Dashlet<CaveModule> {
 	
 	private Map<String,DefaultDiagramModel> models = new HashMap<String, DefaultDiagramModel>();
 	
+	
 	public ContentsDashlet(CaveModule module) {
 		super(module);
 		
@@ -90,4 +91,5 @@ public class ContentsDashlet extends Dashlet<CaveModule> {
 		this.currentContent = currentContent;
 	}
 
+	
 }

@@ -20,7 +20,9 @@ public class CaveApi {
 	
 	@GetMapping ("/tanks/{domainId}")
 	public List<Tank> getTanks (@PathVariable("domainId") String domainId){
-		final List<Tank> tanks = containerService.getTanks(domainId);
+		final List<Tank> tanks = containerService.getTanks("235338bffa3240cea6a5fda41927c3cd");
+		// Domain Nicolas
+		System.out.println("Calling /tanks/235338bffa3240cea6a5fda41927c3cd");
 	
 		return tanks;
 	}

@@ -26,7 +26,7 @@
          		oncomplete="PF('containerTemplateForm').show()"
          		update=":centerPanel:containerTemplateForm"/>
         	<c:forEach var="template" items="#{module.getContainerTemplates()}">
-        		<ui:param name="containerIcon" value="#{template.type=='tank' ? 'pi pi-tablet':'pi circle-off'}"/>
+        		<ui:param name="containerIcon" value="#{template.type=='tank' ? 'pi pi-tablet':'barrel'}"/>
         		 <p:menuitem id="menu_containerTemplate_#{template.id}" 
         		 	value="#{msg[template.type]} #{template.model} (#{msg[template.material]}) #{template.volume}#{template.unit}" 
         		 	icon="#{containerIcon}"  style="font-size:0.8em; padding:5px"
@@ -37,7 +37,7 @@
         <c:forEach var="millesime" items="#{module.getMillesimes()}">
 	        <p:submenu id="cuvees" label="Cuvée #{millesime.year}" icon="pi pi-tag" >	        
 		        <c:forEach var="cuvee" items="#{module.getCuveesByMillesime(millesime.year)}">
-		          <p:menuitem id="menu_appellation_#{cuvee.appellation.id.replace(':','_')}" 
+		          <p:menuitem id="menu_appellation_#{cuvee.id.replace(':','_')}" 
 		          	value="#{cuvee.appellation.appellation}"  ajax="true" 
 		          	icon="pi pi-tag"  style="font-size:0.8em; padding:5px"/>
 		         
@@ -52,11 +52,11 @@
     <!--  Draggables -->
      <c:forEach var="millesime" items="#{module.getMillesimes()}">
 	     <c:forEach var="cuvee" items="#{module.getCuveesByMillesime(millesime.year)}">          
-	          <p:draggable id="draggable_appellation_#{cuvee.appellation.id.replace(':','_')}" for="menu_appellation_#{cuvee.appellation.id.replace(':','_')}" appendTo="@(Body)" zindex="200"  revert="true"  helper="clone" />
+	          <p:draggable id="draggable_appellation_#{cuvee.id.replace(':','_')}" for="menu_appellation_#{cuvee.id.replace(':','_')}" scope="fromMenu" appendTo="@(Body)" zindex="200"  revert="true"  helper="clone" />
 	     </c:forEach>
      </c:forEach>
      <c:forEach var="template" items="#{module.getContainerTemplates()}">          
-          <p:draggable id="draggable_template_#{template.id}" for="menu_containerTemplate_#{template.id}" appendTo="@(Body)" zindex="200"  revert="true"  helper="clone" />
+          <p:draggable id="draggable_template_#{template.id}" for="menu_containerTemplate_#{template.id}" appendTo="@(Body)" zindex="200" scope="fromMenu"  revert="true"  helper="clone" />
      </c:forEach>
     
     <p:sticky target="caveMenu" margin="50"/>

@@ -36,6 +36,9 @@ public class DomainDao extends AbstractDao {
 	private final String QUERY_FIND_DOMAIN_BY_MANAGER = "MATCH (user:User{id:$userid}) "
 			+ "MATCH (user)-[:HAS_CONTEXT]->(l:LinkedDomain)-[:LINKED_TO]->(domain:Domain) RETURN domain ";
 	
+	private final String QUERY_FIND_DOMAIN_BY_USER_EMAIL = "MATCH (user:User{email:$email}) "
+			+ "MATCH (user)-[:HAS_CONTEXT]->(l:LinkedDomain)-[:LINKED_TO]->(domain:Domain) RETURN domain ";
+	
 	private final String QUERY_FIND_USER_AND_DOMAINS = "MATCH (user:User{id:$userid}) "
 			+ "MATCH (user)-[:HAS_CONTEXT]->(l:LinkedDomain)-[:LINKED_TO]->(domain) RETURN user {.*, domains:COLLECT(domain{.*})} AS user ";
 	
@@ -98,6 +101,12 @@ public class DomainDao extends AbstractDao {
 		final Map<String,Object> parameters = new HashMap<>();    	    	
     	parameters.put("userid",userid);    		
     	return this.readMultipleQuery(QUERY_FIND_DOMAIN_BY_MANAGER, parameters,"domain",Domain.class);
+	}
+	
+	public List<Domain> findManagedDomainsByUserEmail (final String userEmail) {
+		final Map<String,Object> parameters = new HashMap<>();    	    	
+    	parameters.put("email",userEmail);    		
+    	return this.readMultipleQuery(QUERY_FIND_DOMAIN_BY_USER_EMAIL, parameters,"domain",Domain.class);
 	}
 	
 	

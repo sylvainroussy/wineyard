@@ -6,32 +6,36 @@
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 <f:view>
-	
-	
-	<ui:composition>
-	<style type="text/css">
-    .ui-diagram-element {
-        border: 0.1em dotted #E5E4E2;
-        background-color: #EFEEEC;
-        width: 10em;
-        height: 5em;
-        text-align: center;
-        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
-        user-select: none;
-    }
 
-    .ui-diagram-element:hover {
-        background-color: #C7C6C4;
-    }
-     .ui-chart {
-        margin-bottom: 50px;
-    }
+
+	<ui:composition>
+		<style type="text/css">
+.ui-diagram-element {
+	border: 0.1em dotted #E5E4E2;
+	background-color: #EFEEEC;
+	width: 10em;
+	height: 5em;
+	text-align: center;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
+	user-select: none;
+}
+
+.ui-diagram-element:hover {
+	background-color: #C7C6C4;
+}
+
+.ui-chart {
+	margin-bottom: 50px;
+}
 </style>
-	<div>
-	<ui:param name="tanks" value="#{module.getTanks()}" />
-	
-	<p:tabView styleClass="col-12">
-		<!-- <p:tab title="Contents" >
+		<div>
+			<ui:param name="tanks" value="#{module.getTanks()}" />
+			<ui:param name="barrels" value="#{module.getBarrels()}" />
+			<ui:param name="module"
+				value="#{userSession.getModule('CaveModule')}" />
+
+			<p:tabView styleClass="col-12">
+				<!-- <p:tab title="Contents" >
 			<p:tabView id="millesimes" styleClass="col-12">
 				<p:tab title="2020" >
 					<p:tabView id="appellations" styleClass="col-12 text-sm">
@@ -78,336 +82,393 @@
 				</p:tab>
 			</p:tabView>
 		</p:tab> -->
-		<p:tab title="Cuverie" >
-        <p:commandButton value="Grid" style="margin:2px" icon="pi pi-th-large" update="@form" actionListener="#{module.setCurrentTankView('grid')}" process="@this"  rendered="#{module.currentTankView=='table'}"/>
-    	<p:commandButton value="Table" style="margin:2px" icon="pi pi-bars" update="@form" actionListener="#{module.setCurrentTankView('table')}" process="@this"  rendered="#{module.currentTankView=='grid'}"/>    	
-    	
-    	<p:commandButton value="Montrer/cacher les Qr codes" icon="pi pi-camera"   process="@this"  update="@form" style="align:right"  actionListener="#{module.changeShowCodes()}"/>
-    	
-    	
-    	 <p:commandButton value="XLS" styleClass="p-mr-2 p-mb-2" style="margin:2px">
-         	<p:dataExporter type="xls" target="tankTable" fileName="tanks"/>
-         </p:commandButton>
-     
-    	 <!--  TABLE  -->
-		<p:dataTable id="tankTable" var="tank" value="#{tanks}" rows="12" paginator="true" rendered="#{module.currentTankView=='table'}"
-				rowsPerPageTemplate="6,12,16" paginatorAlwaysVisible="true" paginatorPosition="bottom" scrollable="true"
-				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
-				
-				
-			<ui:param name="wineColor"
-				value="#{tank.contents.color =='white' ? '#EFEBE9':'#78081e'}"></ui:param>
-			<ui:param name="wineText"
-				value="#{tank.contents.color =='white' ? '#78081e':'#EFEBE9'}"></ui:param>
-			<ui:param name="wineClass"
-				value="#{tank.contents.color =='white' ? 'grape':'grape_white'}"></ui:param>
-			<p:column headerText="Cuve"><h:outputText value="#{tank.id}"/></p:column>
-			<p:column headerText="Appellation"><h:outputText value="#{tank.contents.cuvee.appellation.appellation}"/></p:column>			
-		
-			
-			<p:column headerText="Cépages(s)"> 
-				<h:outputText value="#{tank.contents.cuvee.appellation.blends}"/>	
-			 </p:column>
-			 <p:column headerText="Millésime"><h:outputText value="#{tank.contents.cuvee.millesime.year}"/></p:column>
-			 
-			
-			 
-		 		
-		</p:dataTable >
-		
-		<!-- GRID -->
-		
-	
-		<p:droppable  for="tankGrid"   greedy="true" >
-			<p:ajax listener="#{module.onItemDropped}"  oncomplete="console.log('drop completed')" update="tankGrid" />
-		</p:droppable>
-		<p:dataView id="tankGrid" var="tank" value="#{tanks}" 
-				rows="12" paginator="true" 
-				rendered="#{module.currentTankView=='grid'}"
-				rowsPerPageTemplate="6,12,16" paginatorAlwaysVisible="true" paginatorPosition="bottom"
-				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-			    layout="grid" style="background-color:#78081e !important"
-				 
-				>
+				<p:tab title="Cuverie">
+					<p:commandButton value="Grid" style="margin:2px"
+						icon="pi pi-th-large" update="@form"
+						actionListener="#{module.setCurrentTankView('grid')}"
+						process="@this" rendered="#{module.currentTankView=='table'}" />
+					<p:commandButton value="Table" style="margin:2px" icon="pi pi-bars"
+						update="@form"
+						actionListener="#{module.setCurrentTankView('table')}"
+						process="@this" rendered="#{module.currentTankView=='grid'}" />
 
-				<p:dataViewGridItem columns="4" >
-				
-					<p:droppable  for="card"   greedy="true" >
-						<p:ajax listener="#{module.onItemDropped}"  oncomplete="console.log('drop completed')" update="tankGrid" />
+					<p:commandButton value="Montrer/cacher les Qr codes"
+						icon="pi pi-camera" process="@this" update="@form"
+						style="align:right" actionListener="#{module.changeShowCodes()}" />
+
+
+					<p:commandButton value="XLS" styleClass="p-mr-2 p-mb-2"
+						style="margin:2px">
+						<p:dataExporter type="xls" target="tankTable" fileName="tanks" />
+					</p:commandButton>
+
+					<!--  TABLE  -->
+					<p:dataTable id="tankTable" var="tank" value="#{tanks}" rows="12"
+						paginator="true" rendered="#{module.currentTankView=='table'}"
+						rowsPerPageTemplate="6,12,16" paginatorAlwaysVisible="true"
+						paginatorPosition="bottom" scrollable="true"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+
+
+						<ui:param name="wineColor"
+							value="#{tank.contents.cuvee.appellation.wineColor =='white' ? '#EFEBE9':'#78081e'}"></ui:param>
+						<ui:param name="wineText"
+							value="#{tank.contents.cuvee.appellation.wineColor =='white' ? '#78081e':'#EFEBE9'}"></ui:param>
+						<ui:param name="wineClass"
+							value="#{tank.contents.cuvee.appellation.wineColor =='white' ? 'grape':'grape_white'}"></ui:param>
+						<p:column headerText="Cuve" width="10%">
+							<h:outputText value="#{tank.number}" />
+						</p:column>
+						<p:column headerText="Remplissage">
+							<p:progressBar value="#{(tank.contents.volume*100)/tank.volume}"
+								labelTemplate="{value}%" displayOnly="true"
+								styleClass="#{tank.contents.cuvee.appellation.wineColor}Wine"
+								style="height:20px; " />
+
+						</p:column>
+						<p:column headerText="Appellation">
+							<h:outputText
+								value="#{tank.contents.cuvee.appellation.appellation}" />
+						</p:column>
+						<p:column headerText="Millésime">
+							<h:outputText value="#{tank.contents.cuvee.millesime.year}" />
+						</p:column>
+						<p:column headerText="Statut">
+							<h:outputText value="#{msg[tank.status]}" />
+						</p:column>
+
+
+
+
+					</p:dataTable>
+
+					<!-- GRID -->
+
+
+					<p:droppable for="tankGrid" greedy="true" scope="fromMenu">
+						<p:ajax listener="#{module.onItemDropped}"
+							oncomplete="console.log('drop completed')" update="tankGrid" />
 					</p:droppable>
-					
-					
-					<p:card id="card">
-						
-						<div class="grid">
-							<div class="col-12 md:col-6">
-								<ui:repeat var="blend" value="#{tank.contents.cuvee.appellation.blends}">
-									<ui:param name="wineColor"
-										value="#{blend.grape.color =='white' ? '#EFEBE9':'#78081e'}"></ui:param>
-									<ui:param name="wineText"
-										value="#{blend.grape.color =='white' ? '#78081e':'#EFEBE9'}"></ui:param>
-									<ui:param name="wineClass"
-										value="#{blend.grape.color =='white' ? 'grape':'grape_white'}"></ui:param>
-									<p:tag icon="#{wineClass}" value="#{contentGrape}"
-										style="background-color:#{wineColor};color:#{wineText}" />
-								</ui:repeat>
-							</div>
-							<div class="col-12 md:col-6 ">
-							
-								<p:tag icon="pi pi-calendar" value="#{tank.contents.cuvee.millesime.year}"
-									severity="success" styleClass="" />
-							
+					<p:dataView id="tankGrid" var="tank" value="#{tanks}" rows="12"
+						paginator="true" rendered="#{module.currentTankView=='grid'}"
+						rowsPerPageTemplate="6,12,16" paginatorAlwaysVisible="true"
+						paginatorPosition="bottom"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						layout="grid" style="background-color:#78081e !important">
+
+						<p:dataViewGridItem columns="4">
+
+							<p:droppable for="card" scope="fromMenu">
+								<p:ajax listener="#{module.onItemDropped}"
+									oncomplete="console.log('drop completed')" update="tankGrid"
+									form=":centerPanel" />
+							</p:droppable>
+
+
+							<p:card id="card">
+
+								<div class="grid">
+									<div class="col-12 md:col-6">
+										<ui:repeat var="blend"
+											value="#{tank.contents.cuvee.appellation.blends}">
+											<ui:param name="wineColor"
+												value="#{blend.grape.color =='white' ? '#EFEBE9':'#78081e'}"></ui:param>
+											<ui:param name="wineText"
+												value="#{blend.grape.color =='white' ? '#78081e':'#EFEBE9'}"></ui:param>
+											<ui:param name="wineClass"
+												value="#{blend.grape.color =='white' ? 'grape':'grape_white'}"></ui:param>
+											<p:tag icon="#{wineClass}" value="#{contentGrape}"
+												style="background-color:#{wineColor};color:#{wineText}" />
+										</ui:repeat>
+									</div>
+									<div class="col-12 md:col-6 ">
+
+										<p:tag icon="pi pi-calendar"
+											value="#{tank.contents.cuvee.millesime.year}"
+											severity="success" styleClass="" />
+
+									</div>
+
+								</div>
+								<div class="grid">
+									<div class="col-12 md:col-6">
+										<canvas id="#{tank.id}"> </canvas>
+										<script>drawTank ("#{tank.id}", #{tank.volume}, #{tank.contents.volume}+0,"#{tank.contents.cuvee.appellation.wineColor}")</script>
+										<p:barcode value="wineyard_tank://#{tank.id}" type="qr"
+											width="125" height="125" rendered="#{module.showCodes}" />
+									</div>
+									<div class="col-12 md:col-6 ">
+
+										<p:menuButton value="Actions">
+											<p:menuitem value="Transfert (soutirage, etc.)"
+												actionListener="#{module.prepareTransferAction(tank)}"
+												update=":transferActionForm"
+												oncomplete="PF('transferAction').show()" ajax="true"
+												icon="pi pi-angle-double-right"
+												disabled="#{tank.status != 'STATE_CONTAINER_USED'}" />
+											<p:menuitem value="Sur cuve" action="#{menuView.update}"
+												icon="pi pi-refresh"
+												disabled="#{tank.status != 'STATE_CONTAINER_USED'}" />
+											<p:menuitem value="Nettoyage" action="#{menuView.delete}"
+												icon="pi pi-times"
+												disabled="#{tank.status != 'STATE_CONTAINER_NEEDS_CLEANING'}" />
+											<p:divider />
+											<p:menuitem value="Website" url="http://www.primefaces.org"
+												icon="pi pi-external-link" />
+										</p:menuButton>
+
+										<p:commandButton value="Mesures" icon="pi pi-ellipsis-v"
+											actionListener="#{module.setCurrentTank(tank)}"
+											process="@parent" update=":centerPanel:actionsForTanks"
+											oncomplete="PF('actionsForTanks').show();" style="margin:2px"
+											styleClass="flex align-content-end" />
+
+										<p:commandButton value="Détails" icon="pi pi-ellipsis-v"
+											actionListener="#{module.setCurrentTank(tank)}"
+											process="@parent" update=":centerPanel:detailsForTanks"
+											oncomplete="PF('detailsForTanks').show(); "
+											style="margin:2px" styleClass="flex align-content-end" />
+									</div>
+									<div class="col-12 text-center font-medium">
+										#{tank.contents.cuvee.appellation.appellation}
+										<p:separator />
+
+										<p:inplace editor="true" label="Cuve #{tank.number}">
+											<p:ajax event="save" listener="#{module.saveContainer(tank)}"
+												update="@parent" />
+											<p:inputText value="#{tank.number}" required="true"
+												label="text" />
+										</p:inplace>
+										<br /> <label>#{msg[tank.status]}</label>
+									</div>
+								</div>
+
+							</p:card>
+						</p:dataViewGridItem>
+
+
+						<p:dataViewListItem>
+							<div class="grid">
+
+
+								<div class="col-12 md:col-2">#{tank.id}</div>
+								<div class="col-12 md:col-6">#{tank.contents.cuvee.appellation.appellation}</div>
+
+								<div class="col-12 md:col-2">#{tank.contents.cuvee.millesime.year}</div>
+								<div class="col-12 md:col-2">#{tank.contents.cuvee.appellation.blends}</div>
+
+
 							</div>
 
-						</div>
-						<div class="grid">
-							<div class="col-12 md:col-6">
-								<canvas id="#{tank.id}"> </canvas>
-								<script>drawTank ("#{tank.id}", #{tank.volume}, #{tank.contents.volume},"#{tank.contents.cuvee.appellation.wineColor}")</script>
-								<p:barcode value="wineyard_tank://#{tank.id}" type="qr" width="125" height="125" rendered="#{module.showCodes}"/>
-							</div>
-							<div class="col-12 md:col-6 ">
-								<p:commandButton value="Actions" icon="pi pi-ellipsis-v"
-									actionListener="#{module.setCurrentTank(tank)}"
-									process="@parent" update=":centerPanel:actionsForTanks"
-									oncomplete="PF('actionsForTanks').show();" 
-									style="margin:2px" styleClass="flex align-content-end"/>
-								<p:commandButton value="Mesures" icon="pi pi-ellipsis-v"
-									actionListener="#{module.setCurrentTank(tank)}"
-									process="@parent" update=":centerPanel:actionsForTanks"
-									oncomplete="PF('actionsForTanks').show();" 
-									style="margin:2px" styleClass="flex align-content-end"/>
-									
-								<p:commandButton value="Détails" icon="pi pi-ellipsis-v"
-								actionListener="#{module.setCurrentTank(tank)}"
-								process="@parent" update=":centerPanel:detailsForTanks"
-								oncomplete="PF('detailsForTanks').show(); " style="margin:2px"
-								styleClass="flex align-content-end"/>
-							</div>
-							<div class="col-12 text-center font-medium" >#{tank.contents.cuvee.appellation.appellation}<p:separator /></div>
+						</p:dataViewListItem>
+
+					</p:dataView>
+				</p:tab>
+
+
+
+				<!-- BARRELS -->
+				<p:tab title="Fûts">
+
+					<p:commandButton value="Montrer/cacher les Qr codes"
+						icon="pi pi-camera" process="@this" update="@form"
+						style="align:right" actionListener="#{module.changeShowCodes()}" />
+
+
+					<p:commandButton value="XLS" styleClass="p-mr-2 p-mb-2"
+						style="margin:2px">
+						<p:dataExporter type="xls" target="barrelTable" fileName="barrels" />
+					</p:commandButton>
+
+					<!--  TABLE  -->
+					<p:dataTable id="barrelTable" var="barrel" value="#{barrels}"
+						rows="12" paginator="true" rowsPerPageTemplate="6,12,16"
+						paginatorAlwaysVisible="true" paginatorPosition="bottom"
+						scrollable="true" editable="true"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+
+						<p:ajax event="rowEdit" listener="#{module.saveContainer(barrel)}"/>
+						<ui:param name="wineColor"
+							value="#{barrel.contents.color =='white' ? '#EFEBE9':'#78081e'}"></ui:param>
+						<ui:param name="wineText"
+							value="#{barrel.contents.color =='white' ? '#78081e':'#EFEBE9'}"></ui:param>
+						<ui:param name="wineClass"
+							value="#{barrel.contents.color =='white' ? 'grape':'grape_white'}"></ui:param>
+						<p:column headerText="Fût">
+						
+						
+							<p:cellEditor>
+			                    <f:facet name="output">
+			                       <h:outputText value="#{barrel.number}" />
+			                    </f:facet>
+			                    <f:facet name="input">
+			                        <p:inputText value="#{barrel.number}" style="width:100%" label="Numéro de fût"/>
+			                    </f:facet>
+			                </p:cellEditor>
 							
-							<!-- <p:commandButton value="Pigeage" icon="pi pi-ellipsis-v"
-									actionListener="#{module.setCurrentTank(tank)}"
-									process="@parent" update=":centerPanel:actionsForTanks"
-									oncomplete="PF('actionsForTanks').show();" 
-									style="margin:2px;" styleClass="flex align-content-end"/>
-							<p:commandButton value="Remontage" icon="pi pi-ellipsis-v"
-									actionListener="#{module.setCurrentTank(tank)}"
-									process="@parent" update=":centerPanel:actionsForTanks"
-									oncomplete="PF('actionsForTanks').show();" 
-									style="margin:2px" styleClass="flex align-content-end"/>
-							<p:commandButton value="Bâtonnage" icon="pi pi-ellipsis-v"
-									actionListener="#{module.setCurrentTank(tank)}"
-									process="@parent" update=":centerPanel:actionsForTanks"
-									oncomplete="PF('actionsForTanks').show();" 
-									style="margin:2px" styleClass="flex align-content-end"/>
-							<p:commandButton value="Tirage" icon="pi pi-ellipsis-v"
-									actionListener="#{module.setCurrentTank(tank)}"
-									process="@parent" update=":centerPanel:actionsForTanks"
-									oncomplete="PF('actionsForTanks').show();" 
-									style="margin:2px" styleClass="flex align-content-end"/>
-							<p:commandButton value="Elevage" icon="pi pi-ellipsis-v"
-									actionListener="#{module.setCurrentTank(tank)}"
-									process="@parent" update=":centerPanel:actionsForTanks"
-									oncomplete="PF('actionsForTanks').show();" 
-									style="margin:2px" styleClass="flex align-content-end"/>
-							<p:commandButton value="Analyse" icon="pi pi-ellipsis-v"
-									actionListener="#{module.setCurrentTank(tank)}"
-									process="@parent" update=":centerPanel:actionsForTanks"
-									oncomplete="PF('actionsForTanks').show();" 
-									style="margin:2px" styleClass="flex align-content-end"/>
-							<p:commandButton value="Mesure" icon="pi pi-ellipsis-v"
-									actionListener="#{module.setCurrentTank(tank)}"
-									process="@parent" update=":centerPanel:actionsForTanks"
-									oncomplete="PF('actionsForTanks').show();" 
-									style="margin:2px" styleClass="flex align-content-end"/> -->
-						</div>	
+						</p:column>
+						<p:column headerText="Année">
+							<p:cellEditor>
+			                    <f:facet name="output">
+			                      <h:outputText value="#{barrel.year}" />
+			                    </f:facet>
+			                    <f:facet name="input">
+			                        <p:inputText value="#{barrel.year}" style="width:100%" label="Année du fût"/>
+			                    </f:facet>
+			                </p:cellEditor>
+							
+						</p:column>
+						<p:column headerText="Remplissage">
+							
+									<p:progressBar value="#{(barrel.contents.volume*100)/barrel.volume}"
+									labelTemplate="{value}%" displayOnly="true"
+									styleClass="#{barrel.contents.cuvee.appellation.wineColor}Wine"
+									style="height:20px; " />
 								
-					</p:card>
-				</p:dataViewGridItem>
+
+						</p:column>
+						<p:column headerText="Appellation">
+							
+								<h:outputText
+									value="#{barrel.contents.cuvee.appellation.appellation}" />
+								
+							
+						</p:column>
 
 
-				<p:dataViewListItem >
-					<div class="grid">
+						<p:column headerText="Cépages(s)">
+							<h:outputText value="#{barrel.contents.cuvee.appellation.blends}" />
+						</p:column>
+						<p:column headerText="Millésime">
+							<h:outputText value="#{barrel.contents.cuvee.millesime.year}" />
+						</p:column>
+						<p:column headerText="Statut">
+							<h:outputText value="#{msg[barrel.status]}" />
+						</p:column>
 
-						
-							<div class="col-12 md:col-2">#{tank.id}</div>
-							<div class="col-12 md:col-6">#{tank.contents.cuvee.appellation.appellation}</div>
-
-							<div class="col-12 md:col-2">#{tank.contents.cuvee.millesime.year}</div>
-							<div class="col-12 md:col-2">#{tank.contents.cuvee.appellation.blends}</div>
-						
-
-					</div>
-					
-				</p:dataViewListItem>
-
-			</p:dataView>
-		</p:tab>
-		
-		<!-- BARRELS -->
-		<p:tab title="Fûts">
-
-			<p:dataView var="tank" value="#{tanks}" rows="12" paginator="true"
-				rowsPerPageTemplate="6,12,16"
-				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-				gridIcon="pi pi-th-large" listIcon="pi pi-bars" layout="grid">
-
-				<p:dataViewGridItem columns="4">
-					<div class="product-grid-item card border-1">
-						<div class="product-grid-item-top">
-							<div>
-								<p:tag icon="grape" value="#{tank.contents.cuvee.appellation.blends}" />
-								<p:tag icon="grape" value="#{tank.contents.cuvee.millesime.year}"
-									severity="success" styleClass="product-badge status-instock" />
-							</div>
-
-						</div>
-						<div>
-							<canvas id="barrel_#{tank.id}"> </canvas>
-							<script>drawBarrel ("#{tank.id}", #{tank.volume}, #{tank.contents.volume},"#{tank.contents.cuvee.appellation.wineColor}")</script>
-						</div>
-						<div>
-							<p:commandButton value="Montrer les Actions"
-								icon="pi pi-ellipsis-v"
-								actionListener="#{module.setCurrentTank(tank)}"
-								process="@parent" update=":centerPanel:actionsForTanks"
-								oncomplete="PF('actionsForTanks').show();" />
-						</div>
-						
-					</div>
-				</p:dataViewGridItem>
+						<p:column style="width:6rem">
+							<p:rowEditor editTitle="Edit Row" cancelTitle="Cancel Edit"
+								saveTitle="Save Row" />
+						</p:column>
 
 
-				<p:dataViewListItem>
-					<div class="product-list-item">
+					</p:dataTable>
 
-						<div class="product-list-detail">
-							<div class="product-name">#{tank.id}</div>
-							<div class="product-description">#{tank.contents.cuvee.appellation.appellation}</div>
-
-							<div class="product-category">#{tank.contents.cuvee.millesime.year}</div>
-							<div class="product-category">#{tank.contents.cuvee.appellation.blends}</div>
-						</div>
-
-					</div>
-				</p:dataViewListItem>
-
-			</p:dataView>
-		</p:tab>
-	</p:tabView>
-</div>
+				</p:tab>
+			</p:tabView>
+		</div>
 
 
 
 
-	<p:sidebar widgetVar="actionsForTanks" id="actionsForTanks"
-		position="right" baseZIndex="20000" appendTo="@(Body)" dynamic="true"
-		fullScreen="true">
-		<h3 style="font-weight: normal">Traçabilité</h3>
-		<div class="grid">			
-			<div class="col-12 md:col-6">
+		<p:sidebar widgetVar="actionsForTanks" id="actionsForTanks"
+			position="right" baseZIndex="20000" appendTo="@(Body)" dynamic="true"
+			fullScreen="true">
+			<h3 style="font-weight: normal">Traçabilité</h3>
 			<div class="grid">
-				<div class="col-12 md:6">Identifiant de la cuve</div>
-				<div class="col-12 md:6">#{module.currentTank.id}</div>
-				
-				<div class="col-12 md:6">Identifiant du contenu</div>
-				<div class="col-12 md:6">#{module.currentTank.contents.id}</div>
-				<div class="col-12 md:6">
-					Evénéments liés au contenu (#{module.currentTank.contents.traceLine.traces.size()})
-					<p:chronoline id="tankActionChronoline" value="#{module.currentTank.contents.traceLine.traces}" var="action" 
-							layout="vertical" align="alternate"
-							styleClass="customized-chronoline" style="border:black fill 1px; border-radius:4px">
+				<div class="col-12 md:col-6">
+					<div class="grid">
+						<div class="col-12 md:6">Identifiant de la cuve</div>
+						<div class="col-12 md:6">#{module.currentTank.id}</div>
+
+						<div class="col-12 md:6">Identifiant du contenu</div>
+						<div class="col-12 md:6">#{module.currentTank.contents.id}</div>
+						<div class="col-12 md:6">
+							Evénéments liés au contenu
+							(#{module.currentTank.contents.traceLine.traces.size()})
+							<p:chronoline id="tankActionChronoline"
+								value="#{module.currentTank.contents.traceLine.traces}"
+								var="action" layout="vertical" align="alternate"
+								styleClass="customized-chronoline"
+								style="border:black fill 1px; border-radius:4px">
 				              
 				             #{action.name}
 				             #{action.humanDate}
 				            	
-				    </p:chronoline>			
+				    </p:chronoline>
+						</div>
+						<h3>Mener une action</h3>
+						<h:form>
+							<div class="ui-fluid p-formgrid p-grid">
+								<div class="p-field p-col">
+									<label for="actionName">Nommer l'action</label>
+									<p:inputText id="actionName" />
+								</div>
+								<div class="p-field p-col">
+									<label for="actionDesc">Décrire l'action</label>
+									<p:inputTextarea id="actionDesc" />
+								</div>
+								<div class="p-field p-col">
+									<label for="actionDate">Date de l'action</label>
+									<p:datePicker id="actionDate" appendTo="@parent" />
+
+								</div>
+							</div>
+							<p:commandButton value="Déclarer"
+								oncomplete="PF('actionsForTanks').hide()" />
+							<p:commandButton value="Annuler"
+								oncomplete="PF('actionsForTanks').hide()" />
+						</h:form>
+					</div>
 				</div>
-			    <h3>Mener une action</h3>
-			    <h:form>
-			    <div class="ui-fluid p-formgrid p-grid">
-						<div class="p-field p-col">
-							<label for="actionName">Nommer l'action</label>
-							<p:inputText id="actionName"   />
-						</div>
-						<div class="p-field p-col">
-							<label for="actionDesc">Décrire l'action</label>
-							<p:inputTextarea id="actionDesc"   />
-						</div>
-						<div class="p-field p-col">
-							<label for="actionDate">Date de l'action</label>
-							 <p:datePicker id="actionDate" appendTo="@parent" />
-							
-						</div>
-					</div>		
-					<p:commandButton value="Déclarer"
-						oncomplete="PF('actionsForTanks').hide()" />
-					<p:commandButton value="Annuler"
-						oncomplete="PF('actionsForTanks').hide()" />
-				</h:form>
+				<div class="col-12 md:col-6">
+					<p:lineChart model="#{module.cartesianLinerModel}" />
+				</div>
 			</div>
-		</div>
-		<div class="col-12 md:col-6">			
-			    <p:lineChart model="#{module.cartesianLinerModel}" />
-		</div>
-	</div>
-	</p:sidebar>
+		</p:sidebar>
 
-	<p:sidebar widgetVar="detailsForTanks" id="detailsForTanks"
-		position="right" baseZIndex="20000" appendTo="@(Body)" dynamic="true"
-		fullScreen="false">
-		<h1 style="font-weight: normal">Cuve #{module.currentTank.id}</h1>
+		<p:sidebar widgetVar="detailsForTanks" id="detailsForTanks"
+			position="right" baseZIndex="20000" appendTo="@(Body)" dynamic="true"
+			fullScreen="false">
+			<h1 style="font-weight: normal">Cuve #{module.currentTank.id}</h1>
 
-		<div class="ui-fluid p-formgrid p-grid">
-			<div class="p-field p-col">
-				<label for="tankVolume">Volume</label>
-				<p:inputText id="tankVolume"  value="#{module.currentTank.volume}" />
+			<div class="ui-fluid p-formgrid p-grid">
+				<div class="p-field p-col">
+					<label for="tankVolume">Volume</label>
+					<p:inputText id="tankVolume" value="#{module.currentTank.volume}" />
+				</div>
+				<div class="p-field p-col">
+					<label for="tankYear">Année de mise en service</label>
+					<p:inputText id="tankYear" type="text"
+						value="#{module.currentTank.year}" />
+				</div>
 			</div>
-			<div class="p-field p-col">
-				<label for="tankYear">Année de mise en service</label>
-				<p:inputText id="tankYear" type="text" value="#{module.currentTank.year}"/>
-			</div>
-		</div>		
-		<p:commandButton value="Cancel"
-			oncomplete="PF('detailsForTanks').hide()" />
-	</p:sidebar>
-	
-	
-	
-<p:sidebar widgetVar="addTanks" id="addTanks"
-		position="right" baseZIndex="20000" appendTo="@(Body)" dynamic="true"
-		fullScreen="false" >
-		<h1 style="font-weight: normal">Ajouter des cuves</h1>
-		
-<h:form>
-		<div class="ui-fluid p-formgrid p-grid">
-			<div class="p-field p-col">
-				<label for="tankNumber">Nombre de cuves du même modèle</label>
-				<p:inputText id="tankNumber"  value="#{module.addTanksNumber}" />
-			</div>
-			<div class="p-field p-col">
-				<label for="tankVolume">Volume</label>
-				<p:inputText id="tankVolume"  value="#{module.addTanksVolume}" />
-			</div>
-			<div class="p-field p-col">
-				<label for="tankYear">Année de mise en service</label>
-				<p:inputText id="tankYear" type="text" value="#{module.addTanksYear}"/>
-			</div>
-		</div>		
-		<p:commandButton value="Cancel"
-			oncomplete="PF('addTanks').hide()" />
-		<p:commandButton value="Confirm"
-			actionListener="#{module.addTanks}"
-			update=":centerPanel" 
-			process="@form"
-			partialSubmit="false" type="submit"
-			oncomplete="PF('addTanks').hide()" 
-			immediate="false"/>
+			<p:commandButton value="Cancel"
+				oncomplete="PF('detailsForTanks').hide()" />
+		</p:sidebar>
+
+
+
+		<p:sidebar widgetVar="addTanks" id="addTanks" position="right"
+			baseZIndex="20000" appendTo="@(Body)" dynamic="true"
+			fullScreen="false">
+			<h1 style="font-weight: normal">Ajouter des cuves</h1>
+
+			<h:form>
+				<div class="ui-fluid p-formgrid p-grid">
+					<div class="p-field p-col">
+						<label for="tankNumber">Nombre de cuves du même modèle</label>
+						<p:inputText id="tankNumber" value="#{module.addTanksNumber}" />
+					</div>
+					<div class="p-field p-col">
+						<label for="tankVolume">Volume</label>
+						<p:inputText id="tankVolume" value="#{module.addTanksVolume}" />
+					</div>
+					<div class="p-field p-col">
+						<label for="tankYear">Année de mise en service</label>
+						<p:inputText id="tankYear" type="text"
+							value="#{module.addTanksYear}" />
+					</div>
+				</div>
+				<p:commandButton value="Cancel" oncomplete="PF('addTanks').hide()" />
+				<p:commandButton value="Confirm" actionListener="#{module.addTanks}"
+					update=":centerPanel" process="@form" partialSubmit="false"
+					type="submit" oncomplete="PF('addTanks').hide()" immediate="false" />
 			</h:form>
-	</p:sidebar>
+		</p:sidebar>
 
-		</ui:composition>
-	
+
+	</ui:composition>
+
 </f:view>
 </html>
