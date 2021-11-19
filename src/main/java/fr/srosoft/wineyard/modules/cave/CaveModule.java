@@ -48,11 +48,13 @@ import fr.srosoft.wineyard.core.model.entities.Trace;
 import fr.srosoft.wineyard.core.services.CaveService;
 import fr.srosoft.wineyard.core.services.ContainerService;
 import fr.srosoft.wineyard.core.session.UserSession;
-import fr.srosoft.wineyard.modules.cave.TransferAction.TargetContainer;
+import fr.srosoft.wineyard.engine.CleaningOperation;
+import fr.srosoft.wineyard.engine.DispatchOperation;
 import fr.srosoft.wineyard.modules.commons.AbstractModule;
 import fr.srosoft.wineyard.modules.commons.Module;
 import fr.srosoft.wineyard.modules.domain.DomainModule;
 import fr.srosoft.wineyard.utils.Constants;
+import fr.srosoft.wineyard.utils.WineyardUtils;
 @Component
 
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -85,7 +87,7 @@ public class CaveModule extends AbstractModule{
 	private boolean showCodes = false;
 	
 	
-	private TransferAction transferAction;
+	private CaveTransferAction transferAction;
 	
 	// Trying...
 	private ContentsDashlet contentsDashlet;
@@ -148,9 +150,32 @@ public class CaveModule extends AbstractModule{
 		return caveService.getCuveesByDomainAndMillesime(context, year);
 	}
 	
-	public void prepareTransferAction(Container container) {
-		this.transferAction = new TransferAction(container);
+	public void prepareTransferTankToLargeAction(Container container) {
+		this.transferAction = new TransferTankToLargeAction(container);
 		
+	}
+	
+	public void prepareTransferTankToBarrelsAction(Container container) {
+		this.transferAction = new TransferTankToBarrelsAction(container);
+		
+	}
+	
+	public void executePlan() {
+		final DispatchOperation dop = new DispatchOperation();
+		dop.run(this.transferAction.sourceContainer, this.transferAction.targetContainers);
+		this.containerService.updateContainerAndContents(this.transferAction.sourceContainer, context);
+		for (TargetContainer targetContainer : this.transferAction.targetContainers) {
+			this.containerService.updateContainerAndContents(targetContainer.getContainer(), context);
+		}
+		this.transferAction = null;
+		this.diagramModel.clear();
+		
+	}
+	
+	public void cleanContainer (Container container) {
+		final CleaningOperation cop = new CleaningOperation();
+		cop.run(container);
+		this.containerService.cleanContainer(container, context);
 	}
 	
 	public void initDiagramModel () {
@@ -162,9 +187,9 @@ public class CaveModule extends AbstractModule{
 			String styleSource = containerSource instanceof Tank ? "pi pi-tablet" :"barrel"; 
 		
 			this.diagramModel.clear();
-	        TargetContainer source = new TargetContainer();
-	        source.setContainer(containerSource);
+	        TargetContainer source = new TargetContainer(containerSource,containerSource.getContents().getVolume());	      
 	        source.setVolume(containerSource.getContents().getVolume());
+	        
 	        final ElementWrapper ewSource = new ElementWrapper();
 	        ewSource.setContainers(Arrays.asList(source));
 	        ewSource.setLabel(source.getContainer().getNumber());
@@ -181,7 +206,7 @@ public class CaveModule extends AbstractModule{
 	        int baseX = 2;// +15
 	        int baseY = 24;
 	        if (type.equals("Tank") ) {
-		        for(TargetContainer target : this.getReadyContainers()) {		        	
+		        for(TargetContainer target : this.getPossibleContainers()) {		        	
 		        	
 		        	
 		        	final ElementWrapper ewTarget = new ElementWrapper();
@@ -201,7 +226,7 @@ public class CaveModule extends AbstractModule{
 		        	
 		    }
 	        else if (type.equals("Barrel") ) {
-	        	final Map<String, List<TargetContainer>> map=  this.getReadyContainers().stream().collect(Collectors.groupingBy( e -> e.getContainer().getYear()));
+	        	final Map<String, List<TargetContainer>> map=  this.getPossibleContainers().stream().collect(Collectors.groupingBy( e -> e.getContainer().getYear()));
 	        	for (Map.Entry<String,List<TargetContainer>> targets : map.entrySet()) {
 	        		
 	        		final ElementWrapper ewTarget = new ElementWrapper();
@@ -231,8 +256,10 @@ public class CaveModule extends AbstractModule{
 	   final ElementWrapper wrapper = (ElementWrapper)event.getTargetElement().getData();
        this.transferAction.getTargetContainers().addAll(wrapper.getContainers());
        
-       LabelOverlay lo = new LabelOverlay();
-       lo.setLabel("Volume");
+       /*final Action action = new Action();
+       action.setActionName("Transfert");
+       action.setActionDetail("");
+       action.setEngineOperation(engineOperation);*/
     }	
 	
 
@@ -304,7 +331,7 @@ public class CaveModule extends AbstractModule{
 			Action action = new Action ();
 			action.setActionName("Remplissage");
 			action.setCreationDate(new Date());
-			action.setDate(new Date());
+			action.setDateDone(new Date());
 			container.addAction(action);
 			
 			Contents c= new Contents();			
@@ -322,41 +349,49 @@ public class CaveModule extends AbstractModule{
 		 this.containerService.updateContainer(container, context);
 	}
 	
-	public List<String> getReadyContainerTypes(){
-		return containerService.getReadyContainerTypes(this.context);	
+	public List<String> getPossibleContainerTypes(){
+		return containerService.getPossibleContainerTypes(this.context);	
 	}
 	
-	public List<TargetContainer> getReadyContainers(){		
+	public List<TargetContainer> getPossibleContainers(){		
 		final List<TargetContainer> targetContainers = new ArrayList<>();
-		final String type = this.transferAction.getDestinationContainerType();
-		if (type != null) {
-			switch (type) {
-				case "Barrel" : targetContainers.addAll(this.getReadyBarrels());break;
-				case "Tank" : targetContainers.addAll(this.getReadyTanks());break;
+		if (this.transferAction != null) {
+			final String type = this.transferAction.getDestinationContainerType();
+			if (type != null) {
+				switch (type) {
+					case "Barrel" : targetContainers.addAll(this.getPossibleBarrels());break;
+					case "Tank" : targetContainers.addAll(this.getPossibleTanks());break;
+				}
 			}
 		}
+		
 		return targetContainers;
 	}
 	
-	private List<TargetContainer> getReadyTanks(){
-		return this.containerService.findReadyTanks(context).stream().map(e -> {
+	private List<TargetContainer> getPossibleTanks(){
+		return this.containerService.findPossibleTanks(context).stream()
+		.filter (e -> !e.equals(this.transferAction.getSourceContainer()))
+		.map(e -> {			
 			final TargetContainer targetContainer = new TargetContainer();
+			if (e.getContents() == null) targetContainer.setLeftVolume(e.getVolume());
+			else targetContainer.setLeftVolume(e.getVolume()-e.getContents().getVolume());
+			
 			targetContainer.setContainer(e);
 			return targetContainer;
 		} ).collect(Collectors.toList());
 	}
 	
-	private List<TargetContainer> getReadyBarrels(){
-		return this.containerService.findReadyBarrels(context).stream().map(e -> {
+	private List<TargetContainer> getPossibleBarrels(){
+		return this.containerService.findPossibleBarrels(context).stream().map(e -> {
 			final TargetContainer targetContainer = new TargetContainer();
 			targetContainer.setContainer(e);
+			if (e.getContents() == null) targetContainer.setLeftVolume(e.getVolume());
+			else targetContainer.setLeftVolume(e.getVolume()-e.getContents().getVolume());
 			return targetContainer;
 		} ).collect(Collectors.toList());
 	}
 	
 	public void onItemDropped(DragDropEvent<?> event) {
-	      String item = (String) event.getData();
-	      System.out.println("Source: "+event.getSource());
 	      System.out.println("Source: "+event.getDragId());
 	      if (event.getDragId().contains("menu_containerTemplate_")) {
 	    	  final String parts[] =  event.getDragId().split("_");
@@ -368,16 +403,20 @@ public class CaveModule extends AbstractModule{
 	      }
 	      else {
 	    	  
-	    	  String [] parts = event.getDragId().split("_");
-	    	  if (parts.length > 4) {
-		    	  System.out.println(parts[2]+":"+parts[3]+"_"+parts[4]);
-		    	  final Cuvee cuvee = caveService.getCuveesById(parts[2]+":"+parts[3]+"_"+parts[4], context);    	  	    	  
+	    	  String [] parts = event.getDragId().split("--");
+	    	  if (parts.length == 2) {
+	    		  final String cuveeId = parts[1].replaceFirst("_", ":");
+	    		  
+	    		  
+		    	  System.out.println("CuveeId : "+cuveeId);
+		    	  final Cuvee cuvee = caveService.getCuveesById(cuveeId, context);    	  	    	  
 		    	  
 		    	 // centerPanel:j_idt152:tankGrid:8:card
+		    	  System.out.println("DropId  : "+event.getDropId());
 		    	  parts =  event.getDropId().split(":");
 		    	  Tank tank = this.getTanks().get(Integer.parseInt(parts[3]));
 		    	  Contents c= new Contents();
-		    	  c.setId(cuvee.getId()+"_"+tank.getId());
+		    	  c.setId(WineyardUtils.generateContentsId(tank));
 		    	  c.setVolume(0);		
 		    	  c.setCuvee(cuvee);
 		    	  tank.setContents(c);
@@ -393,8 +432,8 @@ public class CaveModule extends AbstractModule{
 				  tank.getContents().getTraceLine().addTrace(trace);
 				  tank.getContents().setVolume(tank.getVolume());			  
 				  tank.getContents().setCurrentState(Constants.STATE_WAITING_ALCOHOLIC_FERMENTATION);
-				  
-				  containerService.addContentToContainer(c, tank.getId(), context);
+				 
+				  containerService.addContentToContainer(c, tank, context);
 	    	  }
 			  
 	    	  
@@ -679,11 +718,11 @@ public class CaveModule extends AbstractModule{
 		return contentsDashlet;
 	}
 
-	public TransferAction getTransferAction() {
+	public CaveTransferAction getTransferAction() {
 		return transferAction;
 	}
 
-	public void setTransferAction(TransferAction transferAction) {
+	public void setTransferAction(TransferTankToLargeAction transferAction) {
 		this.transferAction = transferAction;
 	}
 

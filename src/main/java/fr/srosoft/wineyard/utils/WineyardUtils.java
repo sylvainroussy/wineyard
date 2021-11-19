@@ -1,7 +1,9 @@
 package fr.srosoft.wineyard.utils;
 
 import java.util.Date;
+import java.util.UUID;
 
+import fr.srosoft.wineyard.core.model.entities.Container;
 import fr.srosoft.wineyard.core.model.entities.WineyardObject;
 
 public class WineyardUtils {
@@ -17,6 +19,10 @@ public class WineyardUtils {
 		object.setLastUpdateUser(actor);
 		
 		
+	}
+	
+	public static String generateContentsId(Container container) {
+		return container.getId()+"_"+UUID.randomUUID().toString();
 	}
 	
 

@@ -1,5 +1,6 @@
 package fr.srosoft.wineyard.core.model.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -46,8 +47,16 @@ public class ContainerDao extends AbstractDao {
 	
 	private static String QUERY_CONTAINER_UPDATE = "MATCH (domain:Domain{id:$domainId}) "
 			+ "MATCH (module:CaveModule)<-[:HAS_MODULE]-(domain) "			
-			+ "MERGE (module)-[:HAS_CONTAINER]->(container{id:$id}) "
+			+ "MERGE (module)-[:HAS_CONTAINER]->(container:Container{id:$id}) "
 			+ "SET container+=$patch ";	
+	
+	private static String QUERY_CONTAINER_CLEAN = "MATCH (domain:Domain{id:$domainId}) "
+			+ "MATCH (module:CaveModule)<-[:HAS_MODULE]-(domain) "			
+			+ "MERGE (module)-[:HAS_CONTAINER]->(container:Container{id:$id}) "
+			+ "SET container+=$patch "
+			+ "WITH container "
+			+ "OPTIONAL MATCH (container)-[r:CURRENT_CONTENT]->(current) "
+			+ "DELETE r ";	
 			
 	
 	private static String QUERY_CONTAINER_FIND_BY_DOMAIN_AND_TYPE = "MATCH (domain:Domain{id:$domainId}) "
@@ -89,6 +98,16 @@ public class ContainerDao extends AbstractDao {
 		this.writeQuery(QUERY_CONTAINER_UPDATE, Map.of("id",container.getId(),"domainId", domainId, "patch",patch, "containerType", containerType));
 	}
 	
+	public void cleanContainer (Container container, String domainId,String containerType) {
+		final Map<?,?> patch =  MAPPER.convertValue(container, Map.class);
+		patch.remove("id");
+		patch.remove("actions");
+		patch.remove("contents");
+		this.writeQuery(QUERY_CONTAINER_CLEAN, Map.of("id",container.getId(),"domainId", domainId, "patch",patch, "containerType", containerType));
+	}
+	
+	
+	
 	public <T extends Container> List<T> findContainersByDomainAndType (String domainId,Class<T> containerType) {		
 		
 		return this.readMultipleQuery(QUERY_CONTAINER_FIND_BY_DOMAIN_AND_TYPE, Map.of("domainId", domainId, "containerType",containerType.getSimpleName()),"container",containerType);
@@ -115,9 +134,16 @@ public class ContainerDao extends AbstractDao {
 			+ "WITH contents, container "			
 			+ "OPTIONAL MATCH (container)-[r:CURRENT_CONTENT]->(current) "
 			+ "DELETE r "
-			+ "MERGE (container)-[:CURRENT_CONTENT]->(contents) "
-			+ "MERGE (container)<-[:HAD_CONTAINER{when:timestamp()}]-(contents) "
-			+ "SET container.status='STATE_CONTAINER_USED'";
+			+ "MERGE (container)-[:CURRENT_CONTENT]->(contents) "			
+			+ "MERGE (container)<-[:HAD_CONTAINER]-(contents) "				
+			+ "WITH contents, COLLECT(current) As currents "
+			+ "WITH contents, [cur IN currents WHERE cur.id <> contents.id] as currents "
+			+ "FOREACH (current IN currents | MERGE (current)-[:NEXT]->(contents)) "
+			+ "WITH contents, $parentIds AS parentIds "
+			+ "UNWIND $parentIds AS parentId "
+			+ "MATCH (parent:Contents{id:parentId}) "
+			+ "MERGE (contents)-[:IS_CHILD_OF]->(parent) ";
+			
 	
 	public void addContentToContainer (Contents contents, String containerId, String domainId) {
 		final Map<?,?> patch =  MAPPER.convertValue(contents, Map.class);
@@ -125,7 +151,36 @@ public class ContainerDao extends AbstractDao {
 		patch.remove("traceLine");
 		patch.remove("parents");
 		Map<?,?> pCuvee = (Map<?, ?>) patch.remove("cuvee");
-		this.writeQuery(QUERY_ADD_CONTENT_TO_CONTAINER, Map.of("id",contents.getId(),"domainId", domainId,"containerId",containerId, "patch",patch,"cuveeId",pCuvee.get("id")));
+		final List<String> parentIds = new ArrayList<>();
+		if (contents.getParents() != null) {
+			contents.getParents().stream().forEach(e -> parentIds.add(e.getId()));
+		}
+		this.writeQuery(QUERY_ADD_CONTENT_TO_CONTAINER, Map.of("id",contents.getId(),"domainId", domainId,"containerId",containerId, "patch",patch,"cuveeId",pCuvee.get("id"),"parentIds",parentIds));
+	}
+	
+	public void updateContainerAndContents (Container container, String domainId,String containerType) {
+		final Map<?,?> containerPatch =  MAPPER.convertValue(container, Map.class);
+		containerPatch.remove("id");
+		containerPatch.remove("actions");
+		final Map<?,?> pContents =(Map<?,?>) containerPatch.remove("contents");
+		String cuveeId="n/a";
+		final List<String> parentIds = new ArrayList<>();
+		if (pContents != null) {
+			pContents.remove("traceLine");
+			pContents.remove("parents");
+			final Map<?,?> pCuvee = (Map<?, ?>) pContents.remove("cuvee");
+			cuveeId = (String) pCuvee.get("id");
+			final Contents contents = container.getContents();
+			if (contents != null) {
+				if (contents.getParents() != null) {
+					contents.getParents().stream().forEach(e -> parentIds.add(e.getId()));
+				}
+			}
+			
+			this.writeQuery(QUERY_ADD_CONTENT_TO_CONTAINER,Map.of("id",pContents.get("id"),"domainId", domainId,"containerId",container.getId(), "patch",pContents,"cuveeId",cuveeId,"parentIds",parentIds), 
+					QUERY_CONTAINER_UPDATE, Map.of("id",container.getId(),"domainId", domainId, "patch",containerPatch, "containerType", containerType));
+		}
+		else this.writeQuery(QUERY_CONTAINER_UPDATE, Map.of("id",container.getId(),"domainId", domainId, "patch",containerPatch, "containerType", containerType));	
 	}
 	
 	
@@ -160,22 +215,23 @@ public class ContainerDao extends AbstractDao {
 	private static String QUERY_CONTAINERS_FIND_BY_STATUS="MATCH (domain:Domain{id:$domainId}) "
 			+ "MATCH (module:CaveModule)<-[:HAS_MODULE]-(domain) "			
 			+ "MATCH (module)-[:HAS_CONTAINER]->(container:Container) "
-			+ "WHERE $containerType IN labels(container) AND container.status =$status "			
-			+ "RETURN container ORDER BY container.number ASC, container.id ASC ";
+			+ "WHERE $containerType IN labels(container) AND container.status IN $status "
+			+ "OPTIONAL MATCH (container)-[:CURRENT_CONTENT]->(contents:Contents) "			
+			+ "RETURN container{.*,contents: contents{.*}} ORDER BY container.number ASC, container.id ASC ";
 			
-	public <T extends Container> List<T> findContainersByStatus(String domainId, Class<T> containerType, STATE_CONTAINER status){
-		return this.readMultipleQuery(QUERY_CONTAINERS_FIND_BY_STATUS, Map.of("domainId", domainId, "containerType",containerType.getSimpleName(),"status",status.name()),"container",containerType);
+	public <T extends Container> List<T> findContainersByStatus(String domainId, Class<T> containerType,  List<STATE_CONTAINER> status){
+		return this.readMultipleQuery(QUERY_CONTAINERS_FIND_BY_STATUS, Map.of("domainId", domainId, "containerType",containerType.getSimpleName(),"status",convertEnumToString(status)),"container",containerType);
 	}
 	
 	private static String QUERY_CONTAINERS_FIND_TYPES="MATCH (domain:Domain{id:$domainId}) "
 			+ "MATCH (module:CaveModule)<-[:HAS_MODULE]-(domain) "			
 			+ "MATCH (module)-[:HAS_CONTAINER]->(container:Container) "
-			+ "WHERE  container.status =$status "
+			+ "WHERE  container.status IN $status "
 			+ "WITH labels(container) AS labels "
 			+ "UNWIND labels AS type "
 			+ "WITH type WHERE type<>'Container'"			
-			+ "RETURN DISTINCT type oRDER BY type ASC ";
-	public List<String> getContainerTypesByStatus(String domainId, STATE_CONTAINER status) {
-		return this.readMultipleQuery(QUERY_CONTAINERS_FIND_TYPES, Map.of("domainId", domainId,"status",status.name()),"type",String.class);
+			+ "RETURN DISTINCT type ORDER BY type ASC ";
+	public List<String> getContainerTypesByStatus(String domainId, List<STATE_CONTAINER> status) {
+		return this.readMultipleQuery(QUERY_CONTAINERS_FIND_TYPES, Map.of("domainId", domainId,"status",convertEnumToString(status)),"type",String.class);
 	}
 }

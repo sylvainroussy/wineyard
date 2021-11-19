@@ -3,6 +3,7 @@ package fr.srosoft.wineyard.core.model.dao;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -123,6 +124,10 @@ public abstract class AbstractDao {
             } );
            
         }
+	}
+	
+	protected  List<String> convertEnumToString(@SuppressWarnings("rawtypes") List<? extends Enum> enums){
+		return enums.stream().map(e -> e.name()).collect(Collectors.toList());
 	}
 	
 	

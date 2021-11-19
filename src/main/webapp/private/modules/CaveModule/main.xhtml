@@ -37,7 +37,7 @@
         <c:forEach var="millesime" items="#{module.getMillesimes()}">
 	        <p:submenu id="cuvees" label="Cuvée #{millesime.year}" icon="pi pi-tag" >	        
 		        <c:forEach var="cuvee" items="#{module.getCuveesByMillesime(millesime.year)}">
-		          <p:menuitem id="menu_appellation_#{cuvee.id.replace(':','_')}" 
+		          <p:menuitem id="menu_appellation--#{cuvee.id.replace(':','_')}" 
 		          	value="#{cuvee.appellation.appellation}"  ajax="true" 
 		          	icon="pi pi-tag"  style="font-size:0.8em; padding:5px"/>
 		         
@@ -52,7 +52,7 @@
     <!--  Draggables -->
      <c:forEach var="millesime" items="#{module.getMillesimes()}">
 	     <c:forEach var="cuvee" items="#{module.getCuveesByMillesime(millesime.year)}">          
-	          <p:draggable id="draggable_appellation_#{cuvee.id.replace(':','_')}" for="menu_appellation_#{cuvee.id.replace(':','_')}" scope="fromMenu" appendTo="@(Body)" zindex="200"  revert="true"  helper="clone" />
+	          <p:draggable id="draggable_appellation--#{cuvee.id.replace(':','_')}" for="menu_appellation--#{cuvee.id.replace(':','_')}" scope="fromMenu" appendTo="@(Body)" zindex="200"  revert="true"  helper="clone" />
 	     </c:forEach>
      </c:forEach>
      <c:forEach var="template" items="#{module.getContainerTemplates()}">          

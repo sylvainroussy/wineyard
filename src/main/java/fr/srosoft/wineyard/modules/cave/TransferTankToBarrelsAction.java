@@ -1,15 +1,12 @@
 package fr.srosoft.wineyard.modules.cave;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import fr.srosoft.wineyard.core.model.entities.Container;
 
-public class TransferAction {
-	// For transfer Action
-	private Container sourceContainer;
-	private List<TargetContainer> targetContainers = new ArrayList<>();
+public class TransferTankToBarrelsAction extends CaveTransferAction{
+	
 	
 	
 	private List<String> actionTypes; 
@@ -22,28 +19,13 @@ public class TransferAction {
 	
 	private String destinationContainerType;
 	
-	public int getDestinationTotalVolume() {
-		int volume = 0;
-		for (TargetContainer targetContainer : targetContainers) {
-			volume = volume+targetContainer.getVolume();
-		}
-		return volume;
-	}
 	
-	public int getLeftContentsVolume() {
-		return this.sourceContainer.getContents().getVolume() - this.getDestinationTotalVolume();
-	}
 	
-	public TransferAction(Container source) {
+	public TransferTankToBarrelsAction(Container source) {
 		this.sourceContainer = source;
+		this.destinationContainerType="Barrel";
 	}
 	
-	public Container getSourceContainer() {
-		return sourceContainer;
-	}
-	public void setSourceContainer(Container sourceContainer) {
-		this.sourceContainer = sourceContainer;
-	}
 	
 
 	public List<String> getActionTypes() {
@@ -78,22 +60,18 @@ public class TransferAction {
 		this.user = user;
 	}
 
+	@Override
 	public String getDestinationContainerType() {
 		return destinationContainerType;
 	}
 
+	@Override
 	public void setDestinationContainerType(String destinationContainerType) {
 		this.destinationContainerType = destinationContainerType;
 	}
 
 	
-	public List<TargetContainer> getTargetContainers() {
-		return targetContainers;
-	}
-
-	public void setTargetContainers(List<TargetContainer> targetContainers) {
-		this.targetContainers = targetContainers;
-	}
+	
 
 	public int getTargetsNumber() {
 		return targetsNumber;
@@ -105,20 +83,5 @@ public class TransferAction {
 		
 	}
 
-	public static class TargetContainer{
-		private Container container;
-		private int volume;
-		public Container getContainer() {
-			return container;
-		}
-		public void setContainer(Container container) {
-			this.container = container;
-		}
-		public int getVolume() {
-			return volume;
-		}
-		public void setVolume(int volume) {
-			this.volume = volume;
-		}
-	}
+	
 }

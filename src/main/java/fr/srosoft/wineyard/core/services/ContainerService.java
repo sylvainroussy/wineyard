@@ -1,8 +1,10 @@
 package fr.srosoft.wineyard.core.services;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -65,11 +67,38 @@ public class ContainerService {
 		tanksCache.remove(context.getCurrentDomain().getId());
 	}
 	
+	public void updateContainerAndContents (Container container,UserSession context) {
+		if (container.getId() == null) throw new IllegalArgumentException ("updateContainer() Container must already exist! ");
+		final String containerType =  container.getClass().getSimpleName();
+		this.stampObject(container,containerType, context);
+		if (container.getStatus().equals(STATE_CONTAINER.STATE_CONTAINER_NEEDS_NUMBER) 
+				&& container.getNumber() != null
+				&& !container.getNumber().isBlank()) {
+			container.setStatus(STATE_CONTAINER.STATE_CONTAINER_READY);			
+		}
+		containerDao.updateContainerAndContents(container, context.getCurrentDomain().getId(), containerType);
+		tanksCache.remove(context.getCurrentDomain().getId());
+	}
+	
+	public void cleanContainer(Container container, UserSession context) {
+		this.stampObject(container, container.getClass().getSimpleName(), context);
+		containerDao.cleanContainer(container, context.getCurrentDomain().getId(), container.getClass().getSimpleName());
+		tanksCache.remove(context.getCurrentDomain().getId());
+	}
+	
 	public List<Tank> getTanks(String domainId){
 		if(tanksCache.get(domainId) == null) {
 			this.loadTanks(domainId);
 		}		
 		return tanksCache.get(domainId);
+		
+	}
+	
+	public Tank getTank(String domainId, String tankId){
+		if(tanksCache.get(domainId) == null) {
+			this.loadTanks(domainId);
+		}		
+		return tanksCache.get(domainId).stream().filter(e -> e.getId().equals(tankId)).findFirst().get();
 		
 	}
 	
@@ -81,8 +110,10 @@ public class ContainerService {
 		
 	}
 	
-	public void addContentToContainer (Contents contents, String containerId,UserSession context) {
-		containerDao.addContentToContainer(contents, containerId, context.getCurrentDomain().getId());
+	public void addContentToContainer (Contents contents, Container container,UserSession context) {
+		container.setStatus(STATE_CONTAINER.STATE_CONTAINER_USED);
+		containerDao.addContentToContainer(contents, container.getId(), context.getCurrentDomain().getId());
+		this.updateContainer(container, context);
 		tanksCache.remove(context.getCurrentDomain().getId());
 	}
 	
@@ -91,18 +122,22 @@ public class ContainerService {
 		return containerDao.loadContentsFromContainer(container,context.getCurrentDomain().getId());
 	}
 	
-	public List<Tank> findReadyTanks(UserSession context){
-		return containerDao.findContainersByStatus(context.getCurrentDomain().getId(), Tank.class, STATE_CONTAINER.STATE_CONTAINER_READY);
+	public List<Tank> findPossibleTanks(UserSession context){
+		return containerDao.findContainersByStatus(context.getCurrentDomain().getId(), Tank.class, Arrays.asList(STATE_CONTAINER.STATE_CONTAINER_READY,STATE_CONTAINER.STATE_CONTAINER_USED))
+				.stream().filter(e -> e.getContents()==null || e.getContents().getVolume() < e.getVolume())
+				.collect(Collectors.toList());
 				
 	}
 	
-	public List<Barrel> findReadyBarrels(UserSession context){
-		return containerDao.findContainersByStatus(context.getCurrentDomain().getId(), Barrel.class, STATE_CONTAINER.STATE_CONTAINER_READY);
+	public List<Barrel> findPossibleBarrels(UserSession context){
+		return containerDao.findContainersByStatus(context.getCurrentDomain().getId(), Barrel.class,Arrays.asList(STATE_CONTAINER.STATE_CONTAINER_READY,STATE_CONTAINER.STATE_CONTAINER_USED))
+				.stream().filter(e -> e.getContents()==null || e.getContents().getVolume() < e.getVolume())
+				.collect(Collectors.toList());
 				
 	}
 	
-	public List<String> getReadyContainerTypes(UserSession context){		
-		return containerDao.getContainerTypesByStatus(context.getCurrentDomain().getId(), STATE_CONTAINER.STATE_CONTAINER_READY);
+	public List<String> getPossibleContainerTypes(UserSession context){		
+		return containerDao.getContainerTypesByStatus(context.getCurrentDomain().getId(), Arrays.asList(STATE_CONTAINER.STATE_CONTAINER_READY,STATE_CONTAINER.STATE_CONTAINER_USED));
 	}
 	
 	
@@ -133,7 +168,7 @@ public class ContainerService {
 			switch (template.getType()) {
 				case "burgundyBarrel" : clazz= (Class<T>) Barrel.class;break;
 				case "tank" : clazz= (Class<T>)	Tank.class;break;
-				case "amphora" : clazz=(Class<T>) Barrel.class;break;
+				case "amphora" : clazz=(Class<T>) Tank.class;break;
 			}
 			
 			container = clazz.getDeclaredConstructor().newInstance();

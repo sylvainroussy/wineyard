@@ -10,21 +10,22 @@ import org.springframework.stereotype.Component;
 
 import fr.srosoft.wineyard.core.session.UserSession;
 import fr.srosoft.wineyard.modules.cave.CaveModule;
-import fr.srosoft.wineyard.modules.cave.TransferAction.TargetContainer;
+import fr.srosoft.wineyard.modules.cave.TargetContainer;
+
 
 @Component
 @Scope("session")
-public class TargetContainerConverter  implements Converter {
+public class TargetContainerConverter  implements Converter<TargetContainer> {
 
 	 @Resource private UserSession userSession;
 	
 	@Override
-	public Object getAsObject(FacesContext context, UIComponent component, String value) {
+	public TargetContainer getAsObject(FacesContext context, UIComponent component, String value) {
 
         if(value != null && value.trim().length() > 0) {
             try {
                 return ((CaveModule)userSession.getModule("CaveModule"))
-                		.getReadyContainers()
+                		.getPossibleContainers()
                 		.stream().filter(e -> e.getContainer().getId().equals(value)).findFirst().get();
             } catch(Exception e) {
             	e.printStackTrace();
@@ -38,9 +39,9 @@ public class TargetContainerConverter  implements Converter {
 	}
 
 	@Override
-	public String getAsString(FacesContext context, UIComponent component, Object value) {
+	public String getAsString(FacesContext context, UIComponent component, TargetContainer value) {
 		 if(value != null) {
-	            return ((TargetContainer) value).getContainer().getId();
+	            return value.getContainer().getId();
 	        }
 	        else {
 	            return null;

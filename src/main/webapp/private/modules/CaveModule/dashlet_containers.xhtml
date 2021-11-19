@@ -158,7 +158,7 @@
 
 						<p:dataViewGridItem columns="4">
 
-							<p:droppable for="card" scope="fromMenu">
+							<p:droppable for="card" scope="fromMenu" greedy="true" >
 								<p:ajax listener="#{module.onItemDropped}"
 									oncomplete="console.log('drop completed')" update="tankGrid"
 									form=":centerPanel" />
@@ -196,24 +196,29 @@
 										<script>drawTank ("#{tank.id}", #{tank.volume}, #{tank.contents.volume}+0,"#{tank.contents.cuvee.appellation.wineColor}")</script>
 										<p:barcode value="wineyard_tank://#{tank.id}" type="qr"
 											width="125" height="125" rendered="#{module.showCodes}" />
+											Bar code : wineyard_tank://#{tank.id}
 									</div>
 									<div class="col-12 md:col-6 ">
 
 										<p:menuButton value="Actions">
-											<p:menuitem value="Transfert (soutirage, etc.)"
-												actionListener="#{module.prepareTransferAction(tank)}"
-												update=":transferActionForm"
-												oncomplete="PF('transferAction').show()" ajax="true"
+											<p:menuitem value="Transfert cuve à cuve(s)"
+												actionListener="#{module.prepareTransferTankToLargeAction(tank)}"
+												update=":transferTankToLargeForm"
+												oncomplete="PF('transferTankToLarge').show()" ajax="true"
 												icon="pi pi-angle-double-right"
 												disabled="#{tank.status != 'STATE_CONTAINER_USED'}" />
 											<p:menuitem value="Sur cuve" action="#{menuView.update}"
 												icon="pi pi-refresh"
 												disabled="#{tank.status != 'STATE_CONTAINER_USED'}" />
-											<p:menuitem value="Nettoyage" action="#{menuView.delete}"
+											<p:menuitem value="Entonnage" action="#{module.prepareTransferTankToBarrelsAction(tank)}"
+												icon="barrel"
+												disabled="#{tank.status != 'STATE_CONTAINER_USED'}" />
+											<p:menuitem value="Nettoyage" action="#{module.cleanContainer(tank)}"
 												icon="pi pi-times"
+												update="@form"
 												disabled="#{tank.status != 'STATE_CONTAINER_NEEDS_CLEANING'}" />
 											<p:divider />
-											<p:menuitem value="Website" url="http://www.primefaces.org"
+											<p:menuitem value="Autre action" url="http://www.primefaces.org"
 												icon="pi pi-external-link" />
 										</p:menuButton>
 

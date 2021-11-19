@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+
+
+<ui:composition>
+	<ui:param name="caveModule"
+		value="#{userSession.getModule('CaveModule')}" />
+		
+	<!-- ********************** -->	
+	<!-- Transfer tank to Tank -->	
+	<!-- ********************** -->
+	<p:dialog widgetVar="transferTankToLarge" id="transferTankToLarge"
+		appendTo="@(Body)" dynamic="true" height="600" width="1000" 
+		header="Plan de transfert" resizable="true" >
+		<h:form id="transferTankToLargeForm">
+			<div class="ui-fluid formgrid grid">
+				<!-- <p:commandButton value="Enregistrer le plan"/>
+				OU -->
+				<p:commandButton value="Exécuter" 
+					actionListener="#{caveModule.executePlan()}" 
+					oncomplete="PF('transferTankToLarge').hide()"
+					update=":centerPanel"/>
+			</div>
+			<div class="ui-fluid formgrid grid">
+				<div class="field col-12 md:col-3">
+					<div class="ui-fluid formgrid grid">
+						<div class="field col-12 md:col-12">
+							<label for="containerType">Sélectionner le type de
+								conteneur de destination : </label>
+							<p:selectOneMenu id="destinationContainerType"
+								value="#{caveModule.transferAction.destinationContainerType}"
+								styleClass="onWhiteBackground" appendTo="@(this)">
+								<p:ajax update="@form" process="@this" listener="#{caveModule.initDiagramModel()}"/>
+								<f:selectItem itemLabel="Choisir un type de contenant" />
+								 
+		                    	<f:selectItems value="#{caveModule.possibleContainerTypes}" var="type" itemLabel="#{msg[type.toLowerCase()]}" itemValue="#{type}"/>
+							
+							</p:selectOneMenu>
+						</div>
+					
+						<div class="field col-12 md:col-12">
+						<p:remoteCommand name="updateTable" process="targetContainers" update="targetContainers"/>
+							<label for="targetContainers" >Du conteneur #{caveModule.transferAction.sourceContainer.getNumber()} vers : </label>
+							<p:dataTable id="targetContainers"
+								value="#{caveModule.transferAction.targetContainers}"
+								clientCache="false" var="targetContainer" >
+								<p:column headerText="Numéro">
+							        	#{targetContainer.container.number}					        	
+							        </p:column>
+								<p:column headerText="Volume">
+									<p:inputText value="#{targetContainer.volume}" onchange="updateTable()" />
+									
+								</p:column>						
+								<!-- <p:column headerText="Actions">
+										<p:commandButton icon="pi pi-trash"
+											actionListener="#{caveModule.removeDomain(linkedDomain)}" 
+											update="@form"
+											process="@this" />
+									</p:column> -->
+									<p:columnGroup type="footer" >
+								  <p:row>						  
+				                    <p:column colspan="1" style="text-align:right" footerText="Total:"/>
+				                    <p:column>                       
+				                        <f:facet name="footer">
+				                            <h:outputText value="#{caveModule.transferAction.getDestinationTotalVolume()}/#{caveModule.transferAction.sourceContainer.contents.volume}">
+				                                
+				                            </h:outputText>
+				                        </f:facet>
+				                    </p:column>
+				                </p:row>
+				                </p:columnGroup>
+							</p:dataTable>
+							<p:droppable for="targetContainers" tolerance="touch"
+								activeStyleClass="ui-state-highlight"
+								datasource=":transferTankToLargeForm:transferTabView:targetContainersSelector">
+								<p:ajax listener="#{caveModule.onTargetContainerDrop}"
+									update="@form" form="transferTankToLargeForm" />
+							</p:droppable>
+						</div>
+						
+					</div>
+				</div>
+				<div class="field col-12 md:col-9">
+				<div class="field col-12 md:col-12">
+						<p:tabView id="transferTabView" dynamic="true">
+						
+							<p:tab title="Vue tableau">
+							<label for="containerType">Sélectionner le conteneur : </label>
+							
+		
+							<p:dataTable id="targetContainersSelector"
+								value="#{caveModule.possibleContainers}" clientCache="false"
+								var="targetContainer" rowIndexVar="index" rowKey="key">
+								<p:column style="width:20px">
+									<h:outputText id="dragIcon" styleClass="ui-icon pi pi-plus" />
+									<p:draggable for="dragIcon" revert="true" helper="clone" />
+								</p:column>
+								<p:column>
+						                #{targetContainer.container.number} 
+						            </p:column>
+								<p:column>
+						               #{targetContainer.container.volume} hl
+						            </p:column>
+								<!-- <p:column headerText="Actions">
+										<p:commandButton icon="pi pi-trash"
+											actionListener="#{caveModule.removeDomain(linkedDomain)}" 
+											update="@form"
+											process="@this" />
+									</p:column> -->
+							</p:dataTable>
+							</p:tab>
+						
+						
+		
+							<p:tab title="Vue diagramme">
+							<p:diagram value="#{caveModule.diagramModel}"
+								style="height:600px" styleClass="ui-widget-content" var="el" >
+								<f:facet name="element" >
+								
+									<h:outputText value="#{el.label} (#{el.containers[0].leftVolume}hl)"
+										style="display:block;margin-top:1em;" 
+										/> 
+									
+									<p:graphicImage styleClass="#{el.style}" />
+								</f:facet>
+							
+								 <p:ajax event="connect" listener="#{caveModule.onConnectDiagram}" update="@form"/>
+		            			<p:ajax event="disconnect" listener="#{caveModule.onDisconnectDiagram}" update="@form"/>
+		            			
+							
+							</p:diagram>
+							</p:tab>
+						
+						</p:tabView>
+						</div>
+				</div>
+			</div>
+		</h:form>
+	</p:dialog>
+
+</ui:composition>
+</html>

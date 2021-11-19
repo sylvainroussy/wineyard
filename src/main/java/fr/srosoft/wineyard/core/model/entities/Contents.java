@@ -1,5 +1,6 @@
 package fr.srosoft.wineyard.core.model.entities;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,6 +41,12 @@ public class Contents  extends WineyardObject{
 	}
 	public void setParents(List<Contents> parents) {
 		this.parents = parents;
+	}
+	public void addParent (Contents parent) {
+		if (this.parents == null) {
+			this.parents = new ArrayList<>();
+		}
+		this.parents.add(parent);
 	}
 	
 	public String getCurrentState() {
