@@ -110,6 +110,7 @@ public class DirectoryService {
 		if(user.getLinkedDomains() != null) {
 			user.getLinkedDomains().stream().forEach(e -> loadUsersOfDomain(e.getDomain().getId()) );
 		}
+		domainsOfUser.remove(user.getId());
 	}
 	
 	private void stampObject (WineyardObject object, String label, UserSession context) {

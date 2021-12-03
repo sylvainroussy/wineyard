@@ -14,6 +14,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import fr.srosoft.wineyard.core.model.beans.ContentPath;
 import fr.srosoft.wineyard.core.model.beans.CuveeSummary;
 import fr.srosoft.wineyard.core.model.entities.Appellation;
 import fr.srosoft.wineyard.core.model.entities.Blend;
@@ -47,6 +48,8 @@ public class CuveeModule extends AbstractModule{
 	private Cuvee currentCuvee;
 	
 	private Millesime currentMillesime;
+	
+	private CuveeDiagram cuveeDiagram;
 	
 	@Override
 	public void loadData(UserSession context) {
@@ -143,6 +146,11 @@ public class CuveeModule extends AbstractModule{
 	
 	}
 	
+	public void showCuveeDiagram (Cuvee cuvee) {
+		final List<ContentPath> contentPaths = caveService.findContentPaths(cuvee.getId());
+		this.cuveeDiagram = new CuveeDiagram(cuvee, contentPaths);
+	}
+	
 	public void cancelAppellation() {		
 		this.selectedGrapes.clear();
 		this.currentAppellation = null;
@@ -204,6 +212,14 @@ public class CuveeModule extends AbstractModule{
 
 	public void setCurrentCuvee(Cuvee currentCuvee) {
 		this.currentCuvee = currentCuvee;
+	}
+
+	public CuveeDiagram getCuveeDiagram() {
+		return cuveeDiagram;
+	}
+
+	public void setCuveeDiagram(CuveeDiagram cuveeDiagram) {
+		this.cuveeDiagram = cuveeDiagram;
 	}
 
 }

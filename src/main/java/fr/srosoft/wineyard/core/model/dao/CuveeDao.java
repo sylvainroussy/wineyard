@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import fr.srosoft.wineyard.core.model.beans.ContentPath;
 import fr.srosoft.wineyard.core.model.entities.Appellation;
 import fr.srosoft.wineyard.core.model.entities.Cuvee;
 import fr.srosoft.wineyard.core.model.entities.Millesime;
@@ -161,6 +162,26 @@ public class CuveeDao extends AbstractDao{
 	
 	public List<Millesime> findMillesimesByDomain(String domainId){
 		return this.readMultipleQuery(QUERY_FIND_MILLESIMES_BY_DOMAIN, Map.of("domainId", domainId),"millesime",Millesime.class);
+	}
+	
+	private static final String QUERY_CONTENTS_PATH="MATCH (cuvee:Cuvee{id:$cuveeId})\r\n" + 
+			"MATCH (cuvee)<-[r]-(contents:Contents) WHERE NOT (contents)-[:IS_CHILD_OF]->(:Contents)\r\n" + 
+			"MATCH (cuvee)<-[]-(cends:Contents) WHERE NOT (cends)<-[:IS_CHILD_OF]-(:Contents)\r\n" + 
+			"MATCH paths=shortestPath((contents)<-[:IS_CHILD_OF*..20]-(cends))\r\n" + 
+			"WITH COLLECT(paths) As pathss\r\n" + 
+			"WITH pathss, range (0,SIZE(pathss)-1) AS is\r\n" + 
+			"UNWIND is AS i\r\n" + 
+			"WITH DISTINCT nodes (pathss[i]) AS nodes, i\r\n" + 
+			"UNWIND nodes AS node\r\n" + 
+			"MATCH (cuvee:Cuvee)<-[r]-(node)\r\n" + 
+			"MATCH (cuvee)<-[]-(millesime:Millesime)\r\n" + 
+			"MATCH (cuvee)<-[]-(appellation:Appellation)\r\n" + 
+			"MATCH (node)-[]-(container:Container)\r\n" + 
+			"WITH i, COLLECT (DISTINCT {appellation:appellation.appellation, millesime:millesime.year, contents:node{.*}, containerNumber:container.number}) AS nodes\r\n" + 
+			"RETURN distinct {pathNumber:i, nodes:nodes} AS path";
+	
+	public List<ContentPath> findContentPaths (String cuveeId){
+		return super.readMultipleQuery(QUERY_CONTENTS_PATH, Map.of("cuveeId", cuveeId),"path", ContentPath.class);
 	}
 	
 	

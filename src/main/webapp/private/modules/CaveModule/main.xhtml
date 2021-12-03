@@ -39,7 +39,9 @@
 		        <c:forEach var="cuvee" items="#{module.getCuveesByMillesime(millesime.year)}">
 		          <p:menuitem id="menu_appellation--#{cuvee.id.replace(':','_')}" 
 		          	value="#{cuvee.appellation.appellation}"  ajax="true" 
-		          	icon="pi pi-tag"  style="font-size:0.8em; padding:5px"/>
+		          	icon="pi pi-tag"  style="font-size:0.8em; padding:5px">
+		          	#{cuvee.appellation.appellation}<p:divider style="margin:0px;padding:0px" rendered="#{cuvee.appellation.label != null and cuvee.appellation.label.trim() !=''}"/>#{cuvee.appellation.label}
+		          	</p:menuitem>
 		         
 		        </c:forEach>
 	        </p:submenu>

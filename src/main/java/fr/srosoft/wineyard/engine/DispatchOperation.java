@@ -4,13 +4,14 @@ import java.util.List;
 
 import fr.srosoft.wineyard.core.model.entities.Container;
 import fr.srosoft.wineyard.core.model.entities.Contents;
+import fr.srosoft.wineyard.core.session.UserSession;
 import fr.srosoft.wineyard.modules.cave.TargetContainer;
 import fr.srosoft.wineyard.utils.Constants.STATE_CONTAINER;
 import fr.srosoft.wineyard.utils.WineyardUtils;
 
 public class DispatchOperation extends EngineOperation{
 
-	public void run (Container source, List<TargetContainer> targets) {
+	public void run (Container source, List<TargetContainer> targets, UserSession context) {
 		Contents sourceContents = source.getContents();
 		for (TargetContainer targetContainer : targets) {
 			
@@ -19,6 +20,7 @@ public class DispatchOperation extends EngineOperation{
 			contents.addParent(sourceContents);
 			contents.setCuvee(sourceContents.getCuvee());
 			contents.setVolume(targetContainer.getVolume());
+			WineyardUtils.stamp(contents, true, context.getCurrentUser().getDisplayName());
 			
 			final Contents oldContents = targetContainer.getContainer().getContents();
 			if (oldContents != null) {

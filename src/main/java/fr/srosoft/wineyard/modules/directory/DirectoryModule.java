@@ -30,7 +30,7 @@ public class DirectoryModule extends AbstractModule{
 	
 	@PostConstruct
 	public void init () {
-		allDomains = domainDao.findAllDomains();
+		this.refreshDomains();
 	}
 	
 	@Override
@@ -43,13 +43,18 @@ public class DirectoryModule extends AbstractModule{
 	public void loadData(UserSession context) {
 		super.loadData(context);
 		
+		
+	}
+	
+	public void refreshDomains () {
+		this.allDomains = domainDao.findAllDomains();
 	}
 
 
 	
 
 	public List<Domain> getAllDomains() {
-		return allDomains;
+		return this.allDomains;
 	}
 
 

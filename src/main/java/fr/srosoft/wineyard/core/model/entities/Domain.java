@@ -12,6 +12,7 @@ public class Domain extends WineyardObject{
 	private String info;
 	private List<String> phones = new ArrayList<String>();
 	private String fax;
+	private String email;
 	private String contact;
 	private String website;
 	private String zipCode;
@@ -19,9 +20,9 @@ public class Domain extends WineyardObject{
 	private String address;
 	private double[] coords = {0d,0d};
 	private String dataSource;
-	@Deprecated
+	//@Deprecated
 	private List<Appellation> appellations;
-	private String surface;
+	private int surface;
 	
 	
 	public String getDomainName() {
@@ -85,6 +86,12 @@ public class Domain extends WineyardObject{
 		this.fax = fax;
 	}
 	
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
 	public String getDataSource() {
 		return dataSource;
 	}
@@ -102,10 +109,10 @@ public class Domain extends WineyardObject{
 		this.appellations.add(appellation);
 	}
 	
-	public String getSurface() {
+	public int getSurface() {
 		return surface;
 	}
-	public void setSurface(String surface) {
+	public void setSurface(int surface) {
 		this.surface = surface;
 	}
 	@Override

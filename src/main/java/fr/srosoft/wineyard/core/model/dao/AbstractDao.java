@@ -14,11 +14,12 @@ import org.neo4j.driver.Transaction;
 import org.neo4j.driver.TransactionWork;
 import org.neo4j.driver.types.Node;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class AbstractDao {
 
-	protected static final ObjectMapper MAPPER = new ObjectMapper();
+	protected static final ObjectMapper MAPPER = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	
 	@Resource
 	protected Driver neo4jDriver;

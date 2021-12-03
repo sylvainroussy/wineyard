@@ -8,13 +8,22 @@
 
 
 	<ui:composition>
-		<ui:param name="allDomains"
-			value="#{userSession.getModule('AdminModule').getAllDomains()}"></ui:param>
+		<ui:param name="module"	value="#{userSession.getModule('DirectoryModule')}"></ui:param>
+		<ui:param name="allDomains"	value="#{module.getAllDomains()}"></ui:param>
 		<p:panel id="alldomains"
 			header="Liste de tous les domaines (#{allDomains.size()})"
 			styleClass="col-12 md:col-12">
+			<f:facet name="options">
+			<p:menu>
+	          <p:submenu label="Options">
+                    <p:menuitem value="Rafraîchir" icon="pi pi-refresh" actionListener="#{module.refreshDomains()}" update="domainList" process="@this"/>
+                  
+                </p:submenu>
+             </p:menu>
+				
+			</f:facet>
 
-			<p:dataTable value="#{allDomains}" var="domain" paginator="true"
+			<p:dataTable value="#{allDomains}" var="domain" paginator="true" id="domainList"
 				rows="10">
 				<p:column headerText="Domaine" filterable="true"
 					filterBy="#{domain.domainName}" sortable="true" filterMatchMode="contains"
@@ -26,10 +35,11 @@
 					filterBy="#{domain.contact}" sortable="true"
 					sortBy="#{domain.contact}">#{domain.contact}</p:column>
 				<p:column headerText="Téléphone(s)">#{domain.phones}</p:column>
+				<p:column headerText="Site web"><a href="#{domain.website}" target="_blank">#{domain.website}</a></p:column>
 				<p:column headerText="Commune" filterable="true" filterMatchMode="contains"
 					filterBy="#{domain.city}" sortable="true" sortBy="#{domain.city}">#{domain.city}</p:column>
 					<p:column headerText="Ha" 
-					 sortable="true" sortBy="#{domain.surface}">#{domain.surface}</p:column>
+					 sortable="true" sortBy="#{domain.surface}" >#{domain.surface}</p:column>
 			</p:dataTable>
 
 		</p:panel>

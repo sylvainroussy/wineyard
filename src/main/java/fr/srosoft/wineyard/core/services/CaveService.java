@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import fr.srosoft.wineyard.core.model.beans.ContentPath;
 import fr.srosoft.wineyard.core.model.beans.Stock;
 import fr.srosoft.wineyard.core.model.beans.StockSummary;
 import fr.srosoft.wineyard.core.model.dao.CuveeDao;
@@ -105,6 +106,10 @@ public class CaveService {
 		stockSummary.addStock(stock2);
 		
 		return stockSummary;
+	}
+	
+	public List<ContentPath> findContentPaths (String cuveeId){
+		return cuveeDao.findContentPaths(cuveeId);
 	}
 	
 	

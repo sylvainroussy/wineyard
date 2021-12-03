@@ -50,7 +50,7 @@ public class ContainerDao extends AbstractDao {
 			+ "MERGE (module)-[:HAS_CONTAINER]->(container:Container{id:$id}) "
 			+ "SET container+=$patch ";	
 	
-	private static String QUERY_CONTAINER_CLEAN = "MATCH (domain:Domain{id:$domainId}) "
+	private final static String QUERY_CONTAINER_CLEAN = "MATCH (domain:Domain{id:$domainId}) "
 			+ "MATCH (module:CaveModule)<-[:HAS_MODULE]-(domain) "			
 			+ "MERGE (module)-[:HAS_CONTAINER]->(container:Container{id:$id}) "
 			+ "SET container+=$patch "

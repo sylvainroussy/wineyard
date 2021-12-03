@@ -162,7 +162,7 @@ public class CaveModule extends AbstractModule{
 	
 	public void executePlan() {
 		final DispatchOperation dop = new DispatchOperation();
-		dop.run(this.transferAction.sourceContainer, this.transferAction.targetContainers);
+		dop.run(this.transferAction.sourceContainer, this.transferAction.targetContainers, this.context);
 		this.containerService.updateContainerAndContents(this.transferAction.sourceContainer, context);
 		for (TargetContainer targetContainer : this.transferAction.targetContainers) {
 			this.containerService.updateContainerAndContents(targetContainer.getContainer(), context);

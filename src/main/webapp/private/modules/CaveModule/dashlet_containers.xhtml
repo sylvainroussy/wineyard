@@ -119,13 +119,15 @@
 						<p:column headerText="Cuve" width="10%">
 							<h:outputText value="#{tank.number}" />
 						</p:column>
-						<p:column headerText="Remplissage">
+						<p:column headerText="Remplissage" exportValue="#{(tank.contents.volume*100)/tank.volume}%">
 							<p:progressBar value="#{(tank.contents.volume*100)/tank.volume}"
-								labelTemplate="{value}%" displayOnly="true"
-								styleClass="#{tank.contents.cuvee.appellation.wineColor}Wine"
+							
+								labelTemplate="{value}%" displayOnly="true" 
+								styleClass="#{tank.contents.cuvee.appellation.wineColor}Progress"
 								style="height:20px; " />
 
 						</p:column>
+						
 						<p:column headerText="Appellation">
 							<h:outputText
 								value="#{tank.contents.cuvee.appellation.appellation}" />
@@ -196,7 +198,7 @@
 										<script>drawTank ("#{tank.id}", #{tank.volume}, #{tank.contents.volume}+0,"#{tank.contents.cuvee.appellation.wineColor}")</script>
 										<p:barcode value="wineyard_tank://#{tank.id}" type="qr"
 											width="125" height="125" rendered="#{module.showCodes}" />
-											Bar code : wineyard_tank://#{tank.id}
+											
 									</div>
 									<div class="col-12 md:col-6 ">
 

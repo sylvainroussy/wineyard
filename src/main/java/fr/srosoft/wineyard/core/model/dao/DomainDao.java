@@ -24,6 +24,7 @@ public class DomainDao extends AbstractDao {
 			+ "MERGE (domain)-[:HAS_MODULE{enabled:true}]->(harvest:Module:HarvestModule{id:domain.id}) "
 			+ "MERGE (domain)-[:HAS_MODULE{enabled:true}]->(vineyard:Module:VineyardModule{id:domain.id}) "
 			+ "MERGE (domain)-[:HAS_MODULE{enabled:true}]->(admin:Module:AdminModule{id:domain.id}) "
+			+ "WITH domain, cuvee "
 			+ "UNWIND $appellations AS appellation "
 			+ "MERGE (app:Appellation{id:domain.id+':'+apoc.util.md5([appellation.id])})  "
 			+ "SET app.appellation = appellation.appellation "
@@ -116,6 +117,7 @@ public class DomainDao extends AbstractDao {
     	 		
     	return this.readMultipleQuery(QUERY_ALL_DOMAINS, parameters,"domain",Domain.class);
 	}
+		
 	
 	public List<User> findDomainUsers (String domainId) {
 		final Map<String,Object> parameters = new HashMap<>();    	    	
