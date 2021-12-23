@@ -1,5 +1,6 @@
 package fr.srosoft.wineyard.modules.cuvee;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.primefaces.model.diagram.Connection;
@@ -67,7 +68,8 @@ public class CuveeDiagram {
 			    	previousNode = nodeElement;
 			    }
 			    else {
-			    	String label = "De "+((NodePath)previousNode.getData()).getContainerNumber()+"\n Vers "+node.getContainerNumber();
+			    	String date = new SimpleDateFormat("dd/MM/YYYY").format(node.getContents().getCreationDate());
+			    	String label = "De "+((NodePath)previousNode.getData()).getContainer().getNumber()+"\n\r Vers "+node.getContainer().getNumber()+" le "+date;
 			    	diagram.connect(createConnection(previousNode.getEndPoints().get(0), nodeElement.getEndPoints().get(1), label));
 			    	previousNode = nodeElement;
 			    }

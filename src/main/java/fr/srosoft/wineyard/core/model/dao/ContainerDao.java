@@ -234,4 +234,7 @@ public class ContainerDao extends AbstractDao {
 	public List<String> getContainerTypesByStatus(String domainId, List<STATE_CONTAINER> status) {
 		return this.readMultipleQuery(QUERY_CONTAINERS_FIND_TYPES, Map.of("domainId", domainId,"status",convertEnumToString(status)),"type",String.class);
 	}
+	
+	
+	
 }

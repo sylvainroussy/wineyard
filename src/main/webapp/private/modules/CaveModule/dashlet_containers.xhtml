@@ -35,53 +35,7 @@
 				value="#{userSession.getModule('CaveModule')}" />
 
 			<p:tabView styleClass="col-12">
-				<!-- <p:tab title="Contents" >
-			<p:tabView id="millesimes" styleClass="col-12">
-				<p:tab title="2020" >
-					<p:tabView id="appellations" styleClass="col-12 text-sm">
-					 <c:forEach var="appellation" items="#{module.getAppellations()}">
-					 	<p:tab title="#{appellation.appellation}" >
-							<div class="card">
-							 <div id="buttons">
-      <button id="start">Start on selected</button>
-      <button id="draw-on">Draw mode on</button>
-      <button id="draw-off">Draw mode off</button>
-    </div>
-								<div id="cyto_2020_#{appellation.id}" style="width:100%;height:600px"></div>
-								<SCRIPT type="text/javascript">
-								var cytoData = [ // list of graph elements to start with
-								    { // node a
-									      data: { id: '#{appellation.appellation}', type:"appellation", wid:'#{appellation.id}' }
-									    },
-									    { // node a
-										      data: { id: 'Cuve', type:'container' }
-										    },
-										    { // node a
-											      data: { id: 'Fût', type:'container' }
-											    },
-									  ];
-								showCytoscape('cyto_2020_#{appellation.id}',cytoData);
-								
-								</SCRIPT>
-								
-														 <p:commandButton value="Ajouter un contenu"></p:commandButton>
-							    <p:diagram value="#{module.contentsDashlet.getModel(appellation.id)}" style="height:600px" styleClass="ui-widget-content" var="el">
-								    <f:facet name="element">
-						                <h:outputText value="#{el.appellation}" style="display:block;margin-top:1em;"/>
-						                <p:commandButton value="Ajouter un contenu"></p:commandButton>
-						                
-						            </f:facet>
-						            <p:ajax event="connect" listener="#{module.contentsDashlet.onConnect}"/>
-	            					<p:ajax event="disconnect" listener="#{module.contentsDashlet.onDisconnect}"/>
-	            					<p:ajax event="connectionChange" listener="#{module.contentsDashlet.onConnectionChange}"/>
-							    </p:diagram> 
-							</div>
-						</p:tab>
-					</c:forEach>
-					</p:tabView>
-				</p:tab>
-			</p:tabView>
-		</p:tab> -->
+			
 				<p:tab title="Cuverie">
 					<p:commandButton value="Grid" style="margin:2px"
 						icon="pi pi-th-large" update="@form"
@@ -226,8 +180,8 @@
 
 										<p:commandButton value="Mesures" icon="pi pi-ellipsis-v"
 											actionListener="#{module.setCurrentTank(tank)}"
-											process="@parent" update=":centerPanel:actionsForTanks"
-											oncomplete="PF('actionsForTanks').show();" style="margin:2px"
+											process="@parent" update=":measures"
+											oncomplete="PF('measures').show();" style="margin:2px"
 											styleClass="flex align-content-end" />
 
 										<p:commandButton value="Détails" icon="pi pi-ellipsis-v"
@@ -368,61 +322,7 @@
 
 
 
-		<p:sidebar widgetVar="actionsForTanks" id="actionsForTanks"
-			position="right" baseZIndex="20000" appendTo="@(Body)" dynamic="true"
-			fullScreen="true">
-			<h3 style="font-weight: normal">Traçabilité</h3>
-			<div class="grid">
-				<div class="col-12 md:col-6">
-					<div class="grid">
-						<div class="col-12 md:6">Identifiant de la cuve</div>
-						<div class="col-12 md:6">#{module.currentTank.id}</div>
-
-						<div class="col-12 md:6">Identifiant du contenu</div>
-						<div class="col-12 md:6">#{module.currentTank.contents.id}</div>
-						<div class="col-12 md:6">
-							Evénéments liés au contenu
-							(#{module.currentTank.contents.traceLine.traces.size()})
-							<p:chronoline id="tankActionChronoline"
-								value="#{module.currentTank.contents.traceLine.traces}"
-								var="action" layout="vertical" align="alternate"
-								styleClass="customized-chronoline"
-								style="border:black fill 1px; border-radius:4px">
-				              
-				             #{action.name}
-				             #{action.humanDate}
-				            	
-				    </p:chronoline>
-						</div>
-						<h3>Mener une action</h3>
-						<h:form>
-							<div class="ui-fluid p-formgrid p-grid">
-								<div class="p-field p-col">
-									<label for="actionName">Nommer l'action</label>
-									<p:inputText id="actionName" />
-								</div>
-								<div class="p-field p-col">
-									<label for="actionDesc">Décrire l'action</label>
-									<p:inputTextarea id="actionDesc" />
-								</div>
-								<div class="p-field p-col">
-									<label for="actionDate">Date de l'action</label>
-									<p:datePicker id="actionDate" appendTo="@parent" />
-
-								</div>
-							</div>
-							<p:commandButton value="Déclarer"
-								oncomplete="PF('actionsForTanks').hide()" />
-							<p:commandButton value="Annuler"
-								oncomplete="PF('actionsForTanks').hide()" />
-						</h:form>
-					</div>
-				</div>
-				<div class="col-12 md:col-6">
-					<p:lineChart model="#{module.cartesianLinerModel}" />
-				</div>
-			</div>
-		</p:sidebar>
+		
 
 		<p:sidebar widgetVar="detailsForTanks" id="detailsForTanks"
 			position="right" baseZIndex="20000" appendTo="@(Body)" dynamic="true"

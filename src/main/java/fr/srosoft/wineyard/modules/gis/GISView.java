@@ -37,7 +37,7 @@ public class GISView {
 	private GisDao featureDao;
 
 	private List<City> allCities;
-	private Map<String, List<String>> allCrinaos;
+	//private Map<String, List<String>> allCrinaos;
 	private Map<String, List<Map<String, List<String>>>> crinaos;
 	private Set<String> selectedCrinaos;
 
@@ -50,6 +50,10 @@ public class GISView {
 
 	@PostConstruct
 	public void initView() {
+		this.loadData();
+	}
+	
+	public void loadData() {
 		this.loadAllCrinaos();
 		this.loadAllCities();
 		this.loadAOCTree();
@@ -57,7 +61,7 @@ public class GISView {
 	}
 
 	private void loadAllCrinaos() {
-		allCrinaos = featureDao.getAllCrinao();
+		//allCrinaos = featureDao.getAllCrinao();
 		crinaos = featureDao.getAll();
 		LOGGER.info("CRINAOS loaded");
 	}

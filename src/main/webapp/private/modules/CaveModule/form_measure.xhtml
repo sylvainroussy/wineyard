@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+
+
+<ui:composition>
+
+<ui:param name="caveModule"
+		value="#{userSession.getModule('CaveModule')}" />
+
+<p:dialog widgetVar="measures" id="measures"
+		appendTo="@(Body)" dynamic="true" height="600" width="1000" 
+		header="Traçabilité - Cuve #{caveModule.containerDetailForm.currentTank.number}" resizable="true" maximizable="true">
+						
+			<h:form id="measuresForm">
+			<div class="grid">
+				<div class="col-12 md:col-4">
+				<p:accordionPanel>
+					 
+				    
+						<p:tab title="Enregistrer une mesure">						
+							<div class="grid">						
+								
+								<div class="col-12 md:col-12">
+									<label for="measureType">Type de mesure</label>
+								</div>
+								<div class="col-12 md:col-12">
+								<p:remoteCommand name="refreshMeasureValue" update="@form" process="@form"/>
+								 <p:selectOneMenu id="measureType" value="#{caveModule.containerDetailForm.measureType}"  
+								 styleClass="onWhiteBackground" appendTo="@(this)" onchange="refreshMeasureValue()" style="width:100%">  
+									<f:selectItem itemLabel="Choisir un type de mesure"/>     
+								 	<f:selectItems  value="#{caveModule.containerDetailForm.measureTypes}" 
+								 		var="measureType" 
+								 		itemLabel="#{msg[measureType]}" 
+								 		itemValue="#{measureType}" />          
+				                   
+				                 </p:selectOneMenu>
+									
+								</div>
+								<div class="col-12 md:col-12">
+									<label >Valeur</label>
+								</div>
+								<div class="col-12 md:col-12">
+								  	<p:spinner id="measureValueDensity" value="#{caveModule.containerDetailForm.measure.value}" stepFactor="10" max="1200" min="800" rendered="#{caveModule.containerDetailForm.measureType=='CONTENTS_DENSITY'}"/>
+								  	<p:spinner id="measureValueTemperature" value="#{caveModule.containerDetailForm.measure.value}" stepFactor="0.25" max="18" min="5" rendered="#{caveModule.containerDetailForm.measureType=='CONTENTS_TEMPERATURE'}"/>
+									
+								</div>
+								<div class="col-12 md:col-12">
+									<label for="comment">Commentaire</label>
+								</div>
+								<div class="col-12 md:col-12">
+									<p:inputTextarea id="comment" style="width:100%" value="#{caveModule.containerDetailForm.measure.comment}"/>
+								</div>
+								<div class="col-12 md:col-12">
+									<label for="actionDate">Date de l'action</label>
+								</div>
+								<div class="col-12 md:col-12">
+									<p:datePicker id="actionDate" appendTo="@parent" showIcon="true"  value="#{caveModule.containerDetailForm.measure.measureDate}"/>
+	
+								</div>
+								
+								<div class="col-12 md:col-6">
+									<p:commandButton value="Enregistrer"
+										actionListener="#{caveModule.containerDetailForm.saveMeasure()}"										
+										update="@form"/>
+								</div>								
+							</div>					
+						</p:tab>
+						<p:tab title="Enrichir le contenu">
+							<div class="grid">					
+								
+								<div class="col-12 md:col-12">
+									<label for="blends">Composition : </label>
+								
+									<p:dataTable id="chemicals" value="#{caveModule.containerDetailForm.selectedChemicals}"
+										var="blend">
+										<p:column headerText="Produit">
+								        	#{chemicals.commonName}					        	
+								        </p:column>
+										<!-- <p:column headerText="Proportion">
+											<p:inputText value="#{blend.proportion}" />
+										</p:column> -->
+										<!-- <p:column headerText="Actions">
+											<p:commandButton icon="pi pi-trash"
+												actionListener="#{module.removeDomain(linkedDomain)}" 
+												update="@form"
+												process="@this" />
+										</p:column> -->
+									</p:dataTable>
+									
+									<p:autoComplete id="chemicalSelection" multiple="true"
+										value="#{caveModule.containerDetailForm.selectedChemicals}"
+										placeholder="Chercher un produit"
+										completeMethod="#{caveModule.containerDetailForm.searchChemicalContains}" dynamic="true"
+										converter="#{chemicalConverter}" var="chemical"
+										itemLabel="#{chemical.commonName}"
+										itemValue="#{chemical}" forceSelection="false" 							
+										maxResults="10"
+										minQueryLength="3">
+										<p:ajax event="itemSelect" 
+											ignoreAutoUpdate="true" 
+											listener="#{caveModule.containerDetailForm.handleSelectChemical}" 
+											update="chemicals"/>  
+										<p:column>         
+			               					#{chemical.commonName}
+			            				</p:column>
+			
+									</p:autoComplete>
+								</div>
+							</div>
+						</p:tab>
+						<p:tab title="Remplissage">
+							<div class="grid">					
+								
+								<div class="col-12 md:col-6">Volume maximal</div>
+								<div class="col-12 md:col-6">#{caveModule.currentTank.volume}</div>
+		
+								<div class="col-12 md:col-6">Volume utilisé</div>
+								<div class="col-12 md:col-6">#{caveModule.currentTank.contents.volume}</div>
+								
+								<div class="col-12 md:col-6">Ajuster le volume utilisé</div>
+								<div class="col-12 md:col-6">
+									<p:spinner id="usedVolume" 
+										value="#{caveModule.currentTank.contents.volume}" 
+										stepFactor="1" max="#{caveModule.currentTank.contents.volume}" 
+										
+										min="1" />
+								</div>	
+						    </div>
+						
+						</p:tab>
+						<p:tab title="Détails">
+							<div class="grid">					
+								
+								<div class="col-12 md:col-6">Identifiant de la cuve</div>
+								<div class="col-12 md:col-6">#{caveModule.currentTank.id}</div>
+		
+								<div class="col-12 md:col-6">Identifiant du contenu</div>
+								<div class="col-12 md:col-6">#{caveModule.currentTank.contents.id}</div>
+						    </div>
+					   </p:tab>
+					</p:accordionPanel>
+				</div>
+				<div class="col-12 md:col-8">
+					<div class="grid">					
+						<div class="col-12 md:col-6">Statut du contenu</div>
+						<div class="col-12 md:col-6">#{caveModule.currentTank.contents.currentState}</div>
+					</div>
+				<p:separator />
+				<p:tabView id="densityTabView">
+					<p:tab title="Mesure densité/température" id="tab1">
+						<p:commandButton value="Grid" style="margin:2px"
+							icon="pi pi-th-large" update="@form"
+							actionListener="#{caveModule.containerDetailForm.setCurrentDensityView('grid')}"
+							process="@this" rendered="#{caveModule.containerDetailForm.currentDensityView=='table'}" />
+						<p:commandButton value="Table" style="margin:2px" icon="pi pi-bars"
+							update="@form"
+							actionListener="#{caveModule.containerDetailForm.setCurrentDensityView('table')}"
+							process="@this" rendered="#{caveModule.containerDetailForm.currentDensityView=='grid'}" />
+						 <p:commandButton  value="Imprimer" id="printButton" icon="pi pi-print" styleClass="p-mr-2 p-mb-2">
+					       <p:printer  title="Température et densité" target="measuresForm:densityTabView:densityChart"/>
+					    </p:commandButton> 
+							
+						<p:lineChart id="densityChart" model="#{caveModule.containerDetailForm.densityChart}" 
+							rendered="#{caveModule.containerDetailForm.currentDensityView=='grid'}"/>
+						<p:dataTable value="#{caveModule.containerDetailForm.currentTank.contents.traceLine.measures}"
+							rendered="#{caveModule.containerDetailForm.currentDensityView=='table'}"
+							var="measure">
+						
+							<p:column>
+								#{msg[measure.measureType.toString()]}
+							</p:column>
+							<p:column>
+								#{measure.value}
+							</p:column>
+							<p:column>
+								<h:outputText value="#{measure.measureDate}">								
+									<f:convertDateTime type="date" pattern="dd/MM/yyyy"/>
+								</h:outputText>
+							</p:column>
+						
+						</p:dataTable>
+						
+					</p:tab>
+					<p:tab title="Historique des actions">
+						Evénéments liés au contenu
+								(#{caveModule.containerDetailForm.currentTank.contents.traceLine.traces.size()})
+								<p:chronoline id="tankActionChronoline"
+									value="#{caveModule.containerDetailForm.currentTank.contents.traceLine.traces}"
+									var="action" layout="vertical" align="alternate"
+									styleClass="customized-chronoline"
+									style="border:black fill 1px; border-radius:4px">
+					              
+					             #{action.name}
+					             #{action.humanDate}
+					            	
+					    		</p:chronoline>
+					</p:tab>
+				</p:tabView>
+				</div>
+			</div>
+			</h:form>			
+		</p:dialog>
+
+</ui:composition>
+</html>

@@ -1,5 +1,6 @@
 package fr.srosoft.wineyard.core.model.dao;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +9,9 @@ import org.springframework.stereotype.Service;
 
 import fr.srosoft.wineyard.core.model.beans.ContentPath;
 import fr.srosoft.wineyard.core.model.entities.Appellation;
+import fr.srosoft.wineyard.core.model.entities.Chemical;
 import fr.srosoft.wineyard.core.model.entities.Cuvee;
+import fr.srosoft.wineyard.core.model.entities.Measure;
 import fr.srosoft.wineyard.core.model.entities.Millesime;
 
 @Service
@@ -167,7 +170,7 @@ public class CuveeDao extends AbstractDao{
 	private static final String QUERY_CONTENTS_PATH="MATCH (cuvee:Cuvee{id:$cuveeId})\r\n" + 
 			"MATCH (cuvee)<-[r]-(contents:Contents) WHERE NOT (contents)-[:IS_CHILD_OF]->(:Contents)\r\n" + 
 			"MATCH (cuvee)<-[]-(cends:Contents) WHERE NOT (cends)<-[:IS_CHILD_OF]-(:Contents)\r\n" + 
-			"MATCH paths=shortestPath((contents)<-[:IS_CHILD_OF*..20]-(cends))\r\n" + 
+			"MATCH paths=shortestPath((contents)<-[:IS_CHILD_OF*0..20]-(cends))\r\n" + 
 			"WITH COLLECT(paths) As pathss\r\n" + 
 			"WITH pathss, range (0,SIZE(pathss)-1) AS is\r\n" + 
 			"UNWIND is AS i\r\n" + 
@@ -177,12 +180,25 @@ public class CuveeDao extends AbstractDao{
 			"MATCH (cuvee)<-[]-(millesime:Millesime)\r\n" + 
 			"MATCH (cuvee)<-[]-(appellation:Appellation)\r\n" + 
 			"MATCH (node)-[]-(container:Container)\r\n" + 
-			"WITH i, COLLECT (DISTINCT {appellation:appellation.appellation, millesime:millesime.year, contents:node{.*}, containerNumber:container.number}) AS nodes\r\n" + 
+			"WITH i, COLLECT (DISTINCT {appellation:appellation{.*}, millesime:millesime{.*}, contents:node{.*}, container:container{.*}}) AS nodes\r\n" + 
 			"RETURN distinct {pathNumber:i, nodes:nodes} AS path";
 	
 	public List<ContentPath> findContentPaths (String cuveeId){
 		return super.readMultipleQuery(QUERY_CONTENTS_PATH, Map.of("cuveeId", cuveeId),"path", ContentPath.class);
+		
 	}
 	
+	
+	// *** MESAURES ***
+	public void addMeasure(Measure measaure, String actor) {
+		
+	}
+	
+	// *** Chemicals
+	private static String QUERY_CHEMICALS_FIND_ALL="MATCH (chemical:Chemical) "
+			+ "RETURN chemical{.*} AS chemical ORDER BY chemical.is ASC ";
+	public List<Chemical> findAllChemicals() {
+		return this.readMultipleQuery(QUERY_CHEMICALS_FIND_ALL, Collections.EMPTY_MAP,"chemical",Chemical.class);
+	}
 	
 }

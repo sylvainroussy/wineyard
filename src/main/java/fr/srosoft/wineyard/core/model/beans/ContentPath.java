@@ -4,7 +4,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.srosoft.wineyard.core.model.entities.Appellation;
+import fr.srosoft.wineyard.core.model.entities.Container;
 import fr.srosoft.wineyard.core.model.entities.Contents;
+import fr.srosoft.wineyard.core.model.entities.Millesime;
 
 @SuppressWarnings("serial")
 public class ContentPath implements Serializable{
@@ -34,21 +37,21 @@ public class ContentPath implements Serializable{
 
 
 	public static class NodePath  implements Serializable{
-		private String appellation;
-		private int millesime;
+		private Appellation appellation;
+		private Millesime millesime;
 		private Contents contents;
-		private String containerNumber;
+		private Container container;
 		
-		public String getAppellation() {
+		public Appellation getAppellation() {
 			return appellation;
 		}
-		public void setAppellation(String appellation) {
+		public void setAppellation(Appellation appellation) {
 			this.appellation = appellation;
 		}
-		public int getMillesime() {
+		public Millesime getMillesime() {
 			return millesime;
 		}
-		public void setMillesime(int millesime) {
+		public void setMillesime(Millesime millesime) {
 			this.millesime = millesime;
 		}
 		public Contents getContents() {
@@ -57,11 +60,13 @@ public class ContentPath implements Serializable{
 		public void setContents(Contents contents) {
 			this.contents = contents;
 		}
-		public String getContainerNumber() {
-			return containerNumber;
+		public Container getContainer() {
+			return container;
 		}
-		public void setContainerNumber(String containerNumber) {
-			this.containerNumber = containerNumber;
+		public void setContainer(Container container) {
+			this.container = container;
 		}
+		
+		
 	}
 }

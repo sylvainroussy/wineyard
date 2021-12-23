@@ -3,8 +3,8 @@ package fr.srosoft.wineyard.modules.cave;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.srosoft.wineyard.core.model.entities.Action;
 import fr.srosoft.wineyard.core.model.entities.Container;
+import fr.srosoft.wineyard.core.model.entities.operations.Operation;
 
 
 public abstract class CaveTransferAction {
@@ -13,7 +13,7 @@ public abstract class CaveTransferAction {
 	protected Container sourceContainer;
 	protected List<TargetContainer> targetContainers = new ArrayList<>();
 	protected String destinationContainerType;
-	protected List<Action> actions;
+	protected List<Operation> actions;
 
 	public int getDestinationTotalVolume() {
 		int volume = 0;
@@ -51,15 +51,15 @@ public abstract class CaveTransferAction {
 		this.destinationContainerType = destinationContainerType;
 	}
 
-	public List<Action> getActions() {
+	public List<Operation> getActions() {
 		return actions;
 	}
 
-	public void setActions(List<Action> actions) {
+	public void setActions(List<Operation> actions) {
 		this.actions = actions;
 	}
 	
-	public void addAction(Action action) {
+	public void addAction(Operation action) {
 		if (this.actions == null) {
 			this.actions = new ArrayList<>();
 		}

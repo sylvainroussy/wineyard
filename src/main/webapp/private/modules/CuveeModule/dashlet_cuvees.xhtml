@@ -45,7 +45,20 @@
         font-size: 12px;
         #font-weight: bold;
         color: #816A51;
+        background-color: white;
     }
+    
+    .hide {
+  display: none;
+}
+    
+.myDIV:hover + .hide {
+  display: block;
+  color: red;
+  background-color:black;
+  width:100%;
+  height:100px;
+}
 
 </style>
 		<ui:param name="module"
@@ -87,34 +100,40 @@
 						</div>
 					</div>
 					<div class="p-mt-5" style="margin:5px">
-						<p:commandButton value="Accéder au chai" 
+						<!-- <p:commandButton value="Accéder au chai" 
 							icon="pi pi-sitemap"
 							actionListener="#{module.context.setCurrentPage('CaveModule')}"
-							update=":centerPanel"/>	
+							update=":centerPanel"/> -->	
 							
 						<p:commandButton value="Voir la traçabilité" 
-							icon="pi pi-sitemap"
+							icon="pi pi-info-circle"
 							actionListener="#{module.showCuveeDiagram(summary.cuvee)}"
-							update=":centerPanel:panelCuvee"/>	
+							update=":centerPanel"/>	
 					</div>
 				</div>
 			</div>
 		</p:carousel>
-		<p:panel id="panelCuvee" rendered="#{module.cuveeDiagram != null}">
+		<p:spacer height="5"/>
+		<p:panel id="panelCuvee" rendered="#{module.cuveeDiagram != null}" closable="false" toggleable="true">
+			<f:facet name="header">
+			<p:graphicImage styleClass="pi pi-info-circle" />
+			#{module.cuveeDiagram.cuvee.appellation.appellation} #{module.cuveeDiagram.cuvee.appellation.label} - #{module.cuveeDiagram.cuvee.millesime.year} 
+			</f:facet>
 			
 			<p:diagram value="#{module.cuveeDiagram.diagram}"
 								style="height:600px" styleClass="ui-widget-content" var="el" >
 								<f:facet name="element" >
+								<div class="myDIV">
 								
-									<h:outputText value="#{el.appellation}"
+									<h:outputText value="#{el.appellation.appellation}"
 										style="display:block;margin-top:1em;" 
 										/> 
 										<h:outputText value="(#{el.contents.volume}hl)"
 										style="display:block;margin-top:1em;" 
 										/> 
 										
-										
-										
+									</div>	
+										<div class="hide">Container : #{el.container.number} </div>
 									
 								</f:facet>
 							

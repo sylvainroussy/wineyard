@@ -14,13 +14,6 @@ import org.primefaces.event.DragDropEvent;
 import org.primefaces.event.diagram.ConnectEvent;
 import org.primefaces.event.diagram.ConnectionChangeEvent;
 import org.primefaces.event.diagram.DisconnectEvent;
-import org.primefaces.model.charts.ChartData;
-import org.primefaces.model.charts.axes.cartesian.CartesianScales;
-import org.primefaces.model.charts.axes.cartesian.linear.CartesianLinearAxes;
-import org.primefaces.model.charts.line.LineChartDataSet;
-import org.primefaces.model.charts.line.LineChartModel;
-import org.primefaces.model.charts.line.LineChartOptions;
-import org.primefaces.model.charts.optionconfig.title.Title;
 import org.primefaces.model.diagram.Connection;
 import org.primefaces.model.diagram.DefaultDiagramModel;
 import org.primefaces.model.diagram.Element;
@@ -35,7 +28,6 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import fr.srosoft.wineyard.core.model.entities.Action;
 import fr.srosoft.wineyard.core.model.entities.Appellation;
 import fr.srosoft.wineyard.core.model.entities.Barrel;
 import fr.srosoft.wineyard.core.model.entities.Container;
@@ -45,6 +37,8 @@ import fr.srosoft.wineyard.core.model.entities.Cuvee;
 import fr.srosoft.wineyard.core.model.entities.Millesime;
 import fr.srosoft.wineyard.core.model.entities.Tank;
 import fr.srosoft.wineyard.core.model.entities.Trace;
+import fr.srosoft.wineyard.core.model.entities.operations.ContainerOperation;
+import fr.srosoft.wineyard.core.model.entities.operations.Operation;
 import fr.srosoft.wineyard.core.services.CaveService;
 import fr.srosoft.wineyard.core.services.ContainerService;
 import fr.srosoft.wineyard.core.session.UserSession;
@@ -79,7 +73,6 @@ public class CaveModule extends AbstractModule{
 	
 	
 	private String currentTankView ="grid";
-	
 	private Integer addTanksNumber;
 	private Integer addTanksVolume;
 	private String addTanksYear;
@@ -92,16 +85,15 @@ public class CaveModule extends AbstractModule{
 	// Trying...
 	private ContentsDashlet contentsDashlet;
 	
-	 private LineChartModel cartesianLinerModel;
-	 
-	 
 	 private DefaultDiagramModel diagramModel; 
+	 
+	 private ContainerDetailForm containerDetailForm ;
 	
 	@Override
 	public void loadData(UserSession context) {
 		super.loadData(context);		
 		contentsDashlet = new ContentsDashlet(this);
-		this.createCartesianLinerModel();
+		
 		
 		diagramModel = new DefaultDiagramModel();
         diagramModel.setMaxConnections(-1);
@@ -113,6 +105,8 @@ public class CaveModule extends AbstractModule{
         connector.setPaintStyle("{stroke:'#98AFC7', strokeWidth:3}");
         connector.setHoverPaintStyle("{stroke:'#5C738B'}");
         diagramModel.setDefaultConnector(connector);
+        
+        containerDetailForm = new ContainerDetailForm(this.caveService);
 		
 	}
 	
@@ -129,9 +123,9 @@ public class CaveModule extends AbstractModule{
 	        events.add(new Event("Shipped", "15/10/2020 16:15", "pi pi-shopping-cart", "#FF9800"));
 	        events.add(new Event("Delivered", "16/10/2020 10:00", "pi pi-check", "#607D8B"));*/
 		if (this.currentTank != null) {
-			final List<Action> actions = this.currentTank.getActions();
+			final List<Operation> actions = this.currentTank.getActions();
 			if (actions != null) {
-				actions.stream().forEach(e -> events.add(new Event(e.getActionName(), "15/10/2020 10:30", "pi pi-shopping-cart", "#9C27B0", "game-controller.jpg")));
+				actions.stream().forEach(e -> events.add(new Event(e.getActionTitle(), "15/10/2020 10:30", "pi pi-shopping-cart", "#9C27B0", "game-controller.jpg")));
 			}
 		}
 		return events;
@@ -294,6 +288,8 @@ public class CaveModule extends AbstractModule{
 	    }
 	
 	
+	
+
 	public void addTanks() {
 		for (int i = 0; i < addTanksNumber; i++) {
 			Tank t = new Tank ();
@@ -328,9 +324,9 @@ public class CaveModule extends AbstractModule{
 			container.setYear("2015");
 			container.setId(UUID.randomUUID().toString());
 			
-			Action action = new Action ();
-			action.setActionName("Remplissage");
-			action.setCreationDate(new Date());
+			ContainerOperation<Void> action = new ContainerOperation<Void> ();
+			action.setActionTitle("Remplissage");
+			WineyardUtils.stamp(action, true, context.getCurrentUser().getDisplayName());
 			action.setDateDone(new Date());
 			container.addAction(action);
 			
@@ -420,6 +416,7 @@ public class CaveModule extends AbstractModule{
 		    	  c.setVolume(0);		
 		    	  c.setCuvee(cuvee);
 		    	  tank.setContents(c);
+		    	  WineyardUtils.stamp(c, true, this.context.getCurrentUser().getDisplayName());
 		    	
 		    	  
 		    	  Trace trace = new Trace();
@@ -467,75 +464,20 @@ public class CaveModule extends AbstractModule{
         return conn;
     }
 	
-	public void createCartesianLinerModel() {
-        cartesianLinerModel = new LineChartModel();
-        ChartData data = new ChartData();
-
-        LineChartDataSet dataSet = new LineChartDataSet();
-        List<Object> values = new ArrayList<>();
-        values.add(1100);
-        values.add(1090);
-        values.add(1070);
-        values.add(1040);
-        values.add(1020);
-        values.add(980);
-        dataSet.setData(values);
-        dataSet.setLabel("Densité");
-        dataSet.setYaxisID("left-y-axis");
-        dataSet.setFill(true);
-        //dataSet.setTension(0.5);
-
-        LineChartDataSet dataSet2 = new LineChartDataSet();
-        List<Object> values2 = new ArrayList<>();
-        values2.add(10);
-        values2.add(12);
-        values2.add(14);
-        values2.add(14);
-        values2.add(12);
-        values2.add(10);
-        dataSet2.setData(values2);
-        dataSet2.setLabel("Température");
-        dataSet2.setYaxisID("right-y-axis");
-        dataSet2.setFill(true);
-        dataSet2.setBorderColor("#f3f6f9");
-        //dataSet2.setTension(0.5);
-
-        data.addChartDataSet(dataSet);
-        data.addChartDataSet(dataSet2);
-
-        List<String> labels = new ArrayList<>();
-        labels.add("Jour 1");
-        labels.add("Jour 2");
-        labels.add("Jour 3");
-        labels.add("Jour 4");
-        labels.add("Jour 5");
-        labels.add("Jour 6");
-        data.setLabels(labels);
-        cartesianLinerModel.setData(data);
-
-        //Options
-        LineChartOptions options = new LineChartOptions();
-        CartesianScales cScales = new CartesianScales();
-        CartesianLinearAxes linearAxes = new CartesianLinearAxes();
-        linearAxes.setId("left-y-axis");
-        linearAxes.setPosition("left");
-        CartesianLinearAxes linearAxes2 = new CartesianLinearAxes();
-        linearAxes2.setId("right-y-axis");
-        linearAxes2.setPosition("right");
-
-        cScales.addYAxesData(linearAxes);
-        cScales.addYAxesData(linearAxes2);
-        options.setScales(cScales);
-
-        Title title = new Title();
-        title.setDisplay(true);
-        title.setText("Température et densité (fermentation)");
-        options.setTitle(title);
-
-        cartesianLinerModel.setOptions(options);
-    }
 	
 	
+	
+	
+	
+	
+	public ContainerDetailForm getContainerDetailForm() {
+		return containerDetailForm;
+	}
+
+	public void setContainerDetailForm(ContainerDetailForm measureForm) {
+		this.containerDetailForm = measureForm;
+	}
+
 	public List<ContainerTemplate> getContainerTemplates(){
 		return containerService.getContainerTemplates(context);
 	}
@@ -585,6 +527,9 @@ public class CaveModule extends AbstractModule{
 
 	public void setCurrentTank(Tank currentTank) {
 		this.currentTank = currentTank;
+		this.containerDetailForm.clear();
+		this.containerDetailForm.setCurrentTank(currentTank);
+		
 	}	
 
 
@@ -734,13 +679,7 @@ public class CaveModule extends AbstractModule{
 		this.showCodes = !this.showCodes;
 	}
 
-	public LineChartModel getCartesianLinerModel() {
-		return cartesianLinerModel;
-	}
-
-	public void setCartesianLinerModel(LineChartModel cartesianLinerModel) {
-		this.cartesianLinerModel = cartesianLinerModel;
-	}
+	
 
 	public int getContainerTemplateQuantity() {
 		return containerTemplateQuantity;

@@ -24,5 +24,16 @@ public class Constants {
 	}	
 	
 	
+	public static enum MEASURE_TYPE{
+		CONTENTS_DENSITY("Kg/m3"),
+		CONTENTS_TEMPERATURE("°C");
+		
+		public String unit;
+		
+		private MEASURE_TYPE(String unit) {
+			this.unit = unit;
+		}
+	}
+	
 	
 }

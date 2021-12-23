@@ -105,6 +105,10 @@ public class UserSession {
 	public AbstractModule getModule(String moduleName) {
 		return modules.get(moduleName);
 	}
+	
+	public <T extends AbstractModule> T getModule(String moduleName, Class<T> clazz) {
+		return clazz.cast(modules.get(moduleName));
+	}
 
 	public void setCurrentUser(User currentUser) {
 		this.currentUser = currentUser;

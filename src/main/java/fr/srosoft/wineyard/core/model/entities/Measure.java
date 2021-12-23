@@ -2,14 +2,17 @@ package fr.srosoft.wineyard.core.model.entities;
 
 import java.util.Date;
 
+import fr.srosoft.wineyard.utils.Constants.MEASURE_TYPE;
+
 @SuppressWarnings("serial")
 public class Measure  extends WineyardObject{
 	
+	private MEASURE_TYPE measureType;
 	private String name;
 	private Float value;
 	private String unit;
 	private String comment;
-	private Date measureDate;
+	private Date measureDate = new Date();
 	
 	public String getName() {
 		return name;
@@ -40,6 +43,12 @@ public class Measure  extends WineyardObject{
 	}
 	public void setMeasureDate(Date measureDate) {
 		this.measureDate = measureDate;
+	}
+	public MEASURE_TYPE getMeasureType() {
+		return measureType;
+	}
+	public void setMeasureType(MEASURE_TYPE measureType) {
+		this.measureType = measureType;
 	}
 
 }
