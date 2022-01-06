@@ -24,12 +24,17 @@
          		icon="pi pi-plus" style="font-size:1em; padding:5px"
          		actionListener="#{module.prepareContainerTemplate}" 
          		oncomplete="PF('containerTemplateForm').show()"
-         		update=":centerPanel:containerTemplateForm"/>
+         		update=":containerTemplateForm"
+         		process="@this"/>
         	<c:forEach var="template" items="#{module.getContainerTemplates()}">
         		<ui:param name="containerIcon" value="#{template.type=='tank' ? 'pi pi-tablet':'barrel'}"/>
         		 <p:menuitem id="menu_containerTemplate_#{template.id}" 
         		 	value="#{msg[template.type]} #{template.model} (#{msg[template.material]}) #{template.volume}#{template.unit}" 
         		 	icon="#{containerIcon}"  style="font-size:0.8em; padding:5px"
+        		 	actionListener="#{module.editContainerTemplate(template)}" 
+         			oncomplete="PF('containerTemplateForm').show()"
+         			process="@this"
+         			update=":containerTemplateForm"
         		 	/>
         	</c:forEach>
         </p:submenu>
@@ -70,82 +75,7 @@
 	</div>
 </div>
 
-<!-- SIDE BARS -->
 
-<p:sidebar widgetVar="containerTemplateForm" id="containerTemplateForm"
-		position="right" baseZIndex="20000" appendTo="@(Body)" dynamic="true"
-		fullScreen="false" >
-		<h3 style="font-weight: normal">Modèle de container</h3>
-		<ui:param name="template" value="#{module.currentContainerTemplate}"></ui:param>
-	<h:form>
-		<div class="ui-fluid p-formgrid p-grid">
-			
-			<div class="p-field p-col">
-				<label for="model">Modèle</label>
-				<p:inputText id="model"  value="#{template.model}" />
-			</div>
-			<div class="p-field p-col">
-				<label for="type">Type</label>
-				<p:selectOneMenu id="type" value="#{template.type}" styleClass="onWhiteBackground" appendTo="@(this)" >
-                    <f:selectItem itemLabel="Choisir un type de contenant" />
-                    <f:selectItem itemLabel="Cuve" itemValue="tank"/>                   
-                    <f:selectItem itemLabel="Fût bourguignon" itemValue="burgundyBarrel"/>   
-                    <f:selectItem itemLabel="Amphore" itemValue="amphora"/>               
-                </p:selectOneMenu>
-				<!-- <p:inputText id="type"  value="#{template.type}" /> -->
-			</div>
-			<div class="p-field p-col">
-				<label for="material">Matière</label>
-				<p:selectOneMenu id="material" value="#{template.material}" effect="fold" editable="true" appendTo="@(this)" styleClass="onWhiteBackground">
-                    <f:selectItem itemLabel="Choisir une matière" itemValue=""/>
-                    <f:selectItem itemLabel="#{msg['inox']}" itemValue="inox"/>
-                    <f:selectItem itemLabel="#{msg['cement']}" itemValue="cement"/> 
-                    <f:selectItem itemLabel="Email" itemValue="enamel"/> 
-                    <f:selectItem itemLabel="Chêne" itemValue="oak"/>                  
-                </p:selectOneMenu>
-				<!-- <p:inputText id="material"  value="#{template.material}" /> -->
-			</div>
-			<div class="p-field p-col">
-				<label for="volume">Volume</label>
-				<p:inputText id="volume"  value="#{template.volume}" />
-			</div>
-			<div class="p-field p-col">
-				<label for="unit">Unité</label>
-				<p:inputText id="unit"  value="#{template.unit}" />
-			</div>
-			<div class="p-field p-col">
-				<label for="supplier">Fournisseur</label>
-				<p:inputText id="supplier"  value="#{template.supplier}" />
-			</div>
-			
-			<div class="p-field p-col">
-				<label for="label">Libellé</label>
-				<p:inputText id="label"  value="#{template.label}" />
-			</div>
-			<div class="p-field p-col">
-				<label for="description">Description</label>
-				<p:inputText id="description"  value="#{template.description}" />
-			</div>
-			<div class="p-field p-col">
-				<label for="quantity">Quantité</label>
-				<p:inputText id="quantity"  value="#{module.containerTemplateQuantity}" />
-			</div>
-			
-		
-		</div>		
-		<p:commandButton value="Annuler"
-			oncomplete="PF('containerTemplateForm').hide()" 
-			icon="pi pi-times" immediate="true"/>
-		<p:commandButton value="Enregister"
-			actionListener="#{module.saveContainerTemplate}"
-			update=":centerPanel"
-			icon="pi pi-disk" 
-			process="@form"
-			partialSubmit="false" type="submit"
-			oncomplete="PF('containerTemplateForm').hide()" 
-			immediate="false"/>
-	</h:form>
-</p:sidebar>
 
 </ui:composition>
 </html>

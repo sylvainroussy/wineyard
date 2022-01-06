@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+
+
+<ui:composition>
+
+<ui:param name="caveModule" value="#{userSession.getModule('CaveModule')}" />
+
+
+
+<!-- SIDE BARS -->
+
+<p:sidebar widgetVar="containerTemplateForm" id="containerTemplateForm"
+		position="right" baseZIndex="20000" appendTo="@(Body)" dynamic="true"
+		fullScreen="false" >
+		<h3 style="font-weight: normal">Modèle de container</h3>
+		<ui:param name="template" value="#{caveModule.currentContainerTemplate}"></ui:param>
+	<h:form id="templateForm">
+		<div class="ui-fluid p-formgrid p-grid">
+			
+			<div class="p-field p-col">
+				<label for="model">Modèle</label>
+				<p:inputText id="model"  value="#{template.model}" />
+			</div>
+			<div class="p-field p-col">
+				<label for="type">Type</label>
+				<p:selectOneMenu id="type" value="#{template.type}" styleClass="onWhiteBackground" appendTo="@(this)" >
+                    <f:selectItem itemLabel="Choisir un type de contenant" />
+                    <f:selectItem itemLabel="Cuve" itemValue="tank"/>                   
+                    <f:selectItem itemLabel="Fût bourguignon" itemValue="burgundyBarrel"/>   
+                    <f:selectItem itemLabel="Amphore" itemValue="amphora"/>               
+                </p:selectOneMenu>
+				<!-- <p:inputText id="type"  value="#{template.type}" /> -->
+			</div>
+			<div class="p-field p-col">
+				<label for="material">Matière</label>
+				<p:selectOneMenu id="material" value="#{template.material}" editable="false" appendTo="@(this)" styleClass="onWhiteBackground">
+                    <f:selectItem itemLabel="Choisir une matière" itemValue=""/>
+                    <f:selectItem itemLabel="#{msg['inox']}" itemValue="inox"/>
+                    <f:selectItem itemLabel="#{msg['cement']}" itemValue="cement"/> 
+                    <f:selectItem itemLabel="Email" itemValue="enamel"/> 
+                    <f:selectItem itemLabel="Chêne" itemValue="oak"/>                  
+                </p:selectOneMenu>
+				<!-- <p:inputText id="material"  value="#{template.material}" /> -->
+			</div>
+			<div class="p-field p-col">
+				<label for="volume">Volume</label>
+				<p:inputText id="volume"  value="#{template.volume}" />
+			</div>
+			<div class="p-field p-col">
+				<label for="unit">Unité</label>
+				<p:inputText id="unit"  value="#{template.unit}" />
+			</div>
+			<div class="p-field p-col">
+				<label for="supplier">Fournisseur</label>
+				<p:inputText id="supplier"  value="#{template.supplier}" />
+			</div>
+			
+			<div class="p-field p-col">
+				<label for="label">Libellé</label>
+				<p:inputText id="label"  value="#{template.label}" />
+			</div>
+			<div class="p-field p-col">
+				<label for="description">Description</label>
+				<p:inputText id="description"  value="#{template.description}" />
+			</div>
+			<p:outputPanel rendered="#{template.id == null}">
+				<div class="p-field p-col">
+					<label for="quantity" >Quantité</label>
+					<p:inputText id="quantity"  value="#{caveModule.containerTemplateQuantity}" />
+				</div>
+			</p:outputPanel>
+		
+		</div>		
+		<p:separator />
+		
+		
+		<p:commandButton value="Enregister"
+			actionListener="#{caveModule.saveContainerTemplate}"
+			update=":centerPanel"
+			icon="pi pi-file" 
+			process="@form"
+			partialSubmit="false" type="submit"
+			oncomplete="PF('containerTemplateForm').hide()" 
+			immediate="false"/>
+		<p:spacer width="5px"/>
+		<p:commandButton value="Annuler"
+			oncomplete="PF('containerTemplateForm').hide()" 
+			icon="pi pi-times" immediate="true"/>
+	</h:form>
+</p:sidebar>
+
+</ui:composition>
+</html>
+

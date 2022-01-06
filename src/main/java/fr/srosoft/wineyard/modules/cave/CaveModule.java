@@ -503,6 +503,10 @@ public class CaveModule extends AbstractModule{
 		this.currentContainerTemplate = new ContainerTemplate();
 	}
 	
+	public void editContainerTemplate(ContainerTemplate template) {
+		this.currentContainerTemplate =template;
+	}
+	
 	
 	
 	public List<Tank> getTanks() {
