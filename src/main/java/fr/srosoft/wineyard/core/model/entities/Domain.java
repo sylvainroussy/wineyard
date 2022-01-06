@@ -22,7 +22,7 @@ public class Domain extends WineyardObject{
 	private String dataSource;
 	//@Deprecated
 	private List<Appellation> appellations;
-	private int surface;
+	private float surface;
 	
 	
 	public String getDomainName() {
@@ -109,10 +109,10 @@ public class Domain extends WineyardObject{
 		this.appellations.add(appellation);
 	}
 	
-	public int getSurface() {
+	public float getSurface() {
 		return surface;
 	}
-	public void setSurface(int surface) {
+	public void setSurface(float surface) {
 		this.surface = surface;
 	}
 	@Override
