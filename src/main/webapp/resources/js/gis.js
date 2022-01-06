@@ -123,12 +123,13 @@ function initGIS() {
 	});
 	
 	baseMaps = {
-		   // "osm": osm,
+		    
 		    // "relief": reliefLayer,
-		    //"topoMap":topoMap,
+		     "osm": osm,
+		    "topoMap":topoMap
 		    //"ign":OrthoIGN,
-		    "plan":PlanIGN,
-		    "cadastre":cadastreIGN
+		    //"plan":PlanIGN,
+		    //"cadastre":cadastreIGN
 		    //"topo":topoIGN
 		    
 		    // "landMap":landMap
@@ -156,7 +157,7 @@ function initGIS() {
 		baseMaps[key].addTo(map);  
 	}
 	
-	console.log(cadastreIGN);
+	//console.log(cadastreIGN);
 	gisInitialized = true;
 	  /*
 		 * legend = L.control({position: 'bottomright'}); legend.onAdd =
@@ -175,19 +176,23 @@ function initGIS() {
   
 }
 
-function addDomain(lat,long,domain){
-	L.marker([lat, long]).addTo(map)
-    .bindPopup(domain.domainName)
-    .openPopup();
+function addDomain(lat,long,domain, isPopupOpen){
+	var marker = L.marker([lat, long]).addTo(map)
+    .bindPopup(domain.domainName);
+	
+	if (isPopupOpen){
+		marker.openPopup();
+	}
+    
 }
 
-function addDomains(arrayOfDomain){
+function addDomains(arrayOfDomain,isPopupOpen){
 	if (arrayOfDomain){
 		
 		for (i=0 ; i < arrayOfDomain.length ; i++){		
 			var coords = arrayOfDomain[i].coords;
 			if (coords){
-				addDomain(coords[0],coords[1],{domainName:arrayOfDomain[i].domainName});
+				addDomain(coords[0],coords[1],{domainName:arrayOfDomain[i].domainName}, isPopupOpen);
 			}
 		}
 	}
@@ -423,7 +428,8 @@ function buildJsonLayer(datone, color){
 		+"<br/> Commune (old) : "+layer.feature.properties.old_nomcom 
 		+"<br/> Crinao : "+layer.feature.properties.crinao 
 		+"<br/> Description : "+layer.feature.properties.description 
-		+"<br/> <input type='button' onClick='addToDomain2([{name:\"featureId\",value:\""+layer.feature.properties.levelId+"\"}])' value='ajouter au domaine' />" 
+		+"<br/> <input type='button' onClick='addToDomain2([{name:\"featureId\",value:\""+layer.feature.properties.levelId+"\"}])' value='ajouter au domaine' />"
+	
 		; } );
 	return jsonLayer;
 }

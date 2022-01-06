@@ -90,6 +90,7 @@ public class DomainModule extends AbstractModule{
 	public void addToCurrentDomain() {
 		 String featureId = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("featureId");
 		 vineyardService.registerParcelToDomain(featureId, this.currentDomain.getId());
+		 this.context.setCurrentPage("VineyardModule");
 		 
 	}
 

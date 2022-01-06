@@ -18,7 +18,7 @@
 			Situation géographique
 		</f:facet>		
 		
-			<p:remoteCommand name="rc2" onsuccess="initGIS();addDomains(#{userSession.getModule('DomainModule').getJsonManagedDomains()});" autoRun="true" />
+			<p:remoteCommand name="rc2" onsuccess="initGIS();addDomains(#{userSession.getModule('DomainModule').getJsonManagedDomains()},false);" autoRun="true" />
 				
 		
 		<div id='map' >MAP HERE</div>
