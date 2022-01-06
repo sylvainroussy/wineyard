@@ -6,13 +6,13 @@ import java.io.Serializable;
 public class Blend implements Serializable{
 	private String id;
 	private Grape grape;
-	private float proportion;
+	private int proportion;
 	
 	
-	public float getProportion() {
+	public int getProportion() {
 		return proportion;
 	}
-	public void setProportion(float proportion) {
+	public void setProportion(int proportion) {
 		this.proportion = proportion;
 	}
 	public Grape getGrape() {

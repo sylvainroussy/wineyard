@@ -37,7 +37,7 @@
 	          	actionListener="#{module.openAppellation(appellation)}" 
 	          	oncomplete="PF('openAppellation').show()"
 	          	style="font-size:0.8em; padding:5px"
-	          	update="openAppellation">#{appellation.appellation}<p:divider style="margin:0px;padding:0px" rendered="#{appellation.label != null and appellation.label.trim() !=''}"/>#{appellation.label}</p:menuitem>
+	          	update=":openAppellation">#{appellation.appellation}<p:divider style="margin:0px;padding:0px" rendered="#{appellation.label != null and appellation.label.trim() !=''}"/>#{appellation.label}</p:menuitem>
 	         
 	        </c:forEach>
         </p:submenu>
@@ -60,104 +60,7 @@
 </div>
 
 
-<!-- SIDE BARS -->
-<p:sidebar widgetVar="openAppellation" id="openAppellation"
-		position="right" baseZIndex="0" appendTo="@(Body)" 
-		dynamic="true"
-		showCloseIcon="true"
-		fullScreen="false" >
-		<h2 style="font-weight: normal">Appellation</h2>
-		<h2 style="font-weight: normal">#{module.currentAppellation.appellation}</h2>
-		
-	<h:form>
-		<div class="ui-fluid p-formgrid p-grid">
-			<div class="p-field p-col">
-				<label for="appellation">Appellation</label>
-				<p:inputText id="appellation"  value="#{module.currentAppellation.appellation}" />
-				<br/>
-			</div>
-			<div class="p-field p-col">
-				<label for="appellationLabel">Label spécifique</label>
-				<p:inputText id="appellationLabel"  value="#{module.currentAppellation.label}" placeholder="Générique"/>
-				<br/>
-			</div>
-			<div class="p-field p-col">
-				<label for="appellationColor">Couleur du vin</label>
-				 <p:selectOneMenu id="appellationColor" value="#{module.currentAppellation.wineColor}"  styleClass="onWhiteBackground">        
-				 	<f:selectItem itemLabel="Choisissez une couleur de vin"   />           
-                    <f:selectItem itemLabel="Blanc" itemValue="white"  />
-                    <f:selectItem itemLabel="Rouge" itemValue="red"/>
-                    <f:selectItem itemLabel="Rosé" itemValue="rose"/>
-                 </p:selectOneMenu>
-                 <br/>
-				
-			</div>
-			<div class="field col-12 md:col-12">
-						<label for="blends">Composition : </label>
-						
-						
-						
-							
-						<p:dataTable id="blends" value="#{module.currentAppellation.blends}"
-							var="blend">
-							<p:column headerText="Cépage">
-					        	#{blend.grape.commonName}					        	
-					        </p:column>
-							<p:column headerText="Proportion">
-								<p:inputText value="#{blend.proportion}" />
-							</p:column>
-							<!-- <p:column headerText="Actions">
-								<p:commandButton icon="pi pi-trash"
-									actionListener="#{module.removeDomain(linkedDomain)}" 
-									update="@form"
-									process="@this" />
-							</p:column> -->
-						</p:dataTable>
-						
-						<p:autoComplete id="grapeSelection" multiple="true"
-							value="#{module.selectedGrapes}"
-							placeholder="Chercher un cépage"
-							completeMethod="#{module.searchGrapeContains}" dynamic="true"
-							converter="#{grapeConverter}" var="grape"
-							itemLabel="#{grape.commonName}"
-							itemValue="#{grape}" forceSelection="false" 							
-							maxResults="10"
-							minQueryLength="3">
-							<p:ajax event="itemSelect" ignoreAutoUpdate="true" listener="#{module.handleSelectGrape}" update="blends"/>  
-							<p:column>         
-               					#{grape.commonName}
-            				</p:column>
 
-						</p:autoComplete>
-
-					</div>
-		</div>		
-		<p:commandButton value="Annuler"
-			icon="pi pi-times"
-			actionListener="#{module.cancelAppellation}"
-			partialSubmit="false" type="submit"
-			update=":centerPanel" 
-			oncomplete="PF('openAppellation').hide()"
-			immediate="true" />
-		<p:commandButton value="Enregister"
-			icon="pi pi-save"
-			actionListener="#{module.saveAppellation}"
-			update=":centerPanel" 
-			process="@form"
-			partialSubmit="false" type="submit"
-			oncomplete="PF('openAppellation').hide()" 
-			immediate="false"/>
-		<p:commandButton value="Dupliquer"
-			icon="pi pi-clone"
-			actionListener="#{module.duplicateAppellation}"
-			update=":centerPanel" 
-			process="@form"
-			partialSubmit="false" type="submit"
-			oncomplete="PF('openAppellation').hide()" 
-			immediate="false"/>	
-			
-	</h:form>
-</p:sidebar>
 
 </ui:composition>
 </html>

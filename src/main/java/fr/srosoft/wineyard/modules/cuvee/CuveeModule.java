@@ -178,7 +178,7 @@ public class CuveeModule extends AbstractModule{
 		if (alreadyPresent.isEmpty()) {
 			final Blend blend = new Blend();
 			blend.setGrape(grape);
-			blend.setProportion(0f);
+			blend.setProportion(0);
 			blend.setId(this.currentAppellation.getId()+"_"+grape.getId());
 			
 			this.currentAppellation.addBlend(blend);

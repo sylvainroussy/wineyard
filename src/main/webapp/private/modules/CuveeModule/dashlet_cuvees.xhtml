@@ -80,7 +80,7 @@
 				<div class="product-item-content">
 					<div class="p-mb-3">
 					<ui:repeat var="blend" value="#{summary.cuvee.appellation.blends}">
-						<p:tag icon="#{blend.grape.color}Grape" value="#{blend.grape.commonName} (#{(blend.proportion * 100).intValue()}%)"
+						<p:tag icon="#{blend.grape.color}Grape" value="#{blend.grape.commonName} (#{(blend.proportion)}%)"
 										styleClass="#{blend.grape.color}Wine" />
 					</ui:repeat>
 					</div>
