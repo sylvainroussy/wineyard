@@ -8,7 +8,7 @@
 
 	<h:body>
 		<ui:composition>
-
+			<ui:param name="gisModule" value="#{userSession.getModule('GISModule')}"></ui:param>
 			<h:form id="westForm">
 
 				<p:remoteCommand id="applyOnMap" name="applyOnMap"
@@ -17,7 +17,7 @@
 					oncomplete='removeDatum("#{gisView.currentFeature.id}");'></p:remoteCommand>
 				<p:tabView scrollable="true" >
 					<p:tab title="AOC" >
-						<p:tree id="aocTree" value="#{gisView.aocTree}" var="node" 
+						<p:tree id="aocTree" value="#{gisModule.aocTree}" var="node" 
 							dynamic="false" styleClass="treeClass min-h-full" highlight="false" filterBy="#{node}" 
 							selectionMode="checkbox" propagateSelectionDown="false" propagateSelectionUp="false" >
 							<p:ajax event="select" listener="#{gisView.onNodeSelect}"

@@ -3,7 +3,8 @@
 	xmlns:h="http://xmlns.jcp.org/jsf/html"
 	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:p="http://primefaces.org/ui">
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 <f:view>
 
 
@@ -142,6 +143,34 @@
 					
 					<p:inputText id="city" type="text"
 						value="#{currentDomain.city}" required="false" rendered="#{dashletMode == 'edit'}"/>
+						
+					
+				</div>
+				<div class="field col-12 md:col-12">
+					<label >Régions(s) viticole(s) : </label>
+					<p:spacer width="2px"/>
+					<p:outputPanel rendered="#{dashletMode == 'read'}">
+						<c:forEach items="#{module.dashletDomain.domainRegions}" var="region">
+							<p:outputLabel value="#{region.label}"  styleClass="font-medium"/>
+							<br/>
+						</c:forEach>
+					</p:outputPanel>
+				
+					<p:selectManyMenu id="advanced" value="#{currentDomain.regionIds}"
+                            rendered="#{dashletMode == 'edit'}"
+                          
+                            var="c" filter="true" filterMatchMode="contains" showCheckbox="true" styleClass="manymenu-advanced">
+			            <f:selectItems value="#{userSession.regions}" 
+			            				var="region" itemLabel="#{region.label}"
+			                            itemValue="#{region.id}"/>
+			
+			            		
+			            <p:column>
+			                <h:outputText value="#{c}"/>
+			            </p:column>
+			        </p:selectManyMenu>
+					
+					
 						
 					
 				</div>

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.srosoft.wineyard.core.model.entities.City;
+import fr.srosoft.wineyard.core.model.entities.Region;
 
 @Service
 public class GisDao extends AbstractDao{
@@ -69,6 +70,16 @@ RETURN geoNode
 			"WITH crinao, appellation, collect (DISTINCT denomination) AS denominations " + 
 			"WITH crinao, appellation AS appellations, denominations " + 
 			"RETURN DISTINCT crinao, appellations, denominations";
+	
+	
+	private static final String QUERY_CRINAO_BY_REGIONS ="UNWIND $regionIds AS regionId " + 
+			"WITH REPLACE(regionId,'_','-') AS regionId "+
+			"MATCH (props:PROPS) " +
+			"WHERE TOUPPER(props.crinao) CONTAINS regionId " + 
+			"WITH  props.crinao AS crinao, props.appellation AS appellation,props.denomination AS denomination  ORDER BY props.crinao,props.appelation,props.denomination " + 
+			"WITH crinao, appellation, collect (DISTINCT denomination) AS denominations " + 
+			"WITH crinao, appellation AS appellations, denominations " + 
+			"RETURN DISTINCT crinao, appellations, denominations";
 
 	private static final String QUERY_DENOMINATION ="MATCH (p:PROPS{denomination:$denomination}) "+PART_GEO_NODE;
 	private static final String QUERY_INSEE ="MATCH (p:PROPS{new_insee:$insee,denomination:$denomination}) "+PART_GEO_NODE;
@@ -92,6 +103,24 @@ RETURN geoNode
 	                	final Map<String,List<String>> crinaos = new HashMap<>();
 	                	final Result result = tx.run(QUERY_ALL_CRINAO, new HashMap<>());
 	                	result.forEachRemaining(r -> crinaos.put(r.get("crinao").asString(),r.get("appellations").asList(e -> e.toString())));
+	                	return crinaos;
+	                }
+	            } );
+	           
+	        }
+	}
+	
+	public Map<String,List<Map<String,List<String>>>> findCrinaosByRegionIds (List<String> regionIds){
+		 try ( Session session = neo4jDriver.session() )
+	        {
+	          return  session.readTransaction( new TransactionWork<Map<String,List<Map<String,List<String>>>>>()
+	            {
+	                @Override
+	                public Map<String,List<Map<String,List<String>>>> execute( Transaction tx )
+	                {
+	                	final Map<String,List<Map<String,List<String>>>> crinaos = new HashMap<>();
+	                	final Result result = tx.run(QUERY_CRINAO_BY_REGIONS, Map.of("regionIds",regionIds));
+	                	result.forEachRemaining(new DenominationsConsumer(crinaos));
 	                	return crinaos;
 	                }
 	            } );
@@ -225,6 +254,39 @@ RETURN geoNode
 	}
 	
 	
+	private static final String QUERY_CREATE_REGION="MERGE (region:Region{id:$id}) "
+			+ "SET region+=$patch "
+			+ "WITH $pcountry As pcountry, region "
+			+ "MERGE (country:Country{id:pcountry.id}) "
+			+ "ON CREATE SET country+=pcountry "
+			+ "MERGE (country)-[:HAS_REGION]->(region) ";
+	public void createRegion(Region region) {
+		final Map<String,Object> parameters = new HashMap<>();
+    	final Map<?,?> patch =  MAPPER.convertValue(region, Map.class);   
+    	
+    	parameters.put("id",region.getId());
+    	patch.remove("id");
+    	parameters.put("patch", patch);  
+    	
+    	Object country = patch.remove("country");
+    	parameters.put("pcountry", country);
+    	this.writeQuery(QUERY_CREATE_REGION, parameters);
+	}
 	
+	private static final String QUERY_FIND_REGIONS_BY_IDS="UNWIND $ids AS id "
+			+ "MATCH (region:Region{id:id}) "
+			+ "MATCH (country:Country)-[:HAS_REGION]->(region) "
+			+ "RETURN region{.*, country:country{.*}} AS region";
+	public List<Region> findRegionsByIds(List<String> regionIds) {
+		
+		return this.readMultipleQuery(QUERY_FIND_REGIONS_BY_IDS, Map.of("ids",regionIds), "region", Region.class);
+	}
+	
+	private static final String QUERY_FIND_REGIONS_BY_COUNTRY="MATCH (country:Country{id:$id})-[:HAS_REGION]->(region) "			
+			+ "RETURN region{.*, country:country{.*}} AS region ORDER BY region.label ASC";
+	public List<Region> findRegionsByCountryId(String countryId) {
+		
+		return this.readMultipleQuery(QUERY_FIND_REGIONS_BY_COUNTRY, Map.of("id",countryId), "region", Region.class);
+	}
 	
 }

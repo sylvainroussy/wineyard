@@ -20,9 +20,10 @@ public class Domain extends WineyardObject{
 	private String address;
 	private double[] coords = {0d,0d};
 	private String dataSource;
-	//@Deprecated
+	//@Deprecated ? not sure, needs to be check
 	private List<Appellation> appellations;
 	private float surface;
+	private List<String> regionIds  = new ArrayList<String>();
 	
 	
 	public String getDomainName() {
@@ -114,6 +115,12 @@ public class Domain extends WineyardObject{
 	}
 	public void setSurface(float surface) {
 		this.surface = surface;
+	}
+	public List<String> getRegionIds() {
+		return regionIds;
+	}
+	public void setRegionIds(List<String> regionCodes) {
+		this.regionIds = regionCodes;
 	}
 	@Override
 	public String toString() {

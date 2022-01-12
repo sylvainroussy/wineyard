@@ -4,6 +4,7 @@ package fr.srosoft.wineyard.core.model.entities;
 public class Barrel extends Container{
 
 	public String oldColor;
+	
 
 	public String getOldColor() {
 		return oldColor;
@@ -12,4 +13,6 @@ public class Barrel extends Container{
 	public void setOldColor(String oldColor) {
 		this.oldColor = oldColor;
 	}
+
+	
 }

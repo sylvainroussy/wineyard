@@ -18,7 +18,10 @@ import org.springframework.stereotype.Component;
 
 import fr.srosoft.wineyard.core.model.entities.Domain;
 import fr.srosoft.wineyard.core.model.entities.Millesime;
+import fr.srosoft.wineyard.core.model.entities.Region;
 import fr.srosoft.wineyard.core.model.entities.User;
+import fr.srosoft.wineyard.core.services.DirectoryService;
+import fr.srosoft.wineyard.core.services.GISService;
 import fr.srosoft.wineyard.modules.commons.AbstractModule;
 import fr.srosoft.wineyard.modules.commons.ModuleLoader;
 import fr.srosoft.wineyard.modules.cuvee.CuveeModule;
@@ -41,6 +44,12 @@ public class UserSession {
 
 	@Resource
 	private ModuleLoader loader;
+	
+	@Resource
+	private GISService gisService;
+	
+	@Resource
+	private DirectoryService directoryService;
 
 	private User currentUser;
 	private String currentPage = "home";
@@ -58,8 +67,9 @@ public class UserSession {
 	@PostConstruct
 	public void initCurrentUser() throws Exception {
 		currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
+		currentDomain  = directoryService.getDefaultDomain(currentUser.getId());
 		modules = loader.loadAllModules();
+	
 		modules.entrySet().forEach(e -> {
 			final ModuleBean bean = new ModuleBean();
 			final fr.srosoft.wineyard.modules.commons.Module moduleAnnotation = e.getValue().getClass().getAnnotation(fr.srosoft.wineyard.modules.commons.Module.class);
@@ -75,10 +85,10 @@ public class UserSession {
 			bean.setOrder(order);
 			moduleBeans.add(bean);
 		});
-
+		currentDomain = ((DomainModule) this.getModule("DomainModule")).getCurrentDomain();
 		Collections.sort(moduleBeans);
 
-		currentDomain = ((DomainModule) this.getModule("DomainModule")).getCurrentDomain();
+		
 
 		scheduler.init();
 	}
@@ -160,6 +170,10 @@ public class UserSession {
 
 	public void setCurrentMillesime(Millesime currentMillesime) {
 		this.currentMillesime = currentMillesime;
+	}
+	
+	public List<Region> getRegions(){
+		return gisService.findRegionsByCountryId("FR");
 	}
 
 	public String getLocale() {

@@ -1,5 +1,12 @@
 package fr.srosoft.wineyard.core.model.entities;
 
+import fr.srosoft.wineyard.utils.Constants.WARM_BARREL;
+
+/**
+ * General object for all container template types
+ * @author sroussy
+ *
+ */
 @SuppressWarnings("serial")
 public class ContainerTemplate extends WineyardObject{
 
@@ -22,6 +29,9 @@ public class ContainerTemplate extends WineyardObject{
 	private String unit;
 	
 	private String supplier;
+	
+	public WARM_BARREL warm;
+	public String woodType;
 
 	
 	public String getLabel() {
@@ -85,5 +95,13 @@ public class ContainerTemplate extends WineyardObject{
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public WARM_BARREL getWarm() {
+		return warm;
+	}
+
+	public void setWarm(WARM_BARREL warm) {
+		this.warm = warm;
 	}
 }

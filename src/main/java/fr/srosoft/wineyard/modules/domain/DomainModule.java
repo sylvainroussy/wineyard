@@ -47,7 +47,7 @@ public class DomainModule extends AbstractModule{
 	protected DirectoryService directoryService;
 	
 	@Resource
-	private GISService gisService;
+	protected GISService gisService;
 	
 	@Resource
 	private VineyardService vineyardService;
@@ -75,8 +75,8 @@ public class DomainModule extends AbstractModule{
 	public void loadData(UserSession context) {
 		super.loadData(context);
 		this.currentUser = context.getCurrentUser();
-		directoryService.getDomainsForUser(currentUser.getId());
-		currentDomain  = directoryService.getDefaultDomain(currentUser.getId());
+		//directoryService.getDomainsForUser(currentUser.getId());
+		this.currentDomain = context.getCurrentDomain();
 		
 		dashletDomain = new DashletDomain(this);
 		

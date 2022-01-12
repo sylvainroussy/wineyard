@@ -35,5 +35,11 @@ public class Constants {
 		}
 	}
 	
+	public static enum WARM_BARREL {
+		LIGHT,
+		MEDIUM,
+		HEAVY
+	}
+	
 	
 }

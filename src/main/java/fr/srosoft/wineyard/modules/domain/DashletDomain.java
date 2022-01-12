@@ -1,5 +1,8 @@
 package fr.srosoft.wineyard.modules.domain;
 
+import java.util.List;
+
+import fr.srosoft.wineyard.core.model.entities.Region;
 import fr.srosoft.wineyard.core.session.Dashlet;
 
 public class DashletDomain extends Dashlet<DomainModule>{
@@ -33,8 +36,15 @@ public class DashletDomain extends Dashlet<DomainModule>{
 	
 	public void saveDomain() {
 		module.directoryService.saveDomain(module.getCurrentDomain(), module.getContext());
+		module.gisService.evictFromRegionsDomainCache(module.getCurrentDomain().getId());
 		this.mode = MODE_READ;
 	}
+	
+	public List<Region> getDomainRegions (){
+		return module.gisService.findRegionsForCurrentDomain(module.getContext());
+	}
+	
+	
 	
 	
 	
